@@ -129,27 +129,37 @@ def equivalentPosynomial(p,uncertainSubsVars,m,coupled,dependentUncertainties):
 #        meanVector.append(mean)
 #        for j,var in enumerate(pUncertainVars):
 #            if var.key in monUncertainVars:
-#                perturbationMatrix[i].append(mean*p.exps[i].get(var.key)*scale[j])
+#                perturbationMatrix[i].append(p.exps[i].get(var.key)*scale[j])
 #            else:
 #                perturbationMatrix[i].append(0)
 #    return perturbationMatrix, meanVector
 
-def perturbationFunction(perturbationVector):
+def mergeMeshGrid(array,n):
+    if n == 1:
+        return [array]
+    else:
+        output = []
+        for i in xrange(len(array)):
+            output = output + mergeMeshGrid(array[i],n/(len(array) + 0.0))
+        return output 
+
+def perturbationFunction(perturbationVector,numberOfPoints = 2):
     dim = len(perturbationVector)
-    x = np.meshgrid(*[np.linspace(-1,1,4)]*dim)
-    output = 0
-    for i in len(perturbationVector):
-        output = output + perturbationVector[i]*np.exp(x[i])
+    x = np.meshgrid(*[np.linspace(-1,1,numberOfPoints)]*dim)
     result = []
     inputList = []
+    for i in xrange(numberOfPoints**dim):
+        inputList.append([])
     for i in xrange(dim):
+        temp = mergeMeshGrid(x[i],numberOfPoints**dim)
+        for j in xrange(numberOfPoints**dim):
+            inputList[j].append(temp[j])
+    for i in xrange(numberOfPoints**dim):
+        output = 1
         for j in xrange(dim):
-            for k in xrange(dim):
-                for l in xrange(dim):
-                    result.append(output[i][j][k][l])
-                    for m in xrange(len(perturbationVector)):
-                        inputList.append([])
-                        inputList[m].append(x[m][i][j][k][l])
+            if perturbationVector[j] != 0:
+                output = output*perturbationVector[j]**inputList[i][j]
+        result.append(output)
     clf = linear_model.LinearRegression()
     clf.fit(inputList,result)
     return clf.coef_, clf.intercept_
@@ -159,6 +169,8 @@ def linearizePurturbations (p, uncertainVars):
     center = []
     scale = []
     meanVector = []
+    coeff = []
+    intercept = []
     for i in xrange(len(pUncertainVars)):
         pr = pUncertainVars[i].key.pr
         center.append(np.sqrt(1 - pr**2/10000.0))
@@ -174,10 +186,13 @@ def linearizePurturbations (p, uncertainVars):
         meanVector.append(mean)
         for j,var in enumerate(pUncertainVars):
             if var.key in monUncertainVars:
-                perturbationMatrix[i].append(mean*p.exps[i].get(var.key)*scale[j])
+                perturbationMatrix[i].append(np.exp(p.exps[i].get(var.key)*scale[j]))
             else:
                 perturbationMatrix[i].append(0)
-    return perturbationMatrix, meanVector
+        coeff.append([])
+        intercept.append([])
+        coeff[i],intercept[i] = perturbationFunction(perturbationMatrix[i])
+    return coeff, intercept, meanVector
 
 def noCoefficientMonomials (p, uncertainVars):
     monomials = []
@@ -186,14 +201,14 @@ def noCoefficientMonomials (p, uncertainVars):
     return monomials
 
 def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False):
-    perturbationMatrix, meanVector = linearizePurturbations (p, uncertainVars)
+    perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars)
     pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
     if not pUncertainVars:
         return [p <= 1]
     monomials = noCoefficientMonomials (p, uncertainVars)
     constraints = []
     s_main = Variable("s_%s"%(m))
-    constraints = constraints + [sum([a*b for a,b in zip(meanVector,monomials)]) + s_main**0.5 <= 1]
+    constraints = constraints + [sum([a*b for a,b in zip([a*b for a,b in zip(meanVector,intercept)],monomials)]) + s_main**0.5 <= 1]
     ss = []
     for i in xrange(len(perturbationMatrix[0])):
         positivePert = []
@@ -204,10 +219,10 @@ def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False):
         ss.append(s)
         for j in xrange(len(perturbationMatrix)):
             if perturbationMatrix[j][i] > 0:
-                positivePert.append(perturbationMatrix[j][i])
+                positivePert.append(meanVector[j]*perturbationMatrix[j][i])
                 positiveMonomials.append(monomials[j])
             elif perturbationMatrix[j][i] < 0:
-                negativePert.append(-perturbationMatrix[j][i])
+                negativePert.append(-meanVector[j]*perturbationMatrix[j][i])
                 negativeMonomials.append(monomials[j])
         if enableSP:
             with SignomialsEnabled():
@@ -218,6 +233,40 @@ def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False):
                                          + sum([a*b for a,b in zip(negativePert,negativeMonomials)])**2 <= s]
     constraints.append(sum(ss) <= s_main)
     return constraints
+
+#def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False):
+#    perturbationMatrix, meanVector = linearizePurturbations (p, uncertainVars)
+#    pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
+#    if not pUncertainVars:
+#        return [p <= 1]
+#    monomials = noCoefficientMonomials (p, uncertainVars)
+#    constraints = []
+#    s_main = Variable("s_%s"%(m))
+#    constraints = constraints + [sum([a*b for a,b in zip(meanVector,monomials)]) + s_main**0.5 <= 1]
+#    ss = []
+#    for i in xrange(len(perturbationMatrix[0])):
+#        positivePert = []
+#        negativePert = []
+#        positiveMonomials = []
+#        negativeMonomials = []
+#        s = Variable("s^%s_%s"%(i,m))
+#        ss.append(s)
+#        for j in xrange(len(perturbationMatrix)):
+#            if perturbationMatrix[j][i] > 0:
+#                positivePert.append(meanVector[j]*perturbationMatrix[j][i])
+#                positiveMonomials.append(monomials[j])
+#            elif perturbationMatrix[j][i] < 0:
+#                negativePert.append(-meanVector[j]*perturbationMatrix[j][i])
+#                negativeMonomials.append(monomials[j])
+#        if enableSP:
+#            with SignomialsEnabled():
+#                constraints = constraints + [(sum([a*b for a,b in zip(positivePert,positiveMonomials)]) 
+#                                             - sum([a*b for a,b in zip(negativePert,negativeMonomials)]))**2 <= s]
+#        else:       
+#            constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])**2
+#                                         + sum([a*b for a,b in zip(negativePert,negativeMonomials)])**2 <= s]
+#    constraints.append(sum(ss) <= s_main)
+#    return constraints
 
 def safePosynomialBoxUncertainty(p, uncertainVars, m, enableSP = False):
     perturbationMatrix, meanVector = linearizePurturbations (p, uncertainVars)

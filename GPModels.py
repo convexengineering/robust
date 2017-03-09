@@ -61,8 +61,9 @@ def testModel():
 
     a = Variable('a', 1, pr = 10)
     b = Variable('b', 1, pr = 10)
+    
     constraints = [a*x + b*y <= 1]
-    return Model((x*y)**-1, constraints, khara = 1)
+    return Model((x*y)**-1, constraints)
 
 def exampleSP():
     x = Variable('x')
