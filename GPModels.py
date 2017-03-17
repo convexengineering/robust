@@ -1,5 +1,7 @@
-from gpkit import Variable, Model, SignomialsEnabled
+from gpkit import Variable, Model, SignomialsEnabled,VarKey
 import numpy as np
+import sys
+sys.path.insert(0, '/home/saab/gas_solar_trade/gassolar/solar/')
 
 def simpleWing():
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
@@ -72,6 +74,22 @@ def exampleSP():
     with SignomialsEnabled():
         constraints = constraints +  [x >= 1-y, y <= 0.1]
     return  Model(x, constraints)
+
+def MikeSolarModel():
+    import solar as solarMike
+    model = solarMike.Mission(latitude=25)
+    uncertainVarDic = {'h_{batt}':[200,200]}
+    keys = uncertainVarDic.keys()
+    for i in xrange(len(uncertainVarDic)):
+        copy_key = VarKey(**model[keys[i]].key.descr)
+        print(copy_key)
+        print(Variable(**model[keys[i]].key.descr))
+        limits = uncertainVarDic.get(keys[i])
+        value = sum(limits)/2
+        copy_key.descr["value"] = sum(limits)/2
+        copy_key.descr["pr"] = ((value - limits[0])/value)*100
+        model.subinplace({VarKey(**model[keys[i]].key.descr):copy_key})
+    return model
 
 def solveModel(model,*args):
     initialGuess = {}

@@ -40,11 +40,11 @@ def twoTermBoydModel(model):
         constraints.append(TTA.twoTermExpApproximationBoyd(p,i))
     return Model(model.cost,constraints)
     
-def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainties = False, twoTerm = True):
+def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainties = False, twoTerm = True, linearizeTwoTerm = True):
     dataConstraints = []
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
-    if dependentUncertainties == False and coupled == True and twoTerm == True:
+    if (dependentUncertainties == False and coupled == True and twoTerm) or twoTerm == True:
         safeModel, numberOfNoDataConstraints = twoTermModel(model,dependentUncertainties)
     else:
         safeModel, numberOfNoDataConstraints = equivalentModel(model,dependentUncertainties,coupled)
@@ -53,7 +53,7 @@ def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainti
             noDataConstraintsUpper = noDataConstraintsUpper + [p <= 1]
             noDataConstraintsLower = noDataConstraintsLower + [p <= 1]            
         else:
-            if len(p.exps) == 2:
+            if len(p.exps) == 2 and linearizeTwoTerm:
                 noDataUpper, noDataLower, data = LTTP.linearizeTwoTermExp(p, i, r, tol)
                 noDataConstraintsUpper = noDataConstraintsUpper + noDataUpper
                 noDataConstraintsLower = noDataConstraintsLower + noDataLower
