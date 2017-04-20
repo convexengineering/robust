@@ -8,16 +8,28 @@ def uncertainModelVariables(model):
     uncertainVars = [var for var in subsVars if var.key.pr != None]
     return uncertainVars
 
-def equivalentModel(model, dependentUncertainties, coupled = True):
+def sameModel(model):
+    constraints = []
+    for i, p in enumerate(model.as_posyslt1()):
+        constraints.append(p<=1)
+        output = Model(model.cost,constraints)
+        output.substitutions.update(model.substitutions)
+    return output
+    
+def equivalentModel(model, dependentUncertainties = False, coupled = True):
     dataConstraints = []
     noDataConstraints = []
     uncertainVars = uncertainModelVariables(model)
+    #print(uncertainVars)
     for i, p in enumerate(model.as_posyslt1()):
+        #print(p)
         (noData, data) = EP.equivalentPosynomial(p,uncertainVars,i,coupled,dependentUncertainties)
         dataConstraints = dataConstraints + data
         noDataConstraints = noDataConstraints + noData
     numberOfNoDataConstraints = len(noDataConstraints)
-    return Model(model.cost,[noDataConstraints, dataConstraints]), numberOfNoDataConstraints
+    output = Model(model.cost,[noDataConstraints, dataConstraints])
+    output.substitutions.update(model.substitutions)
+    return output, numberOfNoDataConstraints
     
 def twoTermModel(model,dependentUncertainties):
     equiModel, numberOfNoDataConstraints = equivalentModel(model,dependentUncertainties,True)

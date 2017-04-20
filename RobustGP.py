@@ -46,10 +46,14 @@ def constructRobustMonomailCoeffiecientsRhombalUncertainty(expsOfUncertainVars, 
     for i in xrange(expsOfUncertainVars.shape[0]):
         twoNorm = []
         centering = 0
+        numberOfUncertainPars = 0
         for j in range(expsOfUncertainVars.shape[1]):
             twoNorm.append(np.abs(b_purt[i][j]))
+            if b_purt[i][j] != 0:
+                numberOfUncertainPars = numberOfUncertainPars + 1
             centering = centering + expsOfUncertainVars[i][j] * centeringVector[j]
-        coefficient.append([np.exp(max(twoNorm))/np.exp(centering)])
+        print(numberOfUncertainPars)
+        coefficient.append([np.exp(np.sqrt(numberOfUncertainPars)*max(twoNorm))/np.exp(centering)])
     return coefficient
     
 def robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
@@ -252,7 +256,7 @@ def robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoint
     return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
 
 def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 2, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
-    r = 2
+    r = 19
     error = 1
     sol = 0
     while r <= 20 and error > 0.01:

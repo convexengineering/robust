@@ -99,13 +99,14 @@ def equivalentPosynomial(p,uncertainSubsVars,m,coupled,dependentUncertainties):
             ts.append(t)
             dataConstraints = dataConstraints +[Monomial(p.exps[i],p.cs[i]) <= t]
     for i in xrange(len(coupledPartitions)):
-        posynomial = 0
-        t = Variable('t_%s^%s'%(m,superScript))
-        superScript = superScript + 1
-        ts.append(t)
-        for j in coupledPartitions[i]:
-            posynomial = posynomial + Monomial(p.exps[j],p.cs[j])
-        dataConstraints = dataConstraints + [posynomial <= t]
+        if coupledPartitions[i]:
+            posynomial = 0
+            t = Variable('t_%s^%s'%(m,superScript))
+            superScript = superScript + 1
+            ts.append(t)
+            for j in coupledPartitions[i]:
+                posynomial = posynomial + Monomial(p.exps[j],p.cs[j])
+            dataConstraints = dataConstraints + [posynomial <= t]
     noDataConstraint = noDataConstraint + [sum(ts) <= 1]
     return noDataConstraint, dataConstraints
 
@@ -210,6 +211,8 @@ def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, n
     s_main = Variable("s_%s"%(m))
     constraints = constraints + [sum([a*b for a,b in zip([a*b for a,b in zip(meanVector,intercept)],monomials)]) + s_main**0.5 <= 1]
     ss = []
+    #print(perturbationMatrix)
+    #print(meanVector)
     for i in xrange(len(perturbationMatrix[0])):
         positivePert = []
         negativePert = []
@@ -226,9 +229,11 @@ def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, n
                 negativeMonomials.append(monomials[j])
         if enableSP:
             with SignomialsEnabled():
+                #print(positivePert)
+                #print(negativePert)
                 constraints = constraints + [(sum([a*b for a,b in zip(positivePert,positiveMonomials)]) 
                                              - sum([a*b for a,b in zip(negativePert,negativeMonomials)]))**2 <= s]
-        else:       
+        else:
             constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])**2
                                          + sum([a*b for a,b in zip(negativePert,negativeMonomials)])**2 <= s]
     constraints.append(sum(ss) <= s_main)
