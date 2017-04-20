@@ -145,7 +145,7 @@ def MikeSolarModel():
         value = sum(limits)/2.0
         copy_key.descr["value"] = sum(limits)/2
         copy_key.descr["pr"] = ((value - limits[0])/(value + 0.0))*100
-        model.subinplace({model[keys[i]]:copy_key})
+        model.subinplace({model[keys[i]].key:copy_key})
     return model
 
 def solveModel(model,*args):
