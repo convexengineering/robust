@@ -19,6 +19,8 @@ def simpleWing():
     CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
     toz = Variable("toz",1,"-",pr = 15)
+    TSFC = Variable("TSFC",0.6, "1/hr", "thrust specific fuel consumption")
+    Range = Variable("Range", 3000, "km", "aircraft range")
     
     # Free Variables
     D = Variable("D", "N", "total drag force")
@@ -31,7 +33,9 @@ def simpleWing():
     C_L = Variable("C_L", "-", "Lift coefficent of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
-    
+    W_f = Variable("W_f", "N", "fuel weight")
+    T_flight = Variable("T_{flight}", "hr", "flight time")
+
     constraints = []
     
     # Drag model
@@ -48,10 +52,12 @@ def simpleWing():
     # and the rest of the models
     constraints += [D >= 0.5*rho*S*C_D*V**2,
                     Re <= (rho/mu)*V*(S/A)**0.5,
-                          C_f >= 0.074/Re**0.2,
-                          W <= 0.5*rho*S*C_L*V**2,
-                          W <= 0.5*rho*S*C_Lmax*V_min**2,
-                          W >= W_0 + W_w]
+                    C_f >= 0.074/Re**0.2,
+                    T_flight == Range/V,
+                    W_0 + W_w + 0.5*W_f <= 0.5*rho*S*C_L*V**2,
+                    W <= 0.5*rho*S*C_Lmax*V_min**2,
+                    W >= W_0 + W_w + W_f,
+                    W_f >= TSFC*T_flight*D]
     
     return Model(D, constraints)
 
