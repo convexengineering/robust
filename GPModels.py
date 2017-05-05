@@ -3,11 +3,13 @@ import numpy as np
 import sys
 
 def simpleWing():
+    g = Variable("g", 9.81, "m/s^2", "gravitational acceleration")
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
     e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
     #pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
+    rho_f = Variable("\\rho_f", 817, "kg/m^3", "density of fuel")
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=33.333333)
     N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=33.333333)
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
@@ -35,6 +37,7 @@ def simpleWing():
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
     W_f = Variable("W_f", "N", "fuel weight")
+    V_f = Variable("V_f", "m^3", "fuel volume")
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
     constraints = []
@@ -58,6 +61,7 @@ def simpleWing():
                     W_0 + W_w + 0.5*W_f <= 0.5*rho*S*C_L*V**2,
                     W <= 0.5*rho*S*C_Lmax*V_min**2,
                     W >= W_0 + W_w + W_f,
+                    V_f == W_f/g/rho_f,
                     W_f >= TSFC*T_flight*D]
     
     return Model(D, constraints)
