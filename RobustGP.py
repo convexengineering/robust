@@ -46,14 +46,18 @@ def constructRobustMonomailCoeffiecientsRhombalUncertainty(expsOfUncertainVars, 
     for i in xrange(expsOfUncertainVars.shape[0]):
         twoNorm = []
         centering = 0
+        numberOfUncertainPars = 0
         for j in range(expsOfUncertainVars.shape[1]):
             twoNorm.append(np.abs(b_purt[i][j]))
+            if b_purt[i][j] != 0:
+                numberOfUncertainPars = numberOfUncertainPars + 1
             centering = centering + expsOfUncertainVars[i][j] * centeringVector[j]
-        coefficient.append([np.exp(max(twoNorm))/np.exp(centering)])
+        print(numberOfUncertainPars)
+        coefficient.append([np.exp(np.sqrt(numberOfUncertainPars)*max(twoNorm))/np.exp(centering)])
     return coefficient
     
-def robustModelBoxUncertaintyUpperLower(model,r,tol, coupled = True, enableSP = False):
-    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,twoTerm = not enableSP)
+def robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled, False, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
     dataConstraints = []
@@ -67,7 +71,7 @@ def robustModelBoxUncertaintyUpperLower(model,r,tol, coupled = True, enableSP = 
             noDataConstraintsLower = noDataConstraintsLower + [posynomialsLower[i] <= 1]
         else:
             if len(p.exps) > 1:
-                dataConstraints.append(EP.safePosynomialBoxUncertainty(p, uncertainVars, i, enableSP))
+                dataConstraints.append(EP.safePosynomialBoxUncertainty(p, uncertainVars, i, enableSP, numberOfRegressionPoints))
             else:
                 dataMonomails.append(p)
     uncertainVars = EM.uncertainModelVariables(model)
@@ -79,12 +83,12 @@ def robustModelBoxUncertaintyUpperLower(model,r,tol, coupled = True, enableSP = 
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
     return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
 
-def robustModelBoxUncertainty(model, tol=0.001, coupled = True, enableSP = False):
+def robustModelBoxUncertainty(model, tol=0.001, numberOfRegressionPoints = 3, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
     r = 2
     error = 1
     sol = 0
     while r <= 20 and error > 0.01:
-        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r,tol, coupled, False)
+        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled, twoTerm, linearizeTwoTerm, False)
         solUpper = modelUpper.solve(verbosity = 0)
         solLower = modelLower.solve(verbosity = 0)
         try:
@@ -95,7 +99,7 @@ def robustModelBoxUncertainty(model, tol=0.001, coupled = True, enableSP = False
         sol = solUpper
     initialGuess = sol.get("variables")
     if enableSP:
-        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r-1,tol, coupled, True)
+        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled, False, linearizeTwoTerm, True)
         subsVars = modelUpper.substitutions.keys()
         for i in xrange(len(subsVars)):
             del initialGuess[subsVars[i].key]
@@ -175,8 +179,8 @@ def boydRobustModelEllipticalUncertainty(model, tol=0.001):
         r = r + 1
     return modelUpper,r   
     
-def robustModelEllipticalUncertaintyUpperLower(model,r,tol,coupled = True,dependentUncertainties = True, enableSP = False):
-    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties)
+def robustModelEllipticalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
+    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
     dataConstraints = []
@@ -190,7 +194,7 @@ def robustModelEllipticalUncertaintyUpperLower(model,r,tol,coupled = True,depend
             noDataConstraintsLower = noDataConstraintsLower + [posynomialsLower[i] <= 1]
         else:
             if len(p.exps) > 1:
-                dataConstraints.append(EP.safePosynomialEllipticalUncertainty(p, uncertainVars, i, enableSP))
+                dataConstraints.append(EP.safePosynomialEllipticalUncertainty(p, uncertainVars, i, enableSP,numberOfRegressionPoints))
             else:
                 dataMonomails.append(p)
     uncertainVars = EM.uncertainModelVariables(model)
@@ -202,12 +206,12 @@ def robustModelEllipticalUncertaintyUpperLower(model,r,tol,coupled = True,depend
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
     return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
 
-def robustModelEllipticalUncertainty(model, tol=0.001, coupled = True,dependentUncertainties = True, enableSP = False):
+def robustModelEllipticalUncertainty(model,tol = 0.001,numberOfRegressionPoints = 3 ,coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
     r = 2
     error = 1
     sol = 0
     while r <= 20 and error > 0.01:
-        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r,tol, coupled,dependentUncertainties, False)
+        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled,dependentUncertainties, twoTerm, linearizeTwoTerm, False)
         solUpper = modelUpper.solve(verbosity = 0)
         solLower = modelLower.solve(verbosity = 0)
         try:
@@ -218,14 +222,14 @@ def robustModelEllipticalUncertainty(model, tol=0.001, coupled = True,dependentU
         sol = solUpper
     initialGuess = sol.get("variables")
     if enableSP:
-        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r-1,tol, coupled,dependentUncertainties, True)
+        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled,dependentUncertainties, False, linearizeTwoTerm, True)
         subsVars = modelUpper.substitutions.keys()
         for i in xrange(len(subsVars)):
             del initialGuess[subsVars[i].key]
     return modelUpper, initialGuess, r
     
-def robustModelRhombalUncertaintyUpperLower(model,r,tol,coupled = True,dependentUncertainties = True, enableSP = False):
-    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties)
+def robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+    simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
     dataConstraints = []
@@ -251,12 +255,12 @@ def robustModelRhombalUncertaintyUpperLower(model,r,tol,coupled = True,dependent
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
     return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
 
-def robustModelRhombalUncertainty(model, tol=0.001, coupled = True,dependentUncertainties = True, enableSP = False):
-    r = 2
+def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 2, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+    r = 19
     error = 1
     sol = 0
     while r <= 20 and error > 0.01:
-        modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r,tol, coupled,dependentUncertainties, False)
+        modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled,dependentUncertainties, twoTerm, linearizeTwoTerm, False)
         solUpper = modelUpper.solve(verbosity = 0)
         solLower = modelLower.solve(verbosity = 0)
         try:
@@ -267,7 +271,7 @@ def robustModelRhombalUncertainty(model, tol=0.001, coupled = True,dependentUnce
         sol = solUpper
     initialGuess = sol.get("variables")
     if enableSP:
-        modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r-1,tol, coupled,dependentUncertainties, True)
+        modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled,dependentUncertainties, False, linearizeTwoTerm, True)
         subsVars = modelUpper.substitutions.keys()
         for i in xrange(len(subsVars)):
             del initialGuess[subsVars[i].key]

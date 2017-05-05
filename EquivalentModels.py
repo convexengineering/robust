@@ -8,16 +8,28 @@ def uncertainModelVariables(model):
     uncertainVars = [var for var in subsVars if var.key.pr != None]
     return uncertainVars
 
-def equivalentModel(model, dependentUncertainties, coupled = True):
+def sameModel(model):
+    constraints = []
+    for i, p in enumerate(model.as_posyslt1()):
+        constraints.append(p<=1)
+        output = Model(model.cost,constraints)
+        output.substitutions.update(model.substitutions)
+    return output
+    
+def equivalentModel(model, dependentUncertainties = False, coupled = True):
     dataConstraints = []
     noDataConstraints = []
     uncertainVars = uncertainModelVariables(model)
+    #print(uncertainVars)
     for i, p in enumerate(model.as_posyslt1()):
+        #print(p)
         (noData, data) = EP.equivalentPosynomial(p,uncertainVars,i,coupled,dependentUncertainties)
         dataConstraints = dataConstraints + data
         noDataConstraints = noDataConstraints + noData
     numberOfNoDataConstraints = len(noDataConstraints)
-    return Model(model.cost,[noDataConstraints, dataConstraints]), numberOfNoDataConstraints
+    output = Model(model.cost,[noDataConstraints, dataConstraints])
+    output.substitutions.update(model.substitutions)
+    return output, numberOfNoDataConstraints
     
 def twoTermModel(model,dependentUncertainties):
     equiModel, numberOfNoDataConstraints = equivalentModel(model,dependentUncertainties,True)
@@ -40,11 +52,11 @@ def twoTermBoydModel(model):
         constraints.append(TTA.twoTermExpApproximationBoyd(p,i))
     return Model(model.cost,constraints)
     
-def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainties = False, twoTerm = True):
+def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainties = False, twoTerm = True, linearizeTwoTerm = True):
     dataConstraints = []
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
-    if dependentUncertainties == False and coupled == True and twoTerm == True:
+    if (dependentUncertainties == False and coupled == True and twoTerm) or twoTerm == True:
         safeModel, numberOfNoDataConstraints = twoTermModel(model,dependentUncertainties)
     else:
         safeModel, numberOfNoDataConstraints = equivalentModel(model,dependentUncertainties,coupled)
@@ -53,7 +65,7 @@ def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainti
             noDataConstraintsUpper = noDataConstraintsUpper + [p <= 1]
             noDataConstraintsLower = noDataConstraintsLower + [p <= 1]            
         else:
-            if len(p.exps) == 2:
+            if len(p.exps) == 2 and linearizeTwoTerm:
                 noDataUpper, noDataLower, data = LTTP.linearizeTwoTermExp(p, i, r, tol)
                 noDataConstraintsUpper = noDataConstraintsUpper + noDataUpper
                 noDataConstraintsLower = noDataConstraintsLower + noDataLower
