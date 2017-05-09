@@ -4,7 +4,6 @@ import RobustGP as RGP
 import EquivalentModels as EM
 import copy
 
-
 def simpleWing():
     # Env. constants
     g = Variable("g", 9.81, "m/s^2", "gravitational acceleration")
@@ -62,16 +61,7 @@ def simpleWing():
     constraints += [W_w >= W_w_surf + W_w_strc]
 
     # and the rest of the models
-<<<<<<< HEAD
-    constraints += [D >= 0.5*rho*S*C_D*V**2,
-                    Re <= (rho/mu)*V*(S/A)**0.5,
-                          C_f >= 0.074/Re**0.2,
-                          W <= 0.5*rho*S*C_L*V**2,
-                          W <= 0.5*rho*S*C_Lmax*V_min**2,
-                          W >= W_0 + W_w]
-    #for key in subs.keys():
-        
-=======
+
     constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
                     Re <= (rho / mu) * V * (S / A) ** 0.5,
                     C_f >= 0.074 / Re ** 0.2,
@@ -82,7 +72,6 @@ def simpleWing():
                     V_f == W_f / g / rho_f,
                     W_f >= TSFC * T_flight * D]
 
->>>>>>> 82112aad9be405cf90471176acc152cc02092492
     return Model(D, constraints)
     # return Model(W_f, constraints)
     # return Model(W, constraints)
@@ -129,6 +118,7 @@ def simpleWingTwoDimensionalUncertainty():
     constraints += [C_D >= C_D_fuse / toz + C_D_wpar / toz + C_D_ind / toz]
 
     # Wing weight model
+    # W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
     W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
     W_w_surf = W_W_coeff2 * S
     constraints += [W_w >= W_w_surf + W_w_strc]
@@ -164,9 +154,11 @@ def testModel():
 def exampleSP():
     x = Variable('x')
     y = Variable('y')
+    a = Variable('a',1,pr = 10)
+    b = Variable('b',1, pr = 10)
     constraints = []
     with SignomialsEnabled():
-        constraints = constraints + [x >= 1 - y, y <= 0.1]
+        constraints = constraints + [x >= 1 - a*y, b*y <= 0.1]
     return Model(x, constraints)
 
 
