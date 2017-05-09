@@ -1,4 +1,4 @@
-from gpkit import Variable, Model, SignomialsEnabled, VarKey
+from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 import numpy as np
 import sys
 
@@ -25,7 +25,7 @@ def simpleWing():
 
     # Dimensional constants
     CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
-    Range = Variable("Range", 3000, "km", "aircraft range")
+    Range = Variable("Range",3000, "km", "aircraft range")
     toz = Variable("toz", 1, "-", pr=15)
     TSFC = Variable("TSFC", 0.6, "1/hr", "thrust specific fuel consumption")
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
@@ -71,7 +71,10 @@ def simpleWing():
                     W_f >= TSFC * T_flight * D]
 
     return Model(D, constraints)
-
+    # return Model(W_f, constraints)
+    # return Model(W, constraints)
+    # return Model(W_f*T_flight,constraints)
+    # return Model(W_f + 10*T_flight*units('N/min'),constraints)
 
 def simpleWingTwoDimensionalUncertainty():
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
