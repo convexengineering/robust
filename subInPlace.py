@@ -10,6 +10,7 @@ copy_a = VarKey(**testSubInPlace['a'].key.descr)
 copy_a.key.descr['value'] = 3
 copy_a.key.descr['something'] = 1  
 testSubInPlace.subinplace({testSubInPlace['a'].key:copy_a})
+testSubInPlace.substitutions[copy_a] = 3
 print('the substituted key is:')
 print(testSubInPlace['a'].key.descr)
 
