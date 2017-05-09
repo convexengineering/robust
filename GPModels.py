@@ -44,6 +44,7 @@ def simpleWing():
     W_w = Variable("W_w", "N", "wing weight")
     W_f = Variable("W_f", "N", "fuel weight")
     V_f = Variable("V_f", "m^3", "fuel volume")
+    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available")
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
     constraints = []
@@ -68,6 +69,7 @@ def simpleWing():
                     W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
                     W >= W_0 + W_w + W_f,
                     V_f == W_f / g / rho_f,
+                    V_f_avail**2 == .3026*S**3/A**2*tau**2,
                     W_f >= TSFC * T_flight * D]
 
     return Model(D, constraints)
