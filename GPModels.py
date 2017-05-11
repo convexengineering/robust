@@ -191,7 +191,7 @@ def solveModel(model, *args):
         sol = model.solve(verbosity=0)
     except:
         sol  = model.localsolve(verbosity=0,x0 = initialGuess)
-    #print (sol.summary())
+    print (sol.summary())
     return sol
     
 def evaluateRandomModel(oldModel,solutionBox, solutionEll):

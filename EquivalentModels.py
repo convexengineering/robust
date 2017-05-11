@@ -69,12 +69,13 @@ def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainti
             noDataConstraintsLower = noDataConstraintsLower + [p <= 1]            
         else:
             if len(p.exps) == 2 and linearizeTwoTerm:
-                uncertainSubsVars = uncertainModelVariables(model)                
+                uncertainSubsVars = uncertainModelVariables(model)
                 minVars = len(uncertainSubsVars)
                 maxVars = 0
                 pUncertainVars = []
                 for i in xrange(len(p.exps)):
-                    mUncertainVars = [var for var in p.exps[i].keys() if var in uncertainSubsVars]
+                    mUncertainVars = [var for var in p.exps[i].keys() \
+                                      if var in uncertainSubsVars]
                     minVars = min(minVars,len(mUncertainVars))
                     maxVars = max(maxVars,len(mUncertainVars))
                     for var in mUncertainVars:

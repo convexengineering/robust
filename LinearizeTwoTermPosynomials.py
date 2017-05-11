@@ -22,7 +22,7 @@ def iterateTwoTermExpLinearizationCoeff(r,eps):
         xNew = op.newton(intersectionPointFunc, xTangent + 1, args = (a[i],b[i],eps))
     return (a,b,xNew)
     
-def twoTermExpLinearizationCoeff(r, tol = 0.001):
+def twoTermExpLinearizationCoeff(r, tol):
     eps_min = 0
     eps_max = np.log(2)
     delta = 100
@@ -40,7 +40,7 @@ def twoTermExpLinearizationCoeff(r, tol = 0.001):
         delta = np.abs(xFinalActual - xFinalTheoritical)
     return (a,b,eps)
     
-def linearizeTwoTermExp(p, m, r, tol = 0.001):
+def linearizeTwoTermExp(p, m, r, tol):
     if len(p.exps) != 2:
         raise Exception('The Posynomial is not a two term posynomial')
     (a,b,eps) = twoTermExpLinearizationCoeff(r, tol = 0.001)
