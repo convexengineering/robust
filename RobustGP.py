@@ -5,9 +5,10 @@ from gpkit import  Model
 from gpkit import Variable, Monomial, SignomialsEnabled
 from sklearn import linear_model
 
-class UncertainCoefficientsModel(equivalentModel):
+
+class UncertainCoefficientsModel(EquivalentModel):
     """
-    Creates robust Models
+    Creates robust Models starting from a model with uncertain coefficients
     """
     def setup(self, gamma, type_of_uncertainty_set, r_min = 5, tol=0.001,
                  number_of_regression_points = 2, two_term = True,
@@ -72,21 +73,21 @@ class UncertainCoefficientsModel(equivalentModel):
                                              tol, number_of_regression_points,
                                              True, False, linearize_two_term,
                                              True)
-            subsVars = model_upper.substitutions.keys()
+            subs_vars = model_upper.substitutions.keys()
             
-            for i in xrange(len(subsVars)):
-                del initial_guess[subsVars[i].key]
+            for i in xrange(len(subs_vars)):
+                del initial_guess[subs_vars[i].key]
 
         return model_upper, initial_guess, r
 
 
     @staticmethod
-    def merge_mesh_grid(array,n):
+    def __merge_mesh_grid(array,n):
         """
-
-        :param array:
-        :param n:
-        :return:
+        A method used in perturbation_function method, allows easy computation of the output at the regression points
+        :param array: The multidimensional array we need to make simpler (1D)
+        :param n: The total number of interesting points
+        :return: The simplified array
         """
         if n == 1:
             return [array]
@@ -98,101 +99,144 @@ class UncertainCoefficientsModel(equivalentModel):
 
 
     @staticmethod
-    def perturbationFunction(perturbationVector,numberOfPoints):
-        dim = len(perturbationVector)
+    def perturbation_function(perturbation_vector,number_of_regression_points):
+        """
+        A method used to do the linear regression
+        :param perturbation_vector: A list representing the perturbation associated with each uncertain parameter
+        :param number_of_regression_points: The number of regression points per dimension
+        :return: the regression coefficients and intercept
+        """
+        dim = len(perturbation_vector)
         if dim != 1:
-            x = np.meshgrid(*[np.linspace(-1,1,numberOfPoints)]*dim)
+            x = np.meshgrid(*[np.linspace(-1,1,number_of_regression_points)]*dim)
         else:
-            x = [np.linspace(-1,1,numberOfPoints)]
-        result = []
-        inputList = []
-        for i in xrange(numberOfPoints**dim):
-            inputList.append([])
+            x = [np.linspace(-1,1,number_of_regression_points)]
+
+        result, input_list= [], []
+        for i in xrange(number_of_regression_points**dim):
+            input_list.append([])
+
         for i in xrange(dim):
-            temp = x[i].mergeMeshGrid(numberOfPoints**dim)
-            for j in xrange(numberOfPoints**dim):
-                inputList[j].append(temp[j])
-        for i in xrange(numberOfPoints**dim):
+            temp = UncertainCoefficientsModel.merge_mesh_grid(x[i],number_of_regression_points**dim)
+            for j in xrange(number_of_regression_points**dim):
+                input_list[j].append(temp[j])
+
+        for i in xrange(number_of_regression_points**dim):
             output = 1
             for j in xrange(dim):
-                if perturbationVector[j] != 0:
-                    output = output*perturbationVector[j]**inputList[i][j]
+                if perturbation_vector[j] != 0:
+                    output = output*perturbation_vector[j]**input_list[i][j]
             result.append(output)
+
         clf = linear_model.LinearRegression()
-        clf.fit(inputList,result)
+        clf.fit(input_list,result)
         return clf.coef_, clf.intercept_
 
-    @staticmethod
-    def linearizePurturbations (p, uncertainVars, numberOfPoints):
-        pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
-        center = []
-        scale = []
-        meanVector = []
-        coeff = []
-        intercept = []
-        for i in xrange(len(pUncertainVars)):
-            pr = pUncertainVars[i].key.pr
-            center.append(np.sqrt(1 - pr**2/10000.0))
-            scale.append(0.5*np.log((1 + pr/100.0)/(1 - pr/100.0)))
-        perturbationMatrix = []
-        for i in xrange(len(p.exps)):
-            perturbationMatrix.append([])
-            monUncertainVars = [var for var in pUncertainVars if var in p.exps[i]]
-            mean = 1
-            for j,var in enumerate(pUncertainVars):
-                if var.key in monUncertainVars:
-                    mean = mean*center[j]**(p.exps[i].get(var.key))
-            meanVector.append(mean)
-            for j,var in enumerate(pUncertainVars):
-                if var.key in monUncertainVars:
-                    perturbationMatrix[i].append(np.exp(p.exps[i].get(var.key)*scale[j]))
-                else:
-                    perturbationMatrix[i].append(0)
-                coeff.append([])
-                intercept.append([])
-                coeff[i],intercept[i] = perturbationMatrix[i].perturbationFunction(numberOfPoints)
-        return coeff, intercept, meanVector
 
     @staticmethod
-    def noCoefficientMonomials (p, uncertainVars):
+    def linearize_perturbations(p, p_uncertain_vars, number_of_regression_points):
+        """
+        A method used to linearize uncertain exponential functions
+        :param p: The posynomial containing uncertain parameters
+        :param p_uncertain_vars: the uncertain variables in the posynomial
+        :param number_of_regression_points: The number of regression points per dimension
+        :return: The linear regression of all the exponential functions, and the mean vector
+        """
+        center, scale = [], []
+        mean_vector = []
+        coeff, intercept = [],[]
+
+        for i in xrange(len(p_uncertain_vars)):
+            pr = p_uncertain_vars[i].key.pr
+            center.append(np.sqrt(1 - pr**2/10000.0))
+            scale.append(0.5*np.log((1 + pr/100.0)/(1 - pr/100.0)))
+
+        perturbation_matrix = []
+        for i in xrange(len(p.exps)):
+            perturbation_matrix.append([])
+            mon_uncertain_vars = [var for var in p_uncertain_vars if var in p.exps[i]]
+            mean = 1
+            for j,var in enumerate(p_uncertain_vars):
+                if var.key in mon_uncertain_vars:
+                    mean = mean*center[j]**(p.exps[i].get(var.key))
+                    perturbation_matrix[i].append(np.exp(p.exps[i].get(var.key)*scale[j]))
+                else:
+                    perturbation_matrix[i].append(0)
+                coeff.append([])
+                intercept.append([])
+                coeff[i],intercept[i] = UncertainCoefficientsModel.perturbation_function(perturbation_matrix[i], number_of_regression_points)
+            mean_vector.append(mean)
+
+        return coeff, intercept, mean_vector
+
+    @staticmethod
+    def no_coefficient_monomials (p):
         monomials = []
         for i in xrange(len(p.exps)):
             monomials.append(Monomial(p.exps[i],p.cs[i]))
         return monomials
 
+
     @staticmethod
-    def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 4):
-        perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars, numberOfPoints)
-        pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
-        if not pUncertainVars:
+    def generate_robust_constraints(type_of_uncertainty_set, monomials,
+                                                  perturbation_matrix, intercept, mean_vector, m):
+        if type_of_uncertainty_set == 'box':
+            pass
+
+    @staticmethod
+    def robustify_large_posynomial(p, type_of_uncertainty_set, uncertain_vars, m,
+                                   enable_sp, number_of_regression_points):
+        """
+        generate a safe approximation for large posynomials with uncertain coefficients
+        :param p: The posynomial containing uncertain parameters
+        :param type_of_uncertainty_set: 'box', elliptical, or 'one norm'
+        :param uncertain_vars: Model's uncertain variables
+        :param m: Index
+        :param enable_sp: choose whether an sp compatible model is okay
+        :param number_of_regression_points: number of regression points per dimension
+        :return: set of robust constraints
+        """
+        p_uncertain_vars = [var for var in p.varkeys if var in uncertain_vars]
+
+        perturbation_matrix, intercept, mean_vector = \
+            UncertainCoefficientsModel.\
+                linearize_perturbations(p, p_uncertain_vars, number_of_regression_points)
+
+        if not p_uncertain_vars:
             return [p <= 1]
-        monomials = noCoefficientMonomials (p, uncertainVars)
-        constraints = []
-        s_main = Variable("s_%s"%(m))
-        constraints = constraints + [sum([a*b for a,b in zip([a*b for a,b in zip(meanVector,intercept)],monomials)]) + s_main**0.5 <= 1]
+
+        monomials = UncertainCoefficientsModel.no_coefficient_monomials(p)
+        constraints = UncertainCoefficientsModel.generate_robust_constraints(type_of_uncertainty_set, monomials,
+                                                  perturbation_matrix, intercept, mean_vector, m)
+        """constraints = []
+
+        s_main = Variable("s_%s"%m)
+
+        constraints += [sum([a*b for a,b in zip([a*b for a,b in zip(mean_vector,intercept)],monomials)]) + s_main**0.5 <= 1]
+
         ss = []
-        for i in xrange(len(perturbationMatrix[0])):
+        for i in xrange(len(perturbation_matrix[0])):
             positivePert = []
             negativePert = []
             positiveMonomials = []
             negativeMonomials = []
-            s = Variable("s^%s_%s"%(i,m))
+           s = Variable("s^%s_%s"%(i,m))
             ss.append(s)
-            for j in xrange(len(perturbationMatrix)):
-                if perturbationMatrix[j][i] > 0:
-                    positivePert.append(meanVector[j]*perturbationMatrix[j][i])
+            for j in xrange(len(perturbation_matrix)):
+                if perturbation_matrix[j][i] > 0:
+                    positivePert.append(mean_vector[j]*perturbation_matrix[j][i])
                     positiveMonomials.append(monomials[j])
-                elif perturbationMatrix[j][i] < 0:
-                    negativePert.append(-meanVector[j]*perturbationMatrix[j][i])
+                elif perturbation_matrix[j][i] < 0:
+                    negativePert.append(-mean_vector[j]*perturbation_matrix[j][i])
                     negativeMonomials.append(monomials[j])
-            if enableSP:
+            if enable_sp:
                 with SignomialsEnabled():
-                    constraints = constraints + [(sum([a*b for a,b in zip(positivePert,positiveMonomials)]) 
+                    constraints = constraints + [(sum([a*b for a,b in zip(positivePert,positiveMonomials)])
                                              - sum([a*b for a,b in zip(negativePert,negativeMonomials)]))**2 <= s]
             else:
                 constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])**2
                                          + sum([a*b for a,b in zip(negativePert,negativeMonomials)])**2 <= s]
-        constraints.append(sum(ss) <= s_main)
+        constraints.append(sum(ss) <= s_main)"""
         return constraints
 
     
