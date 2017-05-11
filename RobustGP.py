@@ -16,7 +16,7 @@ def normalizePerturbationVector(uncertainVars):
     scalingVector = etaMax - centeringVector
     return centeringVector, scalingVector
 
-def constructRobustMonomailCoeffiecientsBoxUncertainty(RHS_Coeff_Uncertain, centeringVector, scalingVector):
+def constructRobustMonomailCoeffiecientsBoxUncertainty(RHS_Coeff_Uncertain, Gamma, centeringVector, scalingVector):
     b_purt = (RHS_Coeff_Uncertain * scalingVector[np.newaxis])       
     coefficient = []
     for i in xrange(RHS_Coeff_Uncertain.shape[0]):
@@ -25,10 +25,10 @@ def constructRobustMonomailCoeffiecientsBoxUncertainty(RHS_Coeff_Uncertain, cent
         for j in range(RHS_Coeff_Uncertain.shape[1]):
             oneNorm = oneNorm + np.abs(b_purt[i][j])
             centering = centering + RHS_Coeff_Uncertain[i][j] * centeringVector[j]
-        coefficient.append([np.exp(oneNorm)/np.exp(centering)])
+        coefficient.append([np.exp(Gamma*oneNorm)/np.exp(centering)])
     return coefficient
 
-def constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVars, centeringVector, scalingVector):
+def constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVars, Gamma, centeringVector, scalingVector):
     b_purt = (expsOfUncertainVars * scalingVector[np.newaxis])                  
     coefficient = []
     for i in xrange(expsOfUncertainVars.shape[0]):
@@ -37,7 +37,7 @@ def constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVar
         for j in range(expsOfUncertainVars.shape[1]):
             twoNorm = twoNorm + b_purt[i][j]**2
             centering = centering + expsOfUncertainVars[i][j] * centeringVector[j]
-        coefficient.append([np.exp(np.sqrt(twoNorm))/np.exp(centering)])
+        coefficient.append([np.exp(Gamma*np.sqrt(twoNorm))/np.exp(centering)])
     return coefficient
     
 def constructRobustMonomailCoeffiecientsRhombalUncertainty(expsOfUncertainVars, centeringVector, scalingVector):
@@ -52,11 +52,11 @@ def constructRobustMonomailCoeffiecientsRhombalUncertainty(expsOfUncertainVars, 
             if b_purt[i][j] != 0:
                 numberOfUncertainPars = numberOfUncertainPars + 1
             centering = centering + expsOfUncertainVars[i][j] * centeringVector[j]
-        print(numberOfUncertainPars)
+        #print(numberOfUncertainPars)
         coefficient.append([np.exp(np.sqrt(numberOfUncertainPars)*max(twoNorm))/np.exp(centering)])
     return coefficient
     
-def robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+def robustModelBoxUncertaintyUpperLower(model, Gamma,r,tol, numberOfRegressionPoints = 4, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
     simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled, False, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
@@ -66,6 +66,7 @@ def robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 
     posynomialsUpper = simplifiedModelUpper.as_posyslt1()
     posynomialsLower = simplifiedModelLower.as_posyslt1()
     for i,p in enumerate(posynomialsUpper):
+        #print(i)
         if i < numberOfNoDataConstraints:
             noDataConstraintsUpper = noDataConstraintsUpper + [p <= 1]
             noDataConstraintsLower = noDataConstraintsLower + [posynomialsLower[i] <= 1]
@@ -75,34 +76,53 @@ def robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 
             else:
                 dataMonomails.append(p)
     uncertainVars = EM.uncertainModelVariables(model)
+    #for i in xrange(len(uncertainVars)):
+        #print(uncertainVars[i].key.descr.get("name"))
     expsOfUncertainVars = uncertainVariablesExponents (dataMonomails, uncertainVars)
     if expsOfUncertainVars.size > 0:
         centeringVector, scalingVector = normalizePerturbationVector(uncertainVars)
-        coefficient = constructRobustMonomailCoeffiecientsBoxUncertainty(expsOfUncertainVars, centeringVector, scalingVector)
+        coefficient = constructRobustMonomailCoeffiecientsBoxUncertainty(expsOfUncertainVars, Gamma, centeringVector, scalingVector)
         for i in xrange(len(dataMonomails)):
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
-    return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputUpper = Model(model.cost, [noDataConstraintsUpper,dataConstraints])
+    outputUpper.substitutions.update(model.substitutions) 
+    outputLower = Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputLower.substitutions.update(model.substitutions) 
+    return outputUpper, outputLower
 
-def robustModelBoxUncertainty(model, tol=0.001, numberOfRegressionPoints = 3, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+def robustModelBoxUncertainty(model, Gamma, tol=0.001, numberOfRegressionPoints = 4, coupled = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
     r = 2
     error = 1
     sol = 0
+    flag = 0 
     while r <= 20 and error > 0.01:
-        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled, twoTerm, linearizeTwoTerm, False)
-        solUpper = modelUpper.solve(verbosity = 0)
-        solLower = modelLower.solve(verbosity = 0)
+        flag = 0
+        #print(r)
+        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model, Gamma,r,tol, numberOfRegressionPoints, coupled, twoTerm, linearizeTwoTerm, False)
         try:
-            error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            solUpper = modelUpper.solve(verbosity = 0)
+            sol = solUpper
         except:
-            error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
+            flag = 1
+        try:
+            solLower = modelLower.solve(verbosity = 0)
+        except:
+            print("infeasible")
+            r=20
+            sol = model.solve(verbosity = 0)
+            break
+        if flag != 1:    
+            try:
+                error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            except:
+                error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
         r = r + 1
-        sol = solUpper
     initialGuess = sol.get("variables")
-    if enableSP:
-        modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled, False, linearizeTwoTerm, True)
-        subsVars = modelUpper.substitutions.keys()
-        for i in xrange(len(subsVars)):
-            del initialGuess[subsVars[i].key]
+    #if enableSP:
+    #    modelUpper, modelLower = robustModelBoxUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled, False, linearizeTwoTerm, True)
+    #    subsVars = modelUpper.substitutions.keys()
+    #    for i in xrange(len(subsVars)):
+    #        del initialGuess[subsVars[i].key]
     return modelUpper, initialGuess, r
 
 def boydRobustModelBoxUncertaintyUpperLower(model,r=3,tol=0.001):
@@ -126,7 +146,11 @@ def boydRobustModelBoxUncertaintyUpperLower(model,r=3,tol=0.001):
         coefficient = constructRobustMonomailCoeffiecientsBoxUncertainty(expsOfUncertainVars, centeringVector, scalingVector)
         for i in xrange(len(dataMonomails)):
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
-    return Model(model.cost, [noDataConstraintsUpper, dataConstraints]), Model(model.cost, [noDataConstraintsLower, dataConstraints])
+    outputUpper = Model(model.cost, [noDataConstraintsUpper,dataConstraints])
+    outputUpper.substitutions.update(model.substitutions) 
+    outputLower = Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputLower.substitutions.update(model.substitutions) 
+    return outputUpper, outputLower
 
 def boydRobustModelBoxUncertainty(model, tol=0.001):
     r = 3
@@ -163,7 +187,11 @@ def boydRobustModelEllipticalUncertaintyUpperLower(model,r=3,tol=0.001):
         coefficient = constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVars, centeringVector, scalingVector)
         for i in xrange(len(dataMonomails)):
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
-    return Model(model.cost, [noDataConstraintsUpper, dataConstraints]), Model(model.cost, [noDataConstraintsLower, dataConstraints])
+    outputUpper = Model(model.cost, [noDataConstraintsUpper,dataConstraints])
+    outputUpper.substitutions.update(model.substitutions) 
+    outputLower = Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputLower.substitutions.update(model.substitutions) 
+    return outputUpper, outputLower
 
 def boydRobustModelEllipticalUncertainty(model, tol=0.001):
     r = 3
@@ -179,7 +207,7 @@ def boydRobustModelEllipticalUncertainty(model, tol=0.001):
         r = r + 1
     return modelUpper,r   
     
-def robustModelEllipticalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
+def robustModelEllipticalUncertaintyUpperLower(model, Gamma,r,tol, numberOfRegressionPoints = 4, coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
     simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
@@ -201,34 +229,52 @@ def robustModelEllipticalUncertaintyUpperLower(model,r,tol, numberOfRegressionPo
     expsOfUncertainVars = uncertainVariablesExponents (dataMonomails, uncertainVars)
     if expsOfUncertainVars.size > 0:
         centeringVector, scalingVector = normalizePerturbationVector(uncertainVars)
-        coefficient = constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVars, centeringVector, scalingVector)
+        coefficient = constructRobustMonomailCoeffiecientsEllipticalUncertainty(expsOfUncertainVars, Gamma, centeringVector, scalingVector)
         for i in xrange(len(dataMonomails)):
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
-    return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputUpper = Model(model.cost, [noDataConstraintsUpper,dataConstraints])
+    outputUpper.substitutions.update(model.substitutions) 
+    outputLower = Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputLower.substitutions.update(model.substitutions) 
+    return outputUpper, outputLower
 
-def robustModelEllipticalUncertainty(model,tol = 0.001,numberOfRegressionPoints = 3 ,coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
+def robustModelEllipticalUncertainty(model, Gamma,tol = 0.001,numberOfRegressionPoints = 4 ,coupled = True,dependentUncertainties = True, twoTerm = False, linearizeTwoTerm = True, enableSP = True):
     r = 2
     error = 1
     sol = 0
-    while r <= 20 and error > 0.01:
-        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled,dependentUncertainties, twoTerm, linearizeTwoTerm, False)
-        solUpper = modelUpper.solve(verbosity = 0)
-        solLower = modelLower.solve(verbosity = 0)
+    flag = 0 
+    while r <= 20 and error > 0.00001:
+        flag = 0
+        #print(r)
+        #print(error)
+        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model, Gamma,r,tol, numberOfRegressionPoints, coupled,dependentUncertainties, twoTerm, linearizeTwoTerm, False)
         try:
-            error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            solUpper = modelUpper.solve(verbosity = 0)
+            sol = solUpper
         except:
-            error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
+            flag = 1
+        try:
+            solLower = modelLower.solve(verbosity = 0)
+        except:
+            print("infeasible")
+            r=20
+            sol = model.solve(verbosity = 0)
+            break
+        if flag != 1:
+            try:
+                error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            except:
+                error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
         r = r + 1
-        sol = solUpper
     initialGuess = sol.get("variables")
-    if enableSP:
-        modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled,dependentUncertainties, False, linearizeTwoTerm, True)
-        subsVars = modelUpper.substitutions.keys()
-        for i in xrange(len(subsVars)):
-            del initialGuess[subsVars[i].key]
+    #if enableSP:
+    #    modelUpper, modelLower = robustModelEllipticalUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled,dependentUncertainties, False, linearizeTwoTerm, True)
+    #    subsVars = modelUpper.substitutions.keys()
+    #    for i in xrange(len(subsVars)):
+    #        del initialGuess[subsVars[i].key]
     return modelUpper, initialGuess, r
     
-def robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 2, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+def robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints = 4, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
     simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints = EM.tractableModel(model,r,tol,coupled,dependentUncertainties, twoTerm, linearizeTwoTerm)
     noDataConstraintsUpper = []
     noDataConstraintsLower = []
@@ -253,22 +299,40 @@ def robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoint
         coefficient = constructRobustMonomailCoeffiecientsRhombalUncertainty(expsOfUncertainVars, centeringVector, scalingVector)
         for i in xrange(len(dataMonomails)):
             dataConstraints = dataConstraints + [coefficient[i][0]*dataMonomails[i] <= 1]
-    return Model(model.cost, [noDataConstraintsUpper,dataConstraints]), Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputUpper = Model(model.cost, [noDataConstraintsUpper,dataConstraints])
+    outputUpper.substitutions.update(model.substitutions) 
+    outputLower = Model(model.cost, [noDataConstraintsLower,dataConstraints])
+    outputLower.substitutions.update(model.substitutions) 
+    return outputUpper, outputLower
 
-def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 2, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
-    r = 19
+def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 4, coupled = True, dependentUncertainties = True, twoTerm = True, linearizeTwoTerm = True, enableSP = True):
+    r = 2
     error = 1
     sol = 0
+    flag = 0 
     while r <= 20 and error > 0.01:
+        flag = 0
+        print(r)
+        print(error)
         modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r,tol, numberOfRegressionPoints, coupled,dependentUncertainties, twoTerm, linearizeTwoTerm, False)
-        solUpper = modelUpper.solve(verbosity = 0)
-        solLower = modelLower.solve(verbosity = 0)
         try:
-            error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            solUpper = modelUpper.solve(verbosity = 0)
+            sol = solUpper
         except:
-            error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
+            flag = 1
+        try:
+            solLower = modelLower.solve(verbosity = 0)
+        except:
+            print("infeasible")
+            r=20
+            sol = model.solve(verbosity = 0)
+            break
+        if flag != 1:
+            try:
+                error = (solUpper.get('cost').m - solLower.get('cost').m)/(0.0 + solLower.get('cost').m)
+            except:
+                error = (solUpper.get('cost') - solLower.get('cost'))/(0.0 + solLower.get('cost'))
         r = r + 1
-        sol = solUpper
     initialGuess = sol.get("variables")
     if enableSP:
         modelUpper, modelLower = robustModelRhombalUncertaintyUpperLower(model,r-1,tol, numberOfRegressionPoints, coupled,dependentUncertainties, False, linearizeTwoTerm, True)
@@ -276,3 +340,17 @@ def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 2
         for i in xrange(len(subsVars)):
             del initialGuess[subsVars[i].key]
     return modelUpper, initialGuess, r
+
+def solveRobustSPBox(model,Gamma,relTol = 1e-5):
+    initSol = model.localsolve(verbosity=0)
+    initCost = initSol['cost']
+    newCost = initCost*(1 + 2*relTol)
+    while (np.abs(initCost - newCost)/initCost) > relTol:
+        apprModel = Model(model.cost,model.as_gpconstr(initSol))
+        robModel = robustModelBoxUncertainty(apprModel,Gamma)[0]
+        sol = robModel.solve(verbosity=0)
+        initSol = sol.get('variables')
+        initCost = newCost
+        newCost = sol['cost']
+        print(newCost)
+    return initSol

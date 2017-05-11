@@ -1,8 +1,9 @@
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 from gpkit.constraints.bounded import Bounded as BCS
 import numpy as np
-import sys
-
+import RobustGP as RGP
+import EquivalentModels as EM
+import copy
 
 def simpleWing():
     # Env. constants
@@ -10,7 +11,6 @@ def simpleWing():
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
     rho_f = Variable("\\rho_f", 817, "kg/m^3", "density of fuel")
-    # rho_strc = Variable("\\rho_strc",3210, "kg/m^3","density of structural material")
     u = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
 
     # Non-dimensional constants
@@ -134,6 +134,7 @@ def simpleWingTwoDimensionalUncertainty():
     constraints += [C_D >= C_D_fuse / toz + C_D_wpar / toz + C_D_ind / toz]
 
     # Wing weight model
+    # W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
     W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
     W_w_surf = W_W_coeff2 * S
     constraints += [W_w >= W_w_surf + W_w_strc]
@@ -159,34 +160,42 @@ def testModel():
     x = Variable('x')
     y = Variable('y')
 
-    a = Variable('a', 1.1, pr=10)
-    b = Variable('b', 1, pr=10)
+    a = Variable('a', 1.1, pr = 10)
+    b = Variable('b', 1, pr = 10)
 
-    constraints = [a * x + b * y <= 1]
-    return Model((x * y) ** -1, constraints)
+    constraints = [a*b*x + a*b*y <= 1,
+                    b*x/y + b*x*y + b*x**2 <= 1]
+    return Model((x*y)**-1, constraints)
 
 
 def exampleSP():
     x = Variable('x')
     y = Variable('y')
+    a = Variable('a',1,pr = 10)
+    b = Variable('b',1, pr = 10)
     constraints = []
     with SignomialsEnabled():
-        constraints = constraints + [x >= 1 - y, y <= 0.1]
+        constraints = constraints + [x >= 1 - a*y, b*y <= 0.1]
     return Model(x, constraints)
 
 
 def MikeSolarModel():
     import gassolar.solar.solar as solarMike
     model = solarMike.Mission(latitude=25)
-    uncertainVarDic = {'h_{batt}': [500, 500]}
+    model.cost = model["W_{total}"]
+    uncertainVarDic = {"W_{pay}":5,"B_{PM}":0,"\\eta":0.0000001,"\\eta_{charge}":1,"\\eta_{discharge}":1,
+                                "h_{batt}":2,"W_{total}":2,"W_{cent}":2,"W_{wing}":2,"\\tau":2,"C_M":0,"e":2,
+                                "(E/\\mathcal{V})":1,"C_{L_{max}}":1,"m_w":1,}
     keys = uncertainVarDic.keys()
     for i in xrange(len(uncertainVarDic)):
-        copy_key = VarKey(**model[keys[i]].key.descr)
-        limits = uncertainVarDic.get(keys[i])
-        value = sum(limits) / 2.0
-        copy_key.descr["value"] = sum(limits) / 2
-        copy_key.descr["pr"] = ((value - limits[0]) / (value + 0.0)) * 100
-        model.subinplace({model[keys[i]].key: copy_key})
+        #limits = uncertainVarDic.get(keys[i])
+        #value = sum(limits)/2.0
+        for j in xrange(len(model.variables_byname(keys[i]))):
+            print(keys[i],uncertainVarDic.get(keys[i]),len(model.variables_byname(keys[i])))
+            copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
+            copy_key.key.descr["pr"] = uncertainVarDic.get(keys[i])#((value - limits[0])/(value + 0.0))*100
+            model.subinplace({model.variables_byname(keys[i])[j].key:copy_key})
+            #model.substitutions[copy_key] = sum(limits)/2
     return model
 
 
@@ -198,9 +207,87 @@ def solveModel(model, *args):
     try:
         sol = model.solve(verbosity=0)
     except:
-        sol = model.localsolve(verbosity=0, x0=initialGuess)
-    print (sol.summary())
+        sol  = model.localsolve(verbosity=0,x0 = initialGuess)
+    #print (sol.summary())
     return sol
+
+def evaluateRandomModel(oldModel,solutionBox, solutionEll):
+    modelBox = EM.sameModel(oldModel)
+    modelEll = EM.sameModel(oldModel)
+    freeVars = [var for var in modelBox.varkeys.keys()
+    if var not in modelBox.substitutions.keys()]
+    uncertainVars = [var for var in modelBox.substitutions.keys()
+                    if "pr" in var.key.descr]
+    for key in freeVars:
+        if key.descr['name'] == "A" or key.descr['name'] == "S":
+            try:
+                modelBox.substitutions[key] = solutionBox.get(key).m
+                modelEll.substitutions[key] = solutionEll.get(key).m
+            except:
+                modelBox.substitutions[key] = solutionBox.get(key)
+                modelEll.substitutions[key] = solutionEll.get(key)
+    for key in uncertainVars:
+        val = modelBox[key].key.descr["value"]
+        pr = modelBox[key].key.descr["pr"]
+        if pr != 0:
+            sigma = pr*val/300.0
+            #newVal = np.random.normal(val,sigma)
+            newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
+            modelBox.substitutions[key] = newVal
+            modelEll.substitutions[key] = newVal
+    return modelBox, modelEll
+
+def failOrSuccess(model):
+    try:
+       #model.as_posyslt1(model.substitutions)
+       sol = solveModel(model);
+       vars = sol.get('variables')
+       return True, vars.get("D")
+    except:
+        return False,0
+
+def probabilityOfFailure(model,numberOfIterations):
+    probBox = []
+    costBox = []
+    probEll = []
+    costEll = []
+    for Gamma in xrange(9):
+        failureBox = 0
+        successBox = 0
+        failureEll = 0
+        successEll = 0
+        robModelBox = RGP.robustModelBoxUncertainty(model,(Gamma)/6.0)
+        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma)/6.0)
+        #print('Done Creating Robust Models')
+        solBox = solveModel(robModelBox[0])
+        solEll = solveModel(robModelEll[0])
+        #print('Done Solving')
+        solutionBox = solBox.get('variables')
+        solutionEll = solEll.get('variables')
+        del solutionBox["D"]
+        del solutionEll["D"]
+        sumCostBox = 0
+        sumCostEll = 0
+        for i in xrange(numberOfIterations):
+            print('Gamma = %s'%Gamma, 'iteration: %s' %i)
+            newModelBox, newModelEll = evaluateRandomModel(model,solutionBox, solutionEll)
+            FSBox,cost = failOrSuccess(newModelBox)
+            sumCostBox = sumCostBox + cost
+            if FSBox:
+                successBox = successBox + 1
+            else:
+                failureBox = failureBox + 1
+            FSEll,cost = failOrSuccess(newModelEll)
+            sumCostEll = sumCostEll + cost
+            if FSEll:
+                successEll = successEll + 1
+            else:
+                failureEll = failureEll + 1
+        costBox.append(sumCostBox/(successBox+0.0))
+        costEll.append(sumCostEll/(successEll+0.0))
+        probBox.append(failureBox/(failureBox+successBox+0.0))
+        probEll.append(failureEll/(failureEll+successEll+0.0))
+    return probBox, probEll,costBox,costEll
 
 
 if __name__ == '__main__':

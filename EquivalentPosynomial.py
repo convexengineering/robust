@@ -69,6 +69,20 @@ def checkIfNoData(uncertainVars, monomial):
         return False
 
 def equivalentPosynomial(p,uncertainSubsVars,m,coupled,dependentUncertainties):
+    pUncertainVars = []
+    minVars = len(uncertainSubsVars)
+    maxVars = 0
+    for i in xrange(len(p.exps)):
+        mUncertainVars = [var for var in p.exps[i].keys() if var in uncertainSubsVars]
+        minVars = min(minVars,len(mUncertainVars))
+        maxVars = max(maxVars,len(mUncertainVars))
+        for var in mUncertainVars:
+            if var not in pUncertainVars:
+                pUncertainVars.append(var)
+    if len(pUncertainVars) == maxVars and len(pUncertainVars) == minVars:
+        dependentUncertainties = False
+    #if len(p.exps) == 2:
+    #    print(p)
     if len(p.exps) == 1:
         if len(p.exps[0]) == 0:
             return [],[]
@@ -89,6 +103,7 @@ def equivalentPosynomial(p,uncertainSubsVars,m,coupled,dependentUncertainties):
     noDataConstraint = []
     elements = list(range(len(p.exps)))
     uncoupled = [element for element in elements if not checkIfInListOfLists(element, coupledPartitions)]
+    #print(uncoupled)
     superScript = 0
     for i in uncoupled:
         if checkIfNoData(uncertainSubsVars, p.exps[i]):
@@ -144,9 +159,12 @@ def mergeMeshGrid(array,n):
             output = output + mergeMeshGrid(array[i],n/(len(array) + 0.0))
         return output 
 
-def perturbationFunction(perturbationVector,numberOfPoints = 3):
+def perturbationFunction(perturbationVector,numberOfPoints = 4):
     dim = len(perturbationVector)
-    x = np.meshgrid(*[np.linspace(-1,1,numberOfPoints)]*dim)
+    if dim != 1:
+        x = np.meshgrid(*[np.linspace(-1,1,numberOfPoints)]*dim)
+    else:
+        x = [np.linspace(-1,1,numberOfPoints)]
     result = []
     inputList = []
     for i in xrange(numberOfPoints**dim):
@@ -165,7 +183,7 @@ def perturbationFunction(perturbationVector,numberOfPoints = 3):
     clf.fit(inputList,result)
     return clf.coef_, clf.intercept_
 
-def linearizePurturbations (p, uncertainVars, numberOfPoints = 3):
+def linearizePurturbations (p, uncertainVars, numberOfPoints = 4):
     pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
     center = []
     scale = []
@@ -201,7 +219,7 @@ def noCoefficientMonomials (p, uncertainVars):
         monomials.append(Monomial(p.exps[i],p.cs[i]))
     return monomials
 
-def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 3):
+def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 4):
     perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars, numberOfPoints)
     pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
     if not pUncertainVars:
@@ -316,7 +334,7 @@ def safePosynomialEllipticalUncertainty(p, uncertainVars, m, enableSP = False, n
 #    constraints.append(sum(ss) <= s_main)
 #    return constraints
     
-def safePosynomialBoxUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 3):
+def safePosynomialBoxUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 4):
     perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars, numberOfPoints)
     pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
     if not pUncertainVars:
@@ -398,7 +416,7 @@ def safePosynomialBoxUncertainty(p, uncertainVars, m, enableSP = False, numberOf
 #                constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)]) <= s]
 #    return constraints   
 
-def safePosynomialRhombalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 2):
+def safePosynomialRhombalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 4):
     perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars, numberOfPoints)
     pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
     if not pUncertainVars:
