@@ -121,7 +121,7 @@ def simpleWingTwoDimensionalUncertainty():
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
     C_D = Variable("C_D", "-", "Drag coefficient of wing")
-    C_L = Variable("C_L", "-", "Lift coefficent of wing")
+    C_L = Variable("C_L", "-", "Lift coefficient of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
 
