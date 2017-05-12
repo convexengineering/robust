@@ -10,7 +10,6 @@ def simpleWing():
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
     rho_f = Variable("\\rho_f", 817, "kg/m^3", "density of fuel")
-    u = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
 
     # Non-dimensional constants
     C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)

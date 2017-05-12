@@ -11,8 +11,8 @@ class UncertainCoefficientsModel(EquivalentModel):
     Creates robust Models starting from a model with uncertain coefficients
     """
     def setup(self, gamma, type_of_uncertainty_set, r_min = 5, tol=0.001,
-                 number_of_regression_points = 2, two_term = True,
-                 linearize_two_term = True, enable_sp = True):
+              number_of_regression_points = 2, linearize_two_term = True,
+              enable_sp = True, *two_term):
         """
         Constructs a robust model starting from a model with uncertain coefficients
         :param gamma: Controls the size of the uncertainty set
@@ -22,7 +22,8 @@ class UncertainCoefficientsModel(EquivalentModel):
         :param number_of_regression_points: The number of points per dimension used to replace exponential uncertainty
         function by a linear function
         :param two_term: Solve the problem using two term decoupling rather than linear approximation of exponential
-        uncertainties
+        uncertainties. If the problem is small or the number of uncertain variables per constraint is small,
+        switch two_term to True
         :param linearize_two_term: linearize two term functions rather than considering them large posynomials
         :param enable_sp: choose to solve an SP to get a better solution
         :return: The robust Model, The initial guess if the robust model is an SP, and the number of PWL functions used
@@ -31,11 +32,20 @@ class UncertainCoefficientsModel(EquivalentModel):
         r = r_min
         error = 1
         sol = 0
+
+        if len(two_term) == 0:
+            if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
+                two_term = True
+            elif type_of_uncertainty_set == 'elliptical':
+                two_term = False
+        else:
+             two_term =  two_term[0]
+
         model_upper, model_lower = \
-            self.robustModelFixedNumberOfPWLs(gamma, r,
-                                               type_of_uncertainty_set, tol,
-                                               number_of_regression_points, True,
-                                               two_term, linearize_two_term, False)
+            self.robust_model_fixed_r(gamma, r, type_of_uncertainty_set,
+                                              tol, number_of_regression_points,
+                                              two_term, linearize_two_term,
+                                              False)
         while r <= 20 and error > tol:
             flag = 0
             try:
@@ -60,19 +70,18 @@ class UncertainCoefficientsModel(EquivalentModel):
                              sol_lower.get('cost'))/(0.0 + sol_lower.get('cost'))
             r += 1
             model_upper, model_lower = \
-                self.robustModelFixedNumberOfPWLs(gamma, r,
-                                             type_of_uncertainty_set, tol,
-                                             number_of_regression_points, True,
-                                             two_term, linearize_two_term, False)
+                self.robust_model_fixed_r(gamma, r, type_of_uncertainty_set,
+                                                  tol, number_of_regression_points,
+                                                  two_term, linearize_two_term,
+                                                  False)
             
         initial_guess = sol.get("variables")
         
         if enable_sp:
             model_upper, model_lower = \
-                self.robustModelFixedNumberOfPWLs(r-1, type_of_uncertainty_set,
-                                             tol, number_of_regression_points,
-                                             True, False, linearize_two_term,
-                                             True)
+                self.robust_model_fixed_r(gamma, r-1, type_of_uncertainty_set,
+                                                  tol, number_of_regression_points,
+                                                  False, linearize_two_term, True)
             subs_vars = model_upper.substitutions.keys()
             
             for i in xrange(len(subs_vars)):
@@ -113,7 +122,7 @@ class UncertainCoefficientsModel(EquivalentModel):
             x = [np.linspace(-1,1,number_of_regression_points)]
 
         result, input_list= [], []
-        for i in xrange(number_of_regression_points**dim):
+        for _ in xrange(number_of_regression_points**dim):
             input_list.append([])
 
         for i in xrange(dim):
@@ -171,6 +180,11 @@ class UncertainCoefficientsModel(EquivalentModel):
 
     @staticmethod
     def no_coefficient_monomials (p):
+        """
+        separates the monomials in a posynomial into a list of monomials
+        :param p: The posynomial to separate
+        :return: The list of monomials
+        """
         monomials = []
         for i in xrange(len(p.exps)):
             monomials.append(Monomial(p.exps[i],p.cs[i]))
@@ -178,10 +192,90 @@ class UncertainCoefficientsModel(EquivalentModel):
 
 
     @staticmethod
-    def generate_robust_constraints(type_of_uncertainty_set, monomials,
-                                                  perturbation_matrix, intercept, mean_vector, m):
-        if type_of_uncertainty_set == 'box':
-            pass
+    def generate_robust_constraints(type_of_uncertainty_set,
+                                    monomials, perturbation_matrix,
+                                    intercept, mean_vector, enable_sp, m):
+        """
+
+        :param type_of_uncertainty_set: box, elliptical, or one norm
+        :param monomials: the list of monomials
+        :param perturbation_matrix: the matrix of perturbations
+        :param intercept: the list of intercepts
+        :param mean_vector: the list of means
+        :param enable_sp: whether or not we prefer sp solutions
+        :param m: the index
+        :return: the robust set of constraints
+        """
+        constraints = []
+        s_main = Variable("s_%s"%m)
+        if type_of_uncertainty_set == 'box' or 'one norm':
+            constraints += [sum([a*b for a,b in
+                             zip([a*b for a,b in
+                                  zip(mean_vector,intercept)],monomials)]) + s_main <= 1]
+        elif type_of_uncertainty_set == 'elliptical':
+            constraints += [sum([a*b for a,b in
+                                 zip([a*b for a,b in
+                                      zip(mean_vector,intercept)],monomials)]) + s_main**0.5 <= 1]
+        ss = []
+        for i in xrange(len(perturbation_matrix[0])):
+            positive_pert = []
+            negative_pert = []
+            positive_monomials = []
+            negative_monomials = []
+            if type_of_uncertainty_set == 'box' or 'elliptical':
+                s = Variable("s^%s_%s"%(i,m))
+                ss.append(s)
+            else:
+                s = s_main
+            for j in xrange(len(perturbation_matrix)):
+                if perturbation_matrix[j][i] > 0:
+                    positive_pert.append(mean_vector[j]*perturbation_matrix[j][i])
+                    positive_monomials.append(monomials[j])
+                elif perturbation_matrix[j][i] < 0:
+                    negative_pert.append(-mean_vector[j]*perturbation_matrix[j][i])
+                    negative_monomials.append(monomials[j])
+            if enable_sp:
+                with SignomialsEnabled():
+                    if type_of_uncertainty_set == 'box' or 'one norm':
+                        if negative_pert and not positive_pert:
+                            constraints += [sum([a*b for a,b in
+                                                 zip(negative_pert,negative_monomials)])<= s]
+                        elif positive_pert and not negative_pert:
+                            constraints += [sum([a*b for a,b in
+                                                 zip(positive_pert,positive_monomials)])<= s]
+                        else:
+                            constraints += [sum([a*b for a,b in
+                                                 zip(positive_pert,positive_monomials)]) -
+                                            sum([a*b for a,b in
+                                                 zip(negative_pert,negative_monomials)])<= s]
+                            constraints += [sum([a*b for a,b in
+                                                 zip(negative_pert,negative_monomials)]) -
+                                            sum([a*b for a,b in
+                                                 zip(positive_pert,positive_monomials)])<= s]
+                    elif type_of_uncertainty_set == 'elliptical':
+                        constraints += [(sum([a*b for a,b in
+                                              zip(positive_pert,positive_monomials)])
+                                             - sum([a*b for a,b in
+                                                    zip(negative_pert,negative_monomials)]))**2]
+            else:
+                if type_of_uncertainty_set == 'box' or 'one norm':
+                    if positive_pert:
+                        constraints += [sum([a*b for a,b in
+                                             zip(positive_pert,positive_monomials)]) <= s]
+                    if negative_pert:
+                        constraints += [sum([a*b for a,b in
+                                             zip(negative_pert,negative_monomials)]) <= s]
+                elif type_of_uncertainty_set == 'elliptical':
+                    constraints += [sum([a*b for a,b in
+                                         zip(positive_pert,positive_monomials)])**2
+                                    + sum([a*b for a,b in
+                                           zip(negative_pert,negative_monomials)])**2 <= s]
+        if type_of_uncertainty_set == 'box' or 'elliptical':
+            constraints.append(sum(ss) <= s_main)
+        return constraints
+
+
+
 
     @staticmethod
     def robustify_large_posynomial(p, type_of_uncertainty_set, uncertain_vars, m,
@@ -207,187 +301,69 @@ class UncertainCoefficientsModel(EquivalentModel):
 
         monomials = UncertainCoefficientsModel.no_coefficient_monomials(p)
         constraints = UncertainCoefficientsModel.generate_robust_constraints(type_of_uncertainty_set, monomials,
-                                                  perturbation_matrix, intercept, mean_vector, m)
-        """constraints = []
-
-        s_main = Variable("s_%s"%m)
-
-        constraints += [sum([a*b for a,b in zip([a*b for a,b in zip(mean_vector,intercept)],monomials)]) + s_main**0.5 <= 1]
-
-        ss = []
-        for i in xrange(len(perturbation_matrix[0])):
-            positivePert = []
-            negativePert = []
-            positiveMonomials = []
-            negativeMonomials = []
-           s = Variable("s^%s_%s"%(i,m))
-            ss.append(s)
-            for j in xrange(len(perturbation_matrix)):
-                if perturbation_matrix[j][i] > 0:
-                    positivePert.append(mean_vector[j]*perturbation_matrix[j][i])
-                    positiveMonomials.append(monomials[j])
-                elif perturbation_matrix[j][i] < 0:
-                    negativePert.append(-mean_vector[j]*perturbation_matrix[j][i])
-                    negativeMonomials.append(monomials[j])
-            if enable_sp:
-                with SignomialsEnabled():
-                    constraints = constraints + [(sum([a*b for a,b in zip(positivePert,positiveMonomials)])
-                                             - sum([a*b for a,b in zip(negativePert,negativeMonomials)]))**2 <= s]
-            else:
-                constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])**2
-                                         + sum([a*b for a,b in zip(negativePert,negativeMonomials)])**2 <= s]
-        constraints.append(sum(ss) <= s_main)"""
+                                                  perturbation_matrix, intercept, mean_vector, enable_sp, m)
         return constraints
 
-    
-def safePosynomialBoxUncertainty(p, uncertainVars, m, enableSP = False, 
-                                 numberOfPoints = 4):
-    perturbationMatrix, intercept, meanVector = \
-                linearizePurturbations (p, uncertainVars, numberOfPoints)
-    pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
-    if not pUncertainVars:
-        return [p <= 1]
-    monomials = noCoefficientMonomials (p, uncertainVars)
-    constraints = []
-    s_main = Variable("s_%s"%(m))
-    constraints = constraints + [sum([a*b for a,b in zip
-                                      ([a*b for a,b in zip
-                                        (meanVector,intercept)],monomials)]) +\
-                                                              s_main <= 1]
-    ss = []
-    for i in xrange(len(perturbationMatrix[0])):
-        positivePert = []
-        negativePert = []
-        positiveMonomials = []
-        negativeMonomials = []
-        s = Variable("s^%s_%s"%(i,m))
-        ss.append(s)
-        for j in xrange(len(perturbationMatrix)):
-            if perturbationMatrix[j][i] > 0:
-                positivePert.append(meanVector[j]*perturbationMatrix[j][i])
-                positiveMonomials.append(monomials[j])
-            elif perturbationMatrix[j][i] < 0:
-                negativePert.append(-meanVector[j]*perturbationMatrix[j][i])
-                negativeMonomials.append(monomials[j])
-        if enableSP:
-            with SignomialsEnabled():
-                if negativePert and not positivePert:
-                    constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)])<= s]
-                elif positivePert and not negativePert:
-                    constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])<= s]
-                else:
-                    constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)]) 
-                                                 - sum([a*b for a,b in zip(negativePert,negativeMonomials)])<= s]
-                    constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)]) 
-                                                 - sum([a*b for a,b in zip(positivePert,positiveMonomials)])<= s]
-        else:
-            if positivePert:
-                constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)]) <= s]
-            if negativePert:
-                constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)]) <= s]
-    constraints.append(sum(ss) <= s_main)
-    return constraints
 
-
-def safePosynomialRhombalUncertainty(p, uncertainVars, m, enableSP = False, numberOfPoints = 4):
-    perturbationMatrix, intercept, meanVector = linearizePurturbations (p, uncertainVars, numberOfPoints)
-    pUncertainVars = [var for var in p.varkeys if var in uncertainVars]
-    if not pUncertainVars:
-        return [p <= 1]
-    monomials = noCoefficientMonomials (p, uncertainVars)
-    constraints = []
-    s = Variable("s_%s"%(m))
-    constraints = constraints + [sum([a*b for a,b in zip([a*b for a,b in zip(meanVector,intercept)],monomials)]) + s <= 1]
-    for i in xrange(len(perturbationMatrix[0])):
-        positivePert = []
-        negativePert = []
-        positiveMonomials = []
-        negativeMonomials = []
-        for j in xrange(len(perturbationMatrix)):
-            if perturbationMatrix[j][i] > 0:
-                positivePert.append(meanVector[j]*perturbationMatrix[j][i])
-                positiveMonomials.append(monomials[j])
-            elif perturbationMatrix[j][i] < 0:
-                negativePert.append(-meanVector[j]*perturbationMatrix[j][i])
-                negativeMonomials.append(monomials[j])
-        if enableSP:
-            with SignomialsEnabled():
-                if negativePert and not positivePert:
-                    constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)])<= s]
-                elif positivePert and not negativePert:
-                    constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)])<= s]
-                else:
-                    constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)]) 
-                                                 - sum([a*b for a,b in zip(negativePert,negativeMonomials)])<= s]
-                    constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)]) 
-                                                 - sum([a*b for a,b in zip(positivePert,positiveMonomials)])<= s]
+    def robust_model_fixed_r(self, gamma, r, type_of_uncertainty_set,
+                                     tol, number_of_regression_points,
+                                     two_term, linearize_two_term, enable_sp):
+        
+        if type_of_uncertainty_set == 'box':
+            dependent_uncertainty_set = False
         else:
-            if positivePert:
-                constraints = constraints + [sum([a*b for a,b in zip(positivePert,positiveMonomials)]) <= s]
-            if negativePert:
-                constraints = constraints + [sum([a*b for a,b in zip(negativePert,negativeMonomials)]) <= s]
-    return constraints   
+            dependent_uncertainty_set = True
         
-    def robustModelFixedNumberOfPWLs(model, Gamma, typeOfUncertaintySet, r, tol, 
-                                     numberOfRegressionPoints, twoTerm = True, 
-                                     linearizeTwoTerm = True, enableSP = True):
+        simplified_model_upper, simplified_model_lower, number_of_no_data_constraints \
+            = self.tractableModel(r, tol, dependent_uncertainty_set,
+                                two_term, linearize_two_term)
         
-        if typeOfUncertaintySet == 'box':
-            dependentUncertaintySet = False
-        else:
-            dependentUncertaintySet = True
+        no_data_constraints_upper, no_data_constraints_lower = [],[]
+        data_constraints, data_monomails = [],[]
         
-        simplifiedModelUpper, simplifiedModelLower, numberOfNoDataConstraints \
-            = EM.tractableModel(model, r, tol, dependentUncertaintySet =False, 
-                                twoTerm, linearizeTwoTerm)
+        uncertain_vars = self.uncertain_model_variables()
+        posynomials_upper = simplified_model_upper.as_posyslt1()
+        posynomials_lower = simplified_model_lower.as_posyslt1()
         
-        noDataConstraintsUpper, noDataConstraintsLower = [],[]
-        dataConstraints, dataMonomails = [],[]
-        
-        uncertainVars = uncertainModelVariables(model)
-        posynomialsUpper = simplifiedModelUpper.as_posyslt1()
-        posynomialsLower = simplifiedModelLower.as_posyslt1()
-        
-        for i,p in enumerate(posynomialsUpper):
-            if i < numberOfNoDataConstraints:
-                noDataConstraintsUpper = noDataConstraintsUpper + [p <= 1]
-                noDataConstraintsLower = noDataConstraintsLower + \
-                                                [posynomialsLower[i] <= 1]
+        for i,p in enumerate(posynomials_upper):
+            if i < number_of_no_data_constraints:
+                no_data_constraints_upper += [p <= 1]
+                no_data_constraints_lower += [posynomials_lower[i] <= 1]
             else:
                 if len(p.exps) > 1:
-                    dataConstraints.append(EP.safePosynomialBoxUncertainty
-                                           (p, uncertainVars, i, enableSP, 
-                                            numberOfRegressionPoints))
+                    data_constraints.append(EP.safePosynomialBoxUncertainty
+                                           (p, uncertain_vars, i, enable_sp,
+                                            number_of_regression_points))
                 else:
-                    dataMonomails.append(p)
+                    data_monomails.append(p)
 
-        expsOfUncertainVars = uncertainVariablesExponents (dataMonomails, 
-                                                           uncertainVars)
+        exps_of_uncertain_vars = UncertainCoefficientsModel.uncertain_variables_exponents(data_monomails,
+                                                           uncertain_vars)
         
-        if expsOfUncertainVars.size > 0:
-            centeringVector, scalingVector = \
-            normalizePerturbationVector(uncertainVars)
+        if exps_of_uncertain_vars.size > 0:
+            centering_vector, scaling_vector = \
+            UncertainCoefficientsModel.normalize_perturbation_vector(uncertain_vars)
             coefficient = \
-            constructRobustMonomailCoefficients(expsOfUncertainVars, Gamma, 
-                                                typeOfUncertaintySet, 
-                                                centeringVector, scalingVector)
-            for i in xrange(len(dataMonomails)):
-                dataConstraints = dataConstraints + \
-                                    [coefficient[i][0]*dataMonomails[i] <= 1]
-        outputUpper = Model(model.cost, 
-                            [noDataConstraintsUpper,dataConstraints])
-        outputUpper.substitutions.update(model.substitutions) 
-        outputLower = Model(model.cost, 
-                            [noDataConstraintsLower,dataConstraints])
-        outputLower.substitutions.update(model.substitutions) 
+            UncertainCoefficientsModel.construct_robust_monomail_coefficients(exps_of_uncertain_vars, gamma,
+                                                type_of_uncertainty_set,
+                                                centering_vector, scaling_vector)
+            for i in xrange(len(data_monomails)):
+                data_constraints += [coefficient[i][0]*data_monomails[i] <= 1]
+        outputUpper = Model(self.cost,
+                            [no_data_constraints_upper,data_constraints])
+        outputUpper.substitutions.update(self.substitutions)
+        outputLower = Model(self.cost,
+                            [no_data_constraints_lower,data_constraints])
+        outputLower.substitutions.update(self.substitutions)
         return outputUpper, outputLower
         
-        
-    def uncertainVariablesExponents (dataMonomials, uncertainVars):
-        RHS_Coeff_Uncertain = \
-        np.array([[-p.exps[0].get(var.key, 0) for var in uncertainVars] 
-                   for p in dataMonomials])
-        return  RHS_Coeff_Uncertain
+
+    @staticmethod
+    def uncertain_variables_exponents(data_monomails, uncertain_vars):
+        exps_of_uncertain_vars = \
+            np.array([[-p.exps[0].get(var.key, 0) for var in uncertain_vars]
+                   for p in data_monomails])
+        return  exps_of_uncertain_vars
         
 
     def normalizePerturbationVector(uncertainVars):
@@ -831,7 +807,10 @@ def boydRobustModelEllipticalUncertainty(model, tol=0.001):
     
 def solveRobustSPBox(model,Gamma,relTol = 1e-5):
     initSol = model.localsolve(verbosity=0)
-    initCost = initSol['cost']
+    try:
+        initCost = initSol['cost'].m
+    except:
+        initCost = initSol['cost']
     newCost = initCost*(1 + 2*relTol)
     while (np.abs(initCost - newCost)/initCost) > relTol:
         apprModel = Model(model.cost,model.as_gpconstr(initSol))
@@ -839,6 +818,9 @@ def solveRobustSPBox(model,Gamma,relTol = 1e-5):
         sol = robModel.solve(verbosity=0)
         initSol = sol.get('variables')
         initCost = newCost
-        newCost = sol['cost']
+        try:
+            newCost = sol['cost'].m
+        except:
+            newCost = sol['cost']
         print(newCost)
     return initSol
