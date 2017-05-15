@@ -341,7 +341,7 @@ def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 4
             del initialGuess[subsVars[i].key]
     return modelUpper, initialGuess, r
 
-def solveRobustSPBox(model,Gamma,relTol = 1e-5):
+def solveRobustSPBox(model,Gamma,relTol = 1e-3):
     sol = model.localsolve(verbosity=0)
     initSol = sol.get('variables')
     initCost = sol['cost']
