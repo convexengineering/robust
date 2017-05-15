@@ -81,21 +81,21 @@ def simpleWing():
         constraints += [W_w >= W_w_surf + W_w_strc,
                         # W_w_strc >= W_W_coeff1 * (N_ult * A ** 1.5 * ((W_0+V_f_fuse*g*rho_f) * W * S) ** 0.5) / tau, #[GP]
                         W_w_strc**2. >= W_W_coeff1**2. * (N_ult**2. * A ** 3. * ((W_0+V_f_fuse*g*rho_f) * W * S)) / tau**2.,
-                        W_w_surf == W_W_coeff2 * S]
+                        W_w_surf >= W_W_coeff2 * S]
 
     # and the rest of the models
         constraints += [LoD == C_L/C_D,
                     D >= 0.5 * rho * S * C_D * V ** 2,
                     Re <= (rho / mu) * V * (S / A) ** 0.5,
                     C_f >= 0.074 / Re ** 0.2,
-                    T_flight == Range / V,
+                    T_flight >= Range / V,
                     W_0 + W_w + 0.5 * W_f <= 0.5 * rho * S * C_L * V ** 2,
                     W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
                     W >= W_0 + W_w + W_f,
                     V_f == W_f / g / rho_f,
                     V_f_avail <= V_f_wing + V_f_fuse, #[SP]
-                    V_f_wing**2 == 0.0009*S**3/A*tau**2, #linear with b and tau, quadratic with chord!
-                    V_f_fuse == 10*units('m')*CDA0,
+                    V_f_wing**2 <= 0.0009*S**3/A*tau**2, #linear with b and tau, quadratic with chord!
+                    V_f_fuse <= 10*units('m')*CDA0,
                         #TODO: Reduce volume available by the structure!
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
