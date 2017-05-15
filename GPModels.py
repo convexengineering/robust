@@ -59,7 +59,6 @@ def simpleWing():
     V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage') #[fix]
     V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available") #[fix]
     constraints = []
-
     # Drag model
     C_D_fuse = CDA0 / S
     C_D_wpar = k * C_f * S_wetratio
