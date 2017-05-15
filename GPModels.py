@@ -37,24 +37,27 @@ def simpleWing():
     # Free Variables
     LoD = Variable('L/D','-','lift-to-drag ratio')
     D = Variable("D", "N", "total drag force")
-    A = Variable("A", "-", "aspect ratio")
-    S = Variable("S", "m^2", "total wing area")
     V = Variable("V", "m/s", "cruising speed")
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
     C_D = Variable("C_D", "-", "Drag coefficient")
     C_L = Variable("C_L", "-", "Lift coefficent of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
-    W_w = Variable("W_w", "N", "wing weight")
-    W_w_strc = Variable('W_w_strc','N','wing structural weight')
-    W_w_surf = Variable('W_w_surf','N','wing skin weight')
+
     W_f = Variable("W_f", "N", "fuel weight")
     V_f = Variable("V_f", "m^3", "fuel volume")
-    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing')
-    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage')
-    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available")
+
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
+    # Free variables (fixed for performance eval.)
+    A = Variable("A", "-", "aspect ratio") #[fix]
+    S = Variable("S", "m^2", "total wing area") #[fix]
+    W_w = Variable("W_w", "N", "wing weight") #[fix]
+    W_w_strc = Variable('W_w_strc','N','wing structural weight') #[fix]
+    W_w_surf = Variable('W_w_surf','N','wing skin weight') #[fix]
+    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing') #[fix]
+    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage') #[fix]
+    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available") #[fix]
     constraints = []
 
     # Drag model
@@ -89,10 +92,12 @@ def simpleWing():
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
 
-    #return Model(D, constraints)
-    #return Model(W_f, constraints)
-    #return Model(W,constraints)
-    return Model(W_f + 1*T_flight*units('N'),constraints)
+    # return Model(W_f/LoD, constraints)
+    # return Model(D, constraints)
+    return Model(W_f, constraints)
+    # return Model(W,constraints)
+    # return Model(W_f*T_flight,constraints)
+    # return Model(W_f + 1*T_flight*units('N/min'),constraints)
 
 def simpleWingTwoDimensionalUncertainty():
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
@@ -293,3 +298,16 @@ def probabilityOfFailure(model,numberOfIterations):
 if __name__ == '__main__':
     m = simpleWing()
     sol = m.localsolve()
+
+    # Adding sweep functionality/template for Gamma
+    m.substitutions.update({'Range':('sweep',np.linspace(500,5000,15))})
+    sol = m.localsolve()
+
+    # Autosweep doesn't work for Signomials yet apparently. But still nice to have the template.
+    # sol = m.autosweep({'Range':(500,5000)},tol = 0.001, verbosity = 3)
+
+
+    f,ax = sol.plot({'L/D'})
+    ax.set_title('Dep variable vs. indep variable')
+    f.show()
+
