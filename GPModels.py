@@ -88,9 +88,10 @@ def simpleWing():
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
 
+    # return Model(W_f/LoD, constraints)
     # return Model(D, constraints)
-    # return Model(W_f, constraints)
-    return Model(W,constraints)
+    return Model(W_f, constraints)
+    # return Model(W,constraints)
     # return Model(W_f*T_flight,constraints)
     # return Model(W_f + 1*T_flight*units('N/min'),constraints)
 
@@ -293,3 +294,16 @@ def probabilityOfFailure(model,numberOfIterations):
 if __name__ == '__main__':
     m = simpleWing()
     sol = m.localsolve()
+
+    # Adding sweep functionality/template for Gamma
+    m.substitutions.update({'Range':('sweep',np.linspace(500,5000,15))})
+    sol = m.localsolve()
+
+    # Autosweep doesn't work for Signomials yet apparently. But still nice to have the template.
+    # sol = m.autosweep({'Range':(500,5000)},tol = 0.001, verbosity = 3)
+
+
+    f,ax = sol.plot({'L/D'})
+    ax.set_title('Dep variable vs. indep variable')
+    f.show()
+
