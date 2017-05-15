@@ -24,6 +24,7 @@ def simpleWing():
                           "Wing Weight Coefficent 1", pr=66.666666) #orig  12e-5
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
                           "Wing Weight Coefficent 2", pr=66.666666)
+    p_labor = Variable('p_{labor}',1.,'1/min','cost of labor', pr = 20)
 
     # Dimensional constants
     CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area", pr=42.857142) #0.035 originally
@@ -88,11 +89,10 @@ def simpleWing():
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
 
-    # return Model(D, constraints)
-    # return Model(W_f, constraints)
-    return Model(W,constraints)
-    # return Model(W_f*T_flight,constraints)
-    # return Model(W_f + 1*T_flight*units('N/min'),constraints)
+    #return Model(D, constraints)
+    #return Model(W_f, constraints)
+    #return Model(W,constraints)
+    return Model(W_f + 1*T_flight*units('N'),constraints)
 
 def simpleWingTwoDimensionalUncertainty():
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
