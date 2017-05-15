@@ -354,3 +354,17 @@ def solveRobustSPBox(model,Gamma,relTol = 1e-5):
         newCost = sol['cost']
         print(newCost)
     return initSol
+
+def solveRobustSPEll(model,Gamma,relTol = 1e-5):
+    initSol = model.localsolve(verbosity=0)
+    initCost = initSol['cost']
+    newCost = initCost*(1 + 2*relTol)
+    while (np.abs(initCost - newCost)/initCost) > relTol:
+        apprModel = Model(model.cost,model.as_gpconstr(initSol))
+        robModel = robustModelEllipticalUncertainty(apprModel,Gamma)[0]
+        sol = robModel.solve(verbosity=0)
+        initSol = sol.get('variables')
+        initCost = newCost
+        newCost = sol['cost']
+        print(newCost)
+    return initSol

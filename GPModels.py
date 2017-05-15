@@ -50,14 +50,14 @@ def simpleWing():
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
     # Free variables (fixed for performance eval.)
-    A = Variable("A", "-", "aspect ratio") #[fix]
-    S = Variable("S", "m^2", "total wing area") #[fix]
-    W_w = Variable("W_w", "N", "wing weight") #[fix]
-    W_w_strc = Variable('W_w_strc','N','wing structural weight') #[fix]
-    W_w_surf = Variable('W_w_surf','N','wing skin weight') #[fix]
-    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing') #[fix]
-    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage') #[fix]
-    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available") #[fix]
+    A = Variable("A", "-", "aspect ratio",fix = True)
+    S = Variable("S", "m^2", "total wing area", fix = True)
+    W_w = Variable("W_w", "N", "wing weight", fix = True)
+    W_w_strc = Variable('W_w_strc','N','wing structural weight', fix = True)
+    W_w_surf = Variable('W_w_surf','N','wing skin weight', fix = True)
+    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing', fix = True)
+    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage', fix = True)
+    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available", fix = True)
     constraints = []
     # Drag model
     C_D_fuse = CDA0 / S
@@ -223,7 +223,8 @@ def evaluateRandomModel(oldModel,solutionBox, solutionEll):
     uncertainVars = [var for var in modelBox.substitutions.keys()
                     if "pr" in var.key.descr]
     for key in freeVars:
-        if key.descr['name'] == "A" or key.descr['name'] == "S":
+        if fix in key.descr:
+            print('bla')
             try:
                 modelBox.substitutions[key] = solutionBox.get(key).m
                 modelEll.substitutions[key] = solutionEll.get(key).m
@@ -245,8 +246,7 @@ def failOrSuccess(model):
     try:
        #model.as_posyslt1(model.substitutions)
        sol = solveModel(model);
-       vars = sol.get('variables')
-       return True, vars.get("D")
+       return True, sol.get('cost')
     except:
         return False,0
 
@@ -260,16 +260,14 @@ def probabilityOfFailure(model,numberOfIterations):
         successBox = 0
         failureEll = 0
         successEll = 0
-        robModelBox = RGP.robustModelBoxUncertainty(model,(Gamma)/6.0)
-        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma)/6.0)
+        robModelBox = RGP.solveRobustSPBox(model,(Gamma)/6.0)
+        robModelEll = RGP.solveRobustSPEll(model, (Gamma)/6.0)
         #print('Done Creating Robust Models')
         solBox = solveModel(robModelBox[0])
         solEll = solveModel(robModelEll[0])
         #print('Done Solving')
         solutionBox = solBox.get('variables')
         solutionEll = solEll.get('variables')
-        del solutionBox["D"]
-        del solutionEll["D"]
         sumCostBox = 0
         sumCostEll = 0
         for i in xrange(numberOfIterations):
