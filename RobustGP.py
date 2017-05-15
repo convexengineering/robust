@@ -342,8 +342,9 @@ def robustModelRhombalUncertainty(model, tol=0.001, numberOfRegressionPoints = 4
     return modelUpper, initialGuess, r
 
 def solveRobustSPBox(model,Gamma,relTol = 1e-5):
-    initSol = model.localsolve(verbosity=0)
-    initCost = initSol['cost']
+    sol = model.localsolve(verbosity=0)
+    initSol = sol.get('variables')
+    initCost = sol['cost']
     newCost = initCost*(1 + 2*relTol)
     while (np.abs(initCost - newCost)/initCost) > relTol:
         apprModel = Model(model.cost,model.as_gpconstr(initSol))
@@ -353,11 +354,12 @@ def solveRobustSPBox(model,Gamma,relTol = 1e-5):
         initCost = newCost
         newCost = sol['cost']
         print(newCost)
-    return initSol
+    return sol
 
 def solveRobustSPEll(model,Gamma,relTol = 1e-5):
-    initSol = model.localsolve(verbosity=0)
-    initCost = initSol['cost']
+    sol = model.localsolve(verbosity=0)
+    initSol = sol.get('variables')
+    initCost = sol['cost']
     newCost = initCost*(1 + 2*relTol)
     while (np.abs(initCost - newCost)/initCost) > relTol:
         apprModel = Model(model.cost,model.as_gpconstr(initSol))
@@ -367,4 +369,4 @@ def solveRobustSPEll(model,Gamma,relTol = 1e-5):
         initCost = newCost
         newCost = sol['cost']
         print(newCost)
-    return initSol
+    return sol
