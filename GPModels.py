@@ -36,24 +36,27 @@ def simpleWing():
     # Free Variables
     LoD = Variable('L/D','-','lift-to-drag ratio')
     D = Variable("D", "N", "total drag force")
-    A = Variable("A", "-", "aspect ratio")
-    S = Variable("S", "m^2", "total wing area")
     V = Variable("V", "m/s", "cruising speed")
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
     C_D = Variable("C_D", "-", "Drag coefficient")
     C_L = Variable("C_L", "-", "Lift coefficent of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
-    W_w = Variable("W_w", "N", "wing weight")
-    W_w_strc = Variable('W_w_strc','N','wing structural weight')
-    W_w_surf = Variable('W_w_surf','N','wing skin weight')
+
     W_f = Variable("W_f", "N", "fuel weight")
     V_f = Variable("V_f", "m^3", "fuel volume")
-    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing')
-    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage')
-    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available")
+
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
+    # Free variables (fixed for performance eval.)
+    A = Variable("A", "-", "aspect ratio") #[fix]
+    S = Variable("S", "m^2", "total wing area") #[fix]
+    W_w = Variable("W_w", "N", "wing weight") #[fix]
+    W_w_strc = Variable('W_w_strc','N','wing structural weight') #[fix]
+    W_w_surf = Variable('W_w_surf','N','wing skin weight') #[fix]
+    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing') #[fix]
+    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage') #[fix]
+    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available") #[fix]
     constraints = []
 
     # Drag model
