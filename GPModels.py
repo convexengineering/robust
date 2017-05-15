@@ -9,30 +9,39 @@ def simpleWing():
     # Env. constants
     g = Variable("g", 9.81, "m/s^2", "gravitational acceleration")
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
+    # mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air")
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
     rho_f = Variable("\\rho_f", 817, "kg/m^3", "density of fuel")
-    u = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
 
     # Non-dimensional constants
-    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)
-    e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
+    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=5)
+    #C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down")
+    e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=3)
+    # e = Variable("e", 0.92, "-", "Oswald efficiency factor")
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
-    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=33.333333)
-    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
-    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=33.333333)
+    # k = Variable("k", 1.17, "-", "form factor")
+    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=15)
+    # N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor")
+    #S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
+    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio")
+    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=0.00001)
+    # tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio")
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 2e-5, "1/m",
-                          "Wing Weight Coefficent 1", pr=66.666666) #orig  12e-5
+                          "Wing Weight Coefficent 1", pr= 40) #orig  12e-5
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
-                          "Wing Weight Coefficent 2", pr=66.666666)
-    p_labor = Variable('p_{labor}',1.,'1/min','cost of labor', pr = 20)
+                          "Wing Weight Coefficent 2", pr=0)
+    #p_labor = Variable('p_{labor}',1.,'1/min','cost of labor', pr = 20)
 
     # Dimensional constants
-    CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area", pr=42.857142) #0.035 originally
+    CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area") #0.035 originally
     Range = Variable("Range",3000, "km", "aircraft range")
-    toz = Variable("toz", 1, "-", pr=15)
+    #toz = Variable("toz", 1, "-", pr=15)
+    toz = Variable("toz", 1, "-")
     TSFC = Variable("TSFC", 0.6, "1/hr", "thrust specific fuel consumption")
-    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
-    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
+    #V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
+    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed")
+    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=20)
+    #W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing")
 
     # Free Variables
     LoD = Variable('L/D','-','lift-to-drag ratio')
@@ -92,7 +101,7 @@ def simpleWing():
                     W_f >= TSFC * T_flight * D]
 
     # return Model(W_f/LoD, constraints)
-    # return Model(D, constraints)
+    #return Model(D, constraints)
     return Model(W_f, constraints)
     # return Model(W,constraints)
     # return Model(W_f*T_flight,constraints)
@@ -297,14 +306,14 @@ if __name__ == '__main__':
     sol = m.localsolve()
 
     # Adding sweep functionality/template for Gamma
-    m.substitutions.update({'Range':('sweep',np.linspace(500,5000,15))})
-    sol = m.localsolve()
+    #m.substitutions.update({'Range':('sweep',np.linspace(500,5000,15))})
+    #sol = m.localsolve()
 
     # Autosweep doesn't work for Signomials yet apparently. But still nice to have the template.
     # sol = m.autosweep({'Range':(500,5000)},tol = 0.001, verbosity = 3)
 
 
-    f,ax = sol.plot({'L/D'})
-    ax.set_title('Dep variable vs. indep variable')
-    f.show()
+    #f,ax = sol.plot({'L/D'})
+    #ax.set_title('Dep variable vs. indep variable')
+    #f.show()
 
