@@ -12,8 +12,8 @@ def sameModel(model):
     constraints = []
     for i, p in enumerate(model.as_posyslt1()):
         constraints.append(0.9999*p<=1)
-        output = Model(model.cost,constraints)
-        output.substitutions.update(model.substitutions)
+    output = Model(model.cost,constraints)
+    output.substitutions.update(model.substitutions)
     return output
     
 def equivalentModel(model, dependentUncertainties = False, coupled = True):
