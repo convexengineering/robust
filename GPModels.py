@@ -306,7 +306,8 @@ def probabilityOfFailure(numberOfIterations):
     return gamma, probBox, probEll,costBox,costEll
 
 def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
-    plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-')
+    plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-',gamma,np.ones(gamma.shape)*0.02, 'm--',
+             [2.],0.02,'ro',[2.5],0.02,'bo')
     #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
     plt.grid(True)
     plt.xlabel(r'$\Gamma$')
