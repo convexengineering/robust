@@ -308,6 +308,10 @@ def probabilityOfFailure(numberOfIterations):
 def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
     plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-')
     #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
+    plt.grid(True)
+    plt.xlabel(r'$\Gamma$')
+    plt.ylabel('Probability of Failure')
+    plt.title('Probability of Failure vs. ' + r'$\Gamma$')
     plt.show()
 
 if __name__ == '__main__':
