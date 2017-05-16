@@ -353,7 +353,6 @@ def solveRobustSPBox(model,Gamma,relTol = 1e-3):
         initSol = sol.get('variables')
         initCost = newCost
         newCost = sol['cost']
-        print(newCost)
     return sol
 
 def solveRobustSPEll(model,Gamma,relTol = 1e-5):
@@ -368,5 +367,4 @@ def solveRobustSPEll(model,Gamma,relTol = 1e-5):
         initSol = sol.get('variables')
         initCost = newCost
         newCost = sol['cost']
-        print(newCost)
     return sol

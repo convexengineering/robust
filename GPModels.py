@@ -3,7 +3,7 @@ from gpkit.constraints.bounded import Bounded as BCS
 import numpy as np
 import RobustGP as RGP
 import EquivalentModels as EM
-import copy
+from copy import copy
 
 def simpleWing():
     # Env. constants
@@ -51,12 +51,12 @@ def simpleWing():
     # Free variables (fixed for performance eval.)
     A = Variable("A", "-", "aspect ratio",fix = True)
     S = Variable("S", "m^2", "total wing area", fix = True)
-    W_w = Variable("W_w", "N", "wing weight", fix = True)
+    W_w = Variable("W_w", "N", "wing weight")#, fix = True)
     W_w_strc = Variable('W_w_strc','N','wing structural weight', fix = True)
     W_w_surf = Variable('W_w_surf','N','wing skin weight', fix = True)
     V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing', fix = True)
     V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage', fix = True)
-    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available", fix = True)
+    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available")#, fix = True)
     constraints = []
     # Drag model
     C_D_fuse = CDA0 / S
@@ -214,74 +214,82 @@ def solveModel(model, *args):
     #print (sol.summary())
     return sol
 
-def evaluateRandomModel(oldModel,solutionBox, solutionEll):
-    modelBox = EM.sameModel(oldModel)
-    modelEll = EM.sameModel(oldModel)
-    freeVars = [var for var in modelBox.varkeys.keys()
-    if var not in modelBox.substitutions.keys()]
-    uncertainVars = [var for var in modelBox.substitutions.keys()
+def evaluateRandomModel(model,solution):
+    #print('inside',model)
+    freeVars = [var for var in model.varkeys.keys()
+    if var not in model.substitutions.keys()]
+    uncertainVars = [var for var in model.substitutions.keys()
                     if "pr" in var.key.descr]
     for key in freeVars:
-        if fix in key.descr:
-            print('bla')
+        if 'fix' in key.descr.keys():
             try:
-                modelBox.substitutions[key] = solutionBox.get(key).m
-                modelEll.substitutions[key] = solutionEll.get(key).m
+                model.substitutions[key] = solution.get(key).m
             except:
-                modelBox.substitutions[key] = solutionBox.get(key)
-                modelEll.substitutions[key] = solutionEll.get(key)
+                model.substitutions[key] = solution.get(key)
+    #print('after first subs:',model)
     for key in uncertainVars:
-        val = modelBox[key].key.descr["value"]
-        pr = modelBox[key].key.descr["pr"]
+        val = model[key].key.descr["value"]
+        pr = model[key].key.descr["pr"]
         if pr != 0:
             sigma = pr*val/300.0
-            #newVal = np.random.normal(val,sigma)
-            newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
-            modelBox.substitutions[key] = newVal
-            modelEll.substitutions[key] = newVal
-    return modelBox, modelEll
+            newVal = np.random.normal(val,sigma)
+            #newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
+            model.substitutions[key] = newVal
+    #print('final:',model)
+    return model
 
 def failOrSuccess(model):
     try:
-       #model.as_posyslt1(model.substitutions)
-       sol = solveModel(model);
-       return True, sol.get('cost')
+        #print(model['A'].key.descr)
+        sol = solveModel(model)
+        return True, sol.get('cost')
     except:
+        #print('blu')
         return False,0
 
-def probabilityOfFailure(model,numberOfIterations):
+def probabilityOfFailure(numberOfIterations):
     probBox = []
     costBox = []
     probEll = []
     costEll = []
+
     for Gamma in xrange(9):
         failureBox = 0
         successBox = 0
         failureEll = 0
         successEll = 0
-        solBox = RGP.solveRobustSPBox(model,(Gamma)/6.0)
-        solEll = RGP.solveRobustSPEll(model, (Gamma)/6.0)
+        solBox = RGP.solveRobustSPBox(simpleWing(),(Gamma)/6.0)
+        solEll = RGP.solveRobustSPEll(simpleWing(), (Gamma)/6.0)
         solutionBox = solBox.get('variables')
         solutionEll = solEll.get('variables')
         sumCostBox = 0
         sumCostEll = 0
         for i in xrange(numberOfIterations):
             print('Gamma = %s'%Gamma, 'iteration: %s' %i)
-            newModelBox, newModelEll = evaluateRandomModel(model,solutionBox, solutionEll)
-            FSBox,cost = failOrSuccess(newModelBox)
+            model = evaluateRandomModel(simpleWing(),solutionBox)
+
+            FSBox,cost = failOrSuccess(model)
+
             sumCostBox = sumCostBox + cost
             if FSBox:
                 successBox = successBox + 1
             else:
                 failureBox = failureBox + 1
-            FSEll,cost = failOrSuccess(newModelEll)
+            model = evaluateRandomModel(simpleWing(),solutionEll)
+            FSEll,cost = failOrSuccess(model)
             sumCostEll = sumCostEll + cost
             if FSEll:
                 successEll = successEll + 1
             else:
                 failureEll = failureEll + 1
-        costBox.append(sumCostBox/(successBox+0.0))
-        costEll.append(sumCostEll/(successEll+0.0))
+        if successBox != 0:
+            costBox.append(sumCostBox/(successBox+0.0))
+        else:
+            costBox.append(1e10)
+        if successEll != 0:
+            costEll.append(sumCostEll/(successEll+0.0))
+        else:
+            costEll.append(1e10)
         probBox.append(failureBox/(failureBox+successBox+0.0))
         probEll.append(failureEll/(failureEll+successEll+0.0))
     return probBox, probEll,costBox,costEll
