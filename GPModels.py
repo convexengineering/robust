@@ -315,6 +315,22 @@ def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
     plt.title('Probability of Failure vs. ' + r'$\Gamma$')
     plt.show()
 
+def plot_cost(gamma, probBox, probEll,costBox,costEll):
+    costBoxi = [i.magnitude for i in costBox]
+    costElli = [i.magnitude for i in costEll]
+
+    plt.plot(gamma, costBoxi, 'r-', gamma, costElli, 'b-',
+             2., 8942.24,'ro',2.5,9282.02,'bo')
+
+             # [2.],0.02,'ro',[2.5],0.02,'bo')
+    #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
+    plt.grid(True)
+    plt.xlabel(r'$\Gamma$')
+    plt.ylabel(r'$W_{fuel}$ (N)')
+    plt.title(r'$W_{fuel}$' +  ' vs. ' + r'$\Gamma$')
+    plt.show()
+
+
 if __name__ == '__main__':
     m = simpleWing()
     sol = m.localsolve()
