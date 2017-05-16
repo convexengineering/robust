@@ -4,6 +4,7 @@ import numpy as np
 import RobustGP as RGP
 import EquivalentModels as EM
 from copy import copy
+import matplotlib.pyplot as plt
 
 def simpleWing():
     # Env. constants
@@ -214,29 +215,30 @@ def solveModel(model, *args):
     #print (sol.summary())
     return sol
 
-def evaluateRandomModel(model,solution):
-    #print('inside',model)
-    freeVars = [var for var in model.varkeys.keys()
-    if var not in model.substitutions.keys()]
-    uncertainVars = [var for var in model.substitutions.keys()
-                    if "pr" in var.key.descr]
+def evaluateRandomModel(model, solution, uncertainVars, freeVars,values):
     for key in freeVars:
         if 'fix' in key.descr.keys():
             try:
                 model.substitutions[key] = solution.get(key).m
             except:
                 model.substitutions[key] = solution.get(key)
-    #print('after first subs:',model)
-    for key in uncertainVars:
-        val = model[key].key.descr["value"]
+
+    for i, key in enumerate(uncertainVars):
         pr = model[key].key.descr["pr"]
         if pr != 0:
-            sigma = pr*val/300.0
-            newVal = np.random.normal(val,sigma)
-            #newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
-            model.substitutions[key] = newVal
-    #print('final:',model)
+            model.substitutions[key] = values[i]
     return model
+
+def generate_samples(model, uncertain_vars):
+    values = []
+    for key in uncertain_vars:
+        val = model[key].key.descr["value"]
+        pr = model[key].key.descr["pr"]
+        sigma = pr*val/300.0
+        values.append(np.random.normal(val,sigma))
+        #values.append(np.random.uniform(val-pr*val/100.0,val+pr*val/100.0))
+    return values
+
 
 def failOrSuccess(model):
     try:
@@ -252,21 +254,29 @@ def probabilityOfFailure(numberOfIterations):
     costBox = []
     probEll = []
     costEll = []
-
+    simp = simpleWing()
+    freeVars = [var for var in simp.varkeys.keys()
+                if var not in simp.substitutions.keys()]
+    uncertainVars = [var for var in simp.substitutions.keys()
+                    if "pr" in var.key.descr]
     for Gamma in xrange(9):
         failureBox = 0
         successBox = 0
         failureEll = 0
         successEll = 0
+        print('started the first SP solve')
         solBox = RGP.solveRobustSPBox(simpleWing(),(Gamma)/6.0)
+        print('started the second SP solve')
         solEll = RGP.solveRobustSPEll(simpleWing(), (Gamma)/6.0)
+        print('finished the SP solves')
         solutionBox = solBox.get('variables')
         solutionEll = solEll.get('variables')
         sumCostBox = 0
         sumCostEll = 0
         for i in xrange(numberOfIterations):
             print('Gamma = %s'%Gamma, 'iteration: %s' %i)
-            model = evaluateRandomModel(simpleWing(),solutionBox)
+            values = generate_samples(simp, uncertainVars)
+            model = evaluateRandomModel(simpleWing(),solutionBox,uncertainVars,freeVars, values)
 
             FSBox,cost = failOrSuccess(model)
 
@@ -275,7 +285,7 @@ def probabilityOfFailure(numberOfIterations):
                 successBox = successBox + 1
             else:
                 failureBox = failureBox + 1
-            model = evaluateRandomModel(simpleWing(),solutionEll)
+            model = evaluateRandomModel(simpleWing(),solutionEll, uncertainVars,freeVars, values)
             FSEll,cost = failOrSuccess(model)
             sumCostEll = sumCostEll + cost
             if FSEll:
@@ -292,8 +302,13 @@ def probabilityOfFailure(numberOfIterations):
             costEll.append(1e10)
         probBox.append(failureBox/(failureBox+successBox+0.0))
         probEll.append(failureEll/(failureEll+successEll+0.0))
-    return probBox, probEll,costBox,costEll
+    gamma = np.linspace(0,4,9)
+    return gamma, probBox, probEll,costBox,costEll
 
+def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
+    plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-')
+    #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
+    plt.show()
 
 if __name__ == '__main__':
     m = simpleWing()
