@@ -91,8 +91,9 @@ def simpleWing():
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
 
-    # return Model(W_f/LoD, constraints)
-    #return Model(D, constraints)
+    #return Model(W_f/LoD, constraints)
+    # return Model(1/V, constraints)
+    # return Model(D, constraints)
     return Model(W_f, constraints)
     # return Model(W,constraints)
     # return Model(W_f*T_flight,constraints)
@@ -307,7 +308,7 @@ def probabilityOfFailure(numberOfIterations):
 
 def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
     plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-',gamma,np.ones(gamma.shape)*0.02, 'm--',
-             [2.],0.02,'ro',[2.5],0.02,'bo')
+             [2.5],0.01,'ro',[2.5],0.01,'bo')
     #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
     plt.grid(True)
     plt.xlabel(r'$\Gamma$')
@@ -320,7 +321,7 @@ def plot_cost(gamma, probBox, probEll,costBox,costEll):
     costElli = [i.magnitude for i in costEll]
 
     plt.plot(gamma, costBoxi, 'r-', gamma, costElli, 'b-',
-             2., 8942.24,'ro',2.5,9282.02,'bo')
+             2.5, 10858.9,'ro',2.5,9299.02,'bo')
 
              # [2.],0.02,'ro',[2.5],0.02,'bo')
     #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
