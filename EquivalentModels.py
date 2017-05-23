@@ -1,8 +1,5 @@
-from gpkit import  Model
+from gpkit import Model
 import numpy as np
-import TwoTermApproximation as TTA
-import LinearizeTwoTermPosynomials as LTTP
-import EquivalentPosynomial as EP
 
 
 class EquivalentModel(Model):
@@ -20,16 +17,16 @@ class EquivalentModel(Model):
         return uncertain_vars
 
     @staticmethod
-    def uncertain_variables_exponents(data_monomails, uncertain_vars):
+    def uncertain_variables_exponents(data_monomials, uncertain_vars):
         """
         gets the exponents of uncertain variables
-        :param data_monomails:  the uncertain posynomials
+        :param data_monomials:  the uncertain posynomials
         :param uncertain_vars: the uncertain variables of the model
         :return: the 2 dimensional array of exponents(matrix)
         """
         exps_of_uncertain_vars = \
             np.array([[-p.exps[0].get(var.key, 0) for var in uncertain_vars]
-                      for p in data_monomails])
+                      for p in data_monomials])
         return exps_of_uncertain_vars
 
     @staticmethod
@@ -40,9 +37,9 @@ class EquivalentModel(Model):
         :return: the centering and scaling vector
         """
         prs = np.array([var.key.pr for var in uncertain_vars])
-        eta_max = np.log(1 + prs/100.0)
-        eta_min = np.log(1 - prs/100.0)
-        centering_vector = (eta_min + eta_max)/2.0
+        eta_max = np.log(1 + prs / 100.0)
+        eta_min = np.log(1 - prs / 100.0)
+        centering_vector = (eta_min + eta_max) / 2.0
         scaling_vector = eta_max - centering_vector
         return centering_vector, scaling_vector
 
@@ -68,7 +65,7 @@ class EquivalentModel(Model):
                 if type_of_uncertainty_set == 'box':
                     norm += np.abs(b_pert[i][j])
                 elif type_of_uncertainty_set == 'elliptical':
-                    norm += b_pert[i][j]**2
+                    norm += b_pert[i][j] ** 2
                 elif type_of_uncertainty_set == 'one norm':
                     norm = max(norm, np.abs(b_pert[i][j]))
                 else:
@@ -76,7 +73,7 @@ class EquivalentModel(Model):
                 centering = centering + exps_of_uncertain_vars[i][j] * centering_vector[j]
             if type_of_uncertainty_set == 'elliptical':
                 norm = np.sqrt(norm)
-            coefficient.append([np.exp(gamma*norm)/np.exp(centering)])
+            coefficient.append([np.exp(gamma * norm) / np.exp(centering)])
         return coefficient
 
     def same_model(self):
@@ -91,9 +88,10 @@ class EquivalentModel(Model):
         output.substitutions.update(self.substitutions)
         return output
 
-    def equivalent_model(self, dependent_uncertainties):
+    def equivalent_model(self, simple_model, dependent_uncertainties):
         """
         generates an equivalent model that might not be ready for robustification
+        :param simple_model: whether or not a simple conservative robust model is preferred
         :param dependent_uncertainties: if the uncertainty set is dependent or not
         :return: the equivalent model
         """
@@ -101,104 +99,112 @@ class EquivalentModel(Model):
         uncertain_vars = EquivalentModel.uncertain_model_variables(self)
 
         for i, p in enumerate(self.as_posyslt1()):
-            (no_data, data) = EquivalentModel.\
-                equivalentPosynomial(p, uncertain_vars, i, dependent_uncertainties)
+            (no_data, data) = EquivalentModel. \
+                equivalentPosynomial(p, uncertain_vars, i, simple_model, dependent_uncertainties)
             data_constraints += data
             no_data_constraints += no_data
         number_of_no_data_constraints = len(no_data_constraints)
-        output = Model(self.cost,[no_data_constraints, data_constraints])
+        output = Model(self.cost, [no_data_constraints, data_constraints])
         output.substitutions.update(self.substitutions)
         return output, number_of_no_data_constraints
 
-    def two_term_model(self, input_model_simplified, dependent_uncertainties, simple, boyd):
+    def two_term_model(self, dependent_uncertainties, simple, boyd):
         """
         generates a two term model that is ready to be linearized
-        :param input_model_simplified: specifies whether the input model is already simplified or
-        can be more simplified
         :param dependent_uncertainties: whether or not the set is dependent
         :param simple: choose to perform simple two term approximation
         :param boyd: choose to apply boyd's two term approximation
         :return: two term model and the number of no data constraints
         """
-        equiModel, numberOfNoDataConstraints = equivalentModel(,dependentUncertainties,True)
-        dataConstraints = []
-        noDataConstraints = []
-        uncertainVars = uncertainModelVariables(model)
-        for i, p in enumerate(equiModel.as_posyslt1()):
-            if i < numberOfNoDataConstraints:
-                noDataConstraints =  noDataConstraints + [p <= 1]
+        equivalent_model, number_of_no_data_constraints \
+            = self.equivalent_model(False, dependent_uncertainties)
+
+        data_constraints, no_data_constraints = [], []
+        uncertain_vars = self.uncertain_model_variables()
+
+        for i, p in enumerate(equivalent_model.as_posyslt1()):
+            if i < number_of_no_data_constraints:
+                no_data_constraints += [p <= 1]
             else:
-                (noData, data) = TTA.twoTermExpApproximation(p,uncertainVars,i)#data = twoTermExpApproximationBoyd(p,i)#
-                dataConstraints = dataConstraints + data
-                noDataConstraints = noDataConstraints + noData
-        numberOfNoDataConstraints = len(noDataConstraints)
-        output = Model(equiModel.cost,[noDataConstraints, dataConstraints])
-        output.substitutions.update(model.substitutions)
-        return output, numberOfNoDataConstraints
+                (no_data, data) = EquivalentModel. \
+                    two_term_equivalent_posynomial(p, uncertain_vars, i, simple, boyd)
+                data_constraints += data
+                no_data_constraints += no_data
+        number_of_no_data_constraints = len(no_data_constraints)
+        output = Model(equivalent_model.cost, [no_data_constraints, data_constraints])
+        output.substitutions.update(self.substitutions)
+        return output, number_of_no_data_constraints
 
-def twoTermBoydModel(model):
-    constraints = []
-    for i, p in enumerate(model.as_posyslt1()):
-        constraints.append(TTA.twoTermExpApproximationBoyd(p,i))
-    output = Model(model.cost,constraints)
-    output.substitutions.update(model.substitutions)
-    return output
+    def tractable_model(self, r, tol, uncertain_vars, simple_model, dependent_uncertainties, two_term,
+                        linearize_two_term, boyd):
+        """
+        generates a tractable model that is ready for robustification, except maybe for large posynomials
+        :param r: the number of piece-wise linear functions per two term constraints
+        :param tol: Determines the accuracy of PWL
+        :param uncertain_vars: the uncertain variables of the model
+        :param simple_model: whether or not a simple conservative robust model is preferred
+        :param dependent_uncertainties: whether the uncertainty is is dependent or not
+        :param two_term: Solve the problem using two term decoupling rather than linear
+        approximation of exponential uncertainties.
+        :param linearize_two_term: linearize two term functions rather than considering
+        them large posynomials
+        :param boyd: choose to apply boyd's two term approximation
+        :return: the safe model, the relaxed model, and the number of data deprived constraints
+        """
+        data_constraints, no_data_constraints_upper, no_data_constraints_lower = [], [], []
 
-def tractableModel(model,r = 3,tol = 0.001, coupled = True, dependentUncertainties = False, twoTerm = True, linearizeTwoTerm = True):
-    dataConstraints = []
-    noDataConstraintsUpper = []
-    noDataConstraintsLower = []
-    if (dependentUncertainties == False and coupled == True and twoTerm) or twoTerm == True:
-        safeModel, numberOfNoDataConstraints = twoTermModel(model,dependentUncertainties)
-    else:
-        safeModel, numberOfNoDataConstraints = equivalentModel(model,dependentUncertainties,coupled)
-    for i, p in enumerate(safeModel.as_posyslt1()):
-        if i < numberOfNoDataConstraints:
-            noDataConstraintsUpper = noDataConstraintsUpper + [p <= 1]
-            noDataConstraintsLower = noDataConstraintsLower + [p <= 1]            
+        if boyd:
+            safe_model, number_of_no_data_constraints \
+                = self.two_term_model(False, False, True)
+        elif two_term:
+            safe_model, number_of_no_data_constraints \
+                = self.two_term_model(dependent_uncertainties, False, False)
         else:
-            if len(p.exps) == 2 and linearizeTwoTerm:
-                uncertainSubsVars = uncertainModelVariables(model)
-                minVars = len(uncertainSubsVars)
-                maxVars = 0
-                pUncertainVars = []
-                for i in xrange(len(p.exps)):
-                    mUncertainVars = [var for var in p.exps[i].keys() \
-                                      if var in uncertainSubsVars]
-                    minVars = min(minVars,len(mUncertainVars))
-                    maxVars = max(maxVars,len(mUncertainVars))
-                    for var in mUncertainVars:
-                        if var not in pUncertainVars:
-                            pUncertainVars.append(var)
-                noDataUpper, noDataLower, data = LTTP.linearizeTwoTermExp(p, i, r, tol)
-                noDataConstraintsUpper = noDataConstraintsUpper + noDataUpper
-                noDataConstraintsLower = noDataConstraintsLower + noDataLower
-                dataConstraints = dataConstraints + data
+            safe_model, number_of_no_data_constraints \
+                = self.equivalent_model(simple_model, dependent_uncertainties)
+
+        for i, p in enumerate(safe_model.as_posyslt1()):
+            if i < number_of_no_data_constraints:
+                no_data_constraints_upper += [p <= 1]
+                no_data_constraints_lower += [p <= 1]
             else:
-                dataConstraints = dataConstraints + [p <= 1]
-    numberOfNoDataConstraints = len(noDataConstraintsUpper)
-    outputUpper = Model(safeModel.cost,[noDataConstraintsUpper,dataConstraints])
-    outputUpper.substitutions.update(model.substitutions)    
-    outputLower = Model(safeModel.cost,[noDataConstraintsLower,dataConstraints])
-    outputLower.substitutions.update(model.substitutions)
-    return outputUpper, outputLower, numberOfNoDataConstraints     
+                if len(p.exps) == 2 and linearize_two_term:
+                    min_vars = len(uncertain_vars)
+                    max_vars = 0
+                    p_uncertain_vars = []
+                    for _ in xrange(len(p.exps)):
+                        m_uncertain_vars = [var for var in p.exps[i].keys()
+                                            if var in uncertain_vars]
+                        min_vars = min(min_vars, len(m_uncertain_vars))
+                        max_vars = max(max_vars, len(m_uncertain_vars))
+                        for var in m_uncertain_vars:
+                            if var not in p_uncertain_vars:
+                                p_uncertain_vars.append(var)
 
-def tractableBoydModel(model,r=3,tol=0.001):
-    dataConstraints = []
-    noDataConstraintsUpper = []
-    noDataConstraintsLower = []
-    twoTerm = twoTermBoydModel(model)
-    for i, p in enumerate(twoTerm.as_posyslt1()):
-        if len(p.exps) == 2:
-            noDataUpper, noDataLower, data = LTTP.linearizeTwoTermExp(p, i, r, tol)
-            noDataConstraintsUpper = noDataConstraintsUpper + noDataUpper
-            noDataConstraintsLower = noDataConstraintsLower + noDataLower
-            dataConstraints = dataConstraints + data
-        else:
-            dataConstraints = dataConstraints + [p <= 1]
-    numberOfNoDataConstraints = len(noDataConstraintsUpper)
-    outputUpper = Model(twoTerm.cost,[noDataConstraintsUpper,dataConstraints])
-    outputUpper.substitutions.update(model.substitutions)    
-    outputLower = Model(twoTerm.cost,[noDataConstraintsLower,dataConstraints])
-    outputLower.substitutions.update(model.substitutions)
-    return outputUpper, outputLower, numberOfNoDataConstraints  
+                    no_data_upper, no_data_lower, data = EquivalentModel.linearizeTwoTermExp(p, i, r, tol)
+                    no_data_constraints_upper += no_data_upper
+                    no_data_constraints_lower += no_data_lower
+                    data_constraints += data
+                else:
+                    data_constraints += [p <= 1]
+
+        number_of_no_data_constraints = len(no_data_constraints_upper)
+        output_upper = Model(safe_model.cost, [no_data_constraints_upper, data_constraints])
+        output_upper.substitutions.update(self.substitutions)
+        output_lower = Model(safe_model.cost, [no_data_constraints_lower, data_constraints])
+        output_lower.substitutions.update(self.substitutions)
+
+        return output_upper, output_lower, number_of_no_data_constraints
+
+    @staticmethod
+    def two_term_equivalent_posynomial(p, uncertain_vars, i, simple, boyd):
+        """
+        returns a two term posynomial equivalent to the original large posynomial
+        :param p: the large posynomial
+        :param uncertain_vars: the uncertain variables of the model containing the posynomial
+        :param i: the index of the posynomial
+        :param simple: whether or not a simple two term approximation is preferred
+        :param boyd: whether or not a boyd two term approximation is preferred
+        :return: the no data constaints and the data constraints
+        """
+        return [], []

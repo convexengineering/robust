@@ -1,7 +1,6 @@
 import numpy as np
 from gpkit import Variable, Monomial
 
-## Two Term Approximation Functions    
 def twoTermExpApproximation (p, uncertainVars, m = 1, n= 0):
     l = len(p.exps)
     if (l <= 2):
