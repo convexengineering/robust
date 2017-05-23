@@ -2,7 +2,6 @@ from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 import numpy as np
 import RobustGP as RGP
 import EquivalentModels as EM
-import copy
 
 def simpleWing():
     # Env. constants
@@ -192,7 +191,7 @@ def solveModel(model, *args):
         sol  = model.localsolve(verbosity=0,x0 = initialGuess)
     print (sol.summary())
     return sol
-    
+
 def evaluateRandomModel(oldModel,solutionBox, solutionEll):
     modelBox = EM.sameModel(oldModel)
     modelEll = EM.sameModel(oldModel)
