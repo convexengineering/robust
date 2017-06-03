@@ -5,7 +5,7 @@ from gpkit import Model
 import numpy as np
 
 
-class UncertainCoefficientsModel(Model):
+class RobustGPModel(Model):
     """
     Creates robust Models starting from a model with uncertain coefficients
     """
@@ -46,7 +46,7 @@ class UncertainCoefficientsModel(Model):
             elif type_of_uncertainty_set == 'elliptical':
                 two_term = False
 
-        no_data_constraints_upper, no_data_constraints_lower, data_constraints = UncertainCoefficientsModel. \
+        no_data_constraints_upper, no_data_constraints_lower, data_constraints = RobustGPModel. \
             robust_model_fixed_r(model, gamma, r, type_of_uncertainty_set,
                                  tol, simple_model, number_of_regression_points,
                                  two_term, simple_two_term, maximum_number_of_permutations,
@@ -248,13 +248,13 @@ class UncertainCoefficientsModel(Model):
                 else:
                     data_monomials.append(p)
         # print('RobustGP: end looping over posynomials')
-        exps_of_uncertain_vars = UncertainCoefficientsModel. \
+        exps_of_uncertain_vars = RobustGPModel. \
             uncertain_variables_exponents(data_monomials, uncertain_vars)
 
         if exps_of_uncertain_vars.size > 0:
-            centering_vector, scaling_vector = UncertainCoefficientsModel. \
+            centering_vector, scaling_vector = RobustGPModel. \
                 normalize_perturbation_vector(uncertain_vars)
-            coefficient = UncertainCoefficientsModel. \
+            coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, gamma,
                                                        type_of_uncertainty_set,
                                                        centering_vector, scaling_vector)
@@ -263,23 +263,11 @@ class UncertainCoefficientsModel(Model):
 
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints
 
-#
-# def solveRobustSPBox(model,Gamma,relTol = 1e-5):
-#    initSol = model.localsolve(verbosity=0)
-#    try:
-#        initCost = initSol['cost'].m
-#    except:
-#        initCost = initSol['cost']
-#    newCost = initCost*(1 + 2*relTol)
-#    while (np.abs(initCost - newCost)/initCost) > relTol:
-#        apprModel = Model(model.cost,model.as_gpconstr(initSol))
-#        robModel = robustModelBoxUncertainty(apprModel,Gamma)[0]
-#        sol = robModel.solve(verbosity=0)
-#        initSol = sol.get('variables')
-#        initCost = newCost
-#        try:
-#            newCost = sol['cost'].m
-#        except:
-#            newCost = sol['cost']
-#        print(newCost)
-#    return initSol
+    def solve(self, verbosity=0, initial_guess=None):
+        if initial_guess is None:
+            initial_guess = {}
+        try:
+            sol = self.solve(verbosity=verbosity)
+        except:
+            sol = self.localsolve(verbosity=verbosity, x0=initial_guess)
+        return sol
