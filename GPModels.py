@@ -1,12 +1,64 @@
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
-from gpkit.constraints.bounded import Bounded as BCS
 import numpy as np
 import RobustGP as RGP
 import EquivalentModels as EM
-from copy import copy
-import matplotlib.pyplot as plt
 
 def simpleWing():
+    k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
+    e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
+    mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
+    #pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
+    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
+    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=33.333333)
+    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=33.333333)
+    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
+    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)
+    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
+    W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m",
+                          "Wing Weight Coefficent 1", pr=66.666666)
+    W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
+                          "Wing Weight Coefficent 2", pr=66.666666)
+    CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
+    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
+    toz = Variable("toz",1,"-",pr = 15)
+
+    # Free Variables
+    D = Variable("D", "N", "total drag force")
+    A = Variable("A", "-", "aspect ratio")
+    S = Variable("S", "m^2", "total wing area")
+    V = Variable("V", "m/s", "cruising speed")
+    W = Variable("W", "N", "total aircraft weight")
+    Re = Variable("Re", "-", "Reynold's number")
+    C_D = Variable("C_D", "-", "Drag coefficient of wing")
+    C_L = Variable("C_L", "-", "Lift coefficent of wing")
+    C_f = Variable("C_f", "-", "skin friction coefficient")
+    W_w = Variable("W_w", "N", "wing weight")
+
+    constraints = []
+
+    # Drag model
+    C_D_fuse = CDA0/S
+    C_D_wpar = k*C_f*S_wetratio
+    C_D_ind = C_L**2/(np.pi*A*e)
+    constraints += [C_D >= C_D_fuse*toz + C_D_wpar/toz + C_D_ind*toz]
+
+    # Wing weight model
+    W_w_strc = W_W_coeff1*(N_ult*A**1.5*(W_0*W*S)**0.5)/tau
+    W_w_surf = W_W_coeff2 * S
+    constraints += [W_w >= W_w_surf + W_w_strc]
+
+    # and the rest of the models
+    constraints += [D >= 0.5*rho*S*C_D*V**2,
+                    Re <= (rho/mu)*V*(S/A)**0.5,
+                          C_f >= 0.074/Re**0.2,
+                          W <= 0.5*rho*S*C_L*V**2,
+                          W <= 0.5*rho*S*C_Lmax*V_min**2,
+                          W >= W_0 + W_w]
+    #for key in subs.keys():
+
+    return Model(D, constraints)
+
+def simpleWingSP():
     # Env. constants
     g = Variable("g", 9.81, "m/s^2", "gravitational acceleration")
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.)
@@ -91,10 +143,9 @@ def simpleWing():
                     V_f_avail >= V_f,
                     W_f >= TSFC * T_flight * D]
 
-    #return Model(W_f/LoD, constraints)
-    # return Model(1/V, constraints)
-    # return Model(D, constraints)
-    return Model(W_f, constraints)
+    # return Model(W_f/LoD, constraints)
+    return Model(D, constraints)
+    #return Model(W_f, constraints)
     # return Model(W,constraints)
     # return Model(W_f*T_flight,constraints)
     # return Model(W_f + 1*T_flight*units('N/min'),constraints)
@@ -126,7 +177,7 @@ def simpleWingTwoDimensionalUncertainty():
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
     C_D = Variable("C_D", "-", "Drag coefficient of wing")
-    C_L = Variable("C_L", "-", "Lift coefficient of wing")
+    C_L = Variable("C_L", "-", "Lift coefficent of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
 
@@ -167,11 +218,10 @@ def testModel():
 
     a = Variable('a', 1.1, pr = 10)
     b = Variable('b', 1, pr = 10)
-
+    
     constraints = [a*b*x + a*b*y <= 1,
                     b*x/y + b*x*y + b*x**2 <= 1]
     return Model((x*y)**-1, constraints)
-
 
 def exampleSP():
     x = Variable('x')
@@ -208,143 +258,92 @@ def solveModel(model, *args):
     initialGuess = {}
     if args:
         initialGuess = args[0]
-        # del initialGuess["S"]
     try:
         sol = model.solve(verbosity=0)
     except:
         sol  = model.localsolve(verbosity=0,x0 = initialGuess)
-    #print (sol.summary())
+    print (sol.summary())
     return sol
 
-def evaluateRandomModel(model, solution, uncertainVars, freeVars,values):
+def evaluateRandomModel(oldModel,solutionBox, solutionEll):
+    modelBox = EM.sameModel(oldModel)
+    modelEll = EM.sameModel(oldModel)
+    freeVars = [var for var in modelBox.varkeys.keys()
+    if var not in modelBox.substitutions.keys()]
+    uncertainVars = [var for var in modelBox.substitutions.keys()
+                    if "pr" in var.key.descr]             
     for key in freeVars:
-        if 'fix' in key.descr.keys():
+        if key.descr['name'] == "A" or key.descr['name'] == "S":
             try:
-                model.substitutions[key] = solution.get(key).m
+                modelBox.substitutions[key] = solutionBox.get(key).m
+                modelEll.substitutions[key] = solutionEll.get(key).m
             except:
-                model.substitutions[key] = solution.get(key)
-
-    for i, key in enumerate(uncertainVars):
-        pr = model[key].key.descr["pr"]
+                modelBox.substitutions[key] = solutionBox.get(key)
+                modelEll.substitutions[key] = solutionEll.get(key)
+    for key in uncertainVars:
+        val = modelBox[key].key.descr["value"]
+        pr = modelBox[key].key.descr["pr"]
         if pr != 0:
-            model.substitutions[key] = values[i]
-    return model
-
-def generate_samples(model, uncertain_vars):
-    values = []
-    for key in uncertain_vars:
-        val = model[key].key.descr["value"]
-        pr = model[key].key.descr["pr"]
-        sigma = pr*val/300.0
-        values.append(np.random.normal(val,sigma))
-        #values.append(np.random.uniform(val-pr*val/100.0,val+pr*val/100.0))
-    return values
-
-
+            sigma = pr*val/300.0
+            #newVal = np.random.normal(val,sigma)
+            newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
+            modelBox.substitutions[key] = newVal
+            modelEll.substitutions[key] = newVal
+    return modelBox, modelEll
+    
 def failOrSuccess(model):
     try:
-        #print(model['A'].key.descr)
-        sol = solveModel(model)
-        return True, sol.get('cost')
+       #model.as_posyslt1(model.substitutions)
+       sol = solveModel(model);
+       vars = sol.get('variables')
+       return True, vars.get("D")
     except:
-        #print('blu')
         return False,0
 
-def probabilityOfFailure(numberOfIterations):
+def probabilityOfFailure(model,numberOfIterations):
     probBox = []
     costBox = []
     probEll = []
     costEll = []
-    simp = simpleWing()
-    freeVars = [var for var in simp.varkeys.keys()
-                if var not in simp.substitutions.keys()]
-    uncertainVars = [var for var in simp.substitutions.keys()
-                    if "pr" in var.key.descr]
     for Gamma in xrange(9):
         failureBox = 0
         successBox = 0
         failureEll = 0
         successEll = 0
-        print('started the first SP solve')
-        solBox = RGP.solveRobustSPBox(simpleWing(),(Gamma)/6.0)
-        print('started the second SP solve')
-        solEll = RGP.solveRobustSPEll(simpleWing(), (Gamma)/6.0)
-        print('finished the SP solves')
+        robModelBox = RGP.robustModelBoxUncertainty(model,(Gamma)/6.0)
+        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma)/6.0)
+        #print('Done Creating Robust Models')
+        solBox = solveModel(robModelBox[0])
+        solEll = solveModel(robModelEll[0])
+        #print('Done Solving')
         solutionBox = solBox.get('variables')
         solutionEll = solEll.get('variables')
+        del solutionBox["D"]
+        del solutionEll["D"]
         sumCostBox = 0
         sumCostEll = 0
         for i in xrange(numberOfIterations):
             print('Gamma = %s'%Gamma, 'iteration: %s' %i)
-            values = generate_samples(simp, uncertainVars)
-            model = evaluateRandomModel(simpleWing(),solutionBox,uncertainVars,freeVars, values)
-
-            FSBox,cost = failOrSuccess(model)
-
+            newModelBox, newModelEll = evaluateRandomModel(model,solutionBox, solutionEll)
+            FSBox,cost = failOrSuccess(newModelBox)
             sumCostBox = sumCostBox + cost
             if FSBox:
                 successBox = successBox + 1
             else:
                 failureBox = failureBox + 1
-            model = evaluateRandomModel(simpleWing(),solutionEll, uncertainVars,freeVars, values)
-            FSEll,cost = failOrSuccess(model)
+            FSEll,cost = failOrSuccess(newModelEll)
             sumCostEll = sumCostEll + cost
             if FSEll:
                 successEll = successEll + 1
             else:
                 failureEll = failureEll + 1
-        if successBox != 0:
-            costBox.append(sumCostBox/(successBox+0.0))
-        else:
-            costBox.append(1e10)
-        if successEll != 0:
-            costEll.append(sumCostEll/(successEll+0.0))
-        else:
-            costEll.append(1e10)
+        costBox.append(sumCostBox/(successBox+0.0))
+        costEll.append(sumCostEll/(successEll+0.0))
         probBox.append(failureBox/(failureBox+successBox+0.0))
         probEll.append(failureEll/(failureEll+successEll+0.0))
-    gamma = np.linspace(0,4,9)
-    return gamma, probBox, probEll,costBox,costEll
-
-def plot_probOfFail(gamma, probBox, probEll,costBox,costEll):
-    plt.plot(gamma, probBox, 'r-', gamma, probEll, 'b-',gamma,np.ones(gamma.shape)*0.02, 'm--',
-             [2.5],0.01,'ro',[2.5],0.01,'bo')
-    #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
-    plt.grid(True)
-    plt.xlabel(r'$\Gamma$')
-    plt.ylabel('Probability of Failure')
-    plt.title('Probability of Failure vs. ' + r'$\Gamma$')
-    plt.show()
-
-def plot_cost(gamma, probBox, probEll,costBox,costEll):
-    costBoxi = [i.magnitude for i in costBox]
-    costElli = [i.magnitude for i in costEll]
-
-    plt.plot(gamma, costBoxi, 'r-', gamma, costElli, 'b-',
-             2.5, 10858.9,'ro',2.5,9299.02,'bo')
-
-             # [2.],0.02,'ro',[2.5],0.02,'bo')
-    #plt.plot(gamma,costBox,'r-',gamma,costEll,'b-')
-    plt.grid(True)
-    plt.xlabel(r'$\Gamma$')
-    plt.ylabel(r'$W_{fuel}$ (N)')
-    plt.title(r'$W_{fuel}$' +  ' vs. ' + r'$\Gamma$')
-    plt.show()
-
-
-if __name__ == '__main__':
-    m = simpleWing()
-    sol = m.localsolve()
-
-    # Adding sweep functionality/template for Gamma
-    #m.substitutions.update({'Range':('sweep',np.linspace(500,5000,15))})
-    #sol = m.localsolve()
-
-    # Autosweep doesn't work for Signomials yet apparently. But still nice to have the template.
-    # sol = m.autosweep({'Range':(500,5000)},tol = 0.001, verbosity = 3)
-
-
-    #f,ax = sol.plot({'L/D'})
-    #ax.set_title('Dep variable vs. indep variable')
-    #f.show()
-
+    return probBox, probEll,costBox,costEll
+#
+#
+# if __name__ == '__main__':
+    # m = simpleWing()
+    # sol = m.solve()
