@@ -97,7 +97,6 @@ class RobustGPModel(Model):
             model_lower.substitutions.update(model.substitutions)
 
         initial_guess = sol.get("variables")
-        # print(initial_guess['(CDA0)'])
 
         if enable_sp:
             no_data_constraints_upper, no_data_constraints_lower, data_constraints = \
@@ -115,7 +114,7 @@ class RobustGPModel(Model):
             model_lower.substitutions.update(model.substitutions)
 
             subs_vars = model_upper.substitutions.keys()
-            # print(initial_guess)
+
             for i in xrange(len(subs_vars)):
                 del initial_guess[subs_vars[i].key]
 
@@ -217,24 +216,24 @@ class RobustGPModel(Model):
             dependent_uncertainty_set = False
         else:
             dependent_uncertainty_set = True
-        # print(dependent_uncertainty_set)
+
         uncertain_vars = SameModel.uncertain_model_variables(model)
-        # print('RobustGP:before creating tractable model')
+
         tractable_model = TractableModel(model, r, tol, uncertain_vars, simple_model, dependent_uncertainty_set,
                                          two_term, maximum_number_of_permutations, simple_two_term,
                                          linearize_two_term, boyd)
-        # print('RobustGP:after creating a tractable modelS')
+
         simplified_model_upper, simplified_model_lower = tractable_model.get_tractable_models()
         number_of_no_data_constraints = tractable_model.get_number_of_no_data_constraints()
 
         no_data_constraints_upper, no_data_constraints_lower = [], []
         data_constraints, data_monomials = [], []
-        # print(simplified_model_upper['(CDA0)'])
+
         posynomials_upper = simplified_model_upper.as_posyslt1()
         posynomials_lower = simplified_model_lower.as_posyslt1()
-        # print('RobustGP: start looping over posynomials')
+
         for i, p in enumerate(posynomials_upper):
-            # print(i)
+
             if i < number_of_no_data_constraints:
                 no_data_constraints_upper += [p <= 1]
                 no_data_constraints_lower += [posynomials_lower[i] <= 1]
@@ -247,7 +246,7 @@ class RobustGPModel(Model):
                                              enable_sp, number_of_regression_points))
                 else:
                     data_monomials.append(p)
-        # print('RobustGP: end looping over posynomials')
+
         exps_of_uncertain_vars = RobustGPModel. \
             uncertain_variables_exponents(data_monomials, uncertain_vars)
 

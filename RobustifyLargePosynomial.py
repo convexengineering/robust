@@ -127,12 +127,12 @@ class RobustifyLargePosynomial:
         constraints = []
         s_main = Variable("s_%s" % m)
         if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-            # print('fuck fuck fuck fuck ... box')
+
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
                                       zip(mean_vector, intercept)], monomials)]) + s_main <= 1]
         elif type_of_uncertainty_set == 'elliptical':
-            # print('fuck fuck fuck fuck .. 1')
+
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
                                       zip(mean_vector, intercept)], monomials)]) + s_main ** 0.5 <= 1]
@@ -143,13 +143,13 @@ class RobustifyLargePosynomial:
             positive_monomials, negative_monomials = [], []
 
             if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'elliptical':
-                # print('fuck fuck fuck fuck .. 2')
+
                 s = Variable("s^%s_%s" % (i, m))
                 ss.append(s)
             else:
                 s = s_main
             for j in xrange(len(perturbation_matrix)):
-                # print('generate_robust_constraints: i, j ', i, j)
+
                 if perturbation_matrix[j][i] > 0:
                     positive_pert.append(mean_vector[j] * perturbation_matrix[j][i])
                     positive_monomials.append(monomials[j])
@@ -175,7 +175,7 @@ class RobustifyLargePosynomial:
                                             sum([a * b for a, b in
                                                  zip(positive_pert, positive_monomials)]) <= s]
                     elif type_of_uncertainty_set == 'elliptical':
-                        # print('fuck fuck fuck fuck .. 3')
+
                         constraints += [(sum([a * b for a, b in
                                               zip(positive_pert, positive_monomials)])
                                          - sum([a * b for a, b in
@@ -189,13 +189,13 @@ class RobustifyLargePosynomial:
                         constraints += [sum([a * b for a, b in
                                              zip(negative_pert, negative_monomials)]) <= s]
                 elif type_of_uncertainty_set == 'elliptical':
-                    # print('fuck fuck fuck fuck .. 3')
+
                     constraints += [sum([a * b for a, b in
                                          zip(positive_pert, positive_monomials)]) ** 2
                                     + sum([a * b for a, b in
                                            zip(negative_pert, negative_monomials)]) ** 2 <= s]
         if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'elliptical':
-            # print('fuck fuck fuck fuck .. 4')
+
             constraints.append(sum(ss) <= s_main)
         return constraints
 

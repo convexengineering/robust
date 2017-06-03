@@ -50,18 +50,17 @@ class EquivalentModel(Model):
         :return: the equivalent model
         """
         data_constraints, no_data_constraints = [], []
-        # print(model['(CDA0)'])
         uncertain_vars = SameModel.uncertain_model_variables(model)
-        # print('EquivalentModel: ', dependent_uncertainties)
+
         for i, p in enumerate(model.as_posyslt1()):
-            # print('EquivalentModel', i)
+
             equivalent_p = EquivalentPosynomials(p)
             (no_data, data) = equivalent_p. \
                 equivalent_posynomial(uncertain_vars, i, simple_model, dependent_uncertainties)
 
             data_constraints += data
             no_data_constraints += no_data
-        # print('EquivalentModel: after looping all the constraints')
+
         self.number_of_no_data_constraints = len(no_data_constraints)
         self.cost = model.cost
         return [no_data_constraints, data_constraints]
@@ -83,17 +82,15 @@ class TwoTermModel(Model):
         :param maximum_number_of_permutations: the maximum allowed number of permutations for two term approximation
         :return: two term model and the number of no data constraints
         """
-        # print('TwoTermModel: before creating an equivalnet model')
         equivalent_model = EquivalentModel(model, False, dependent_uncertainties)
         number_of_no_data_constraints = equivalent_model.get_number_of_no_data_constraints()
-        # print(model['(CDA0)'])
-        # print(equivalent_model['(CDA0)'])
+
         data_constraints, no_data_constraints = [], []
 
         uncertain_vars = SameModel.uncertain_model_variables(model)
-        # print('TwoTermModel: before looping')
+
         for i, p in enumerate(equivalent_model.as_posyslt1()):
-            # print('TwoTermModel', i)
+
             if i < number_of_no_data_constraints:
                 no_data_constraints += [p <= 1]
             else:
@@ -101,12 +98,9 @@ class TwoTermModel(Model):
                 (no_data, data) = two_term_p. \
                     two_term_equivalent_posynomial(uncertain_vars, i, simple, boyd, maximum_number_of_permutations)
 
-                # print(no_data)
-                # print(data)
-
                 data_constraints += data[0]
                 no_data_constraints += no_data[0]
-        # print('TwoTermModel: done looping')
+
         self.number_of_no_data_constraints = len(no_data_constraints)
         self.cost = model.cost
 
@@ -143,7 +137,7 @@ class TractableModel:
         :return: the safe model, the relaxed model, and the number of data deprived constraints
         """
         data_constraints, no_data_constraints_upper, no_data_constraints_lower = [], [], []
-        # print('TractableModel:before creating safe model', dependent_uncertainties)
+
         if boyd:
             safe_model = TwoTermModel(model, False, False, True, maximum_number_of_permutations)
 
@@ -152,11 +146,9 @@ class TractableModel:
                                       maximum_number_of_permutations)
         else:
             safe_model = EquivalentModel(model, simple_model, dependent_uncertainties)
-        # print('TractableModel: after creating safe model')
+
         number_of_no_data_constraints = safe_model.get_number_of_no_data_constraints()
-        # print('TractableModel: before looping over the constraints')
-        # print(model['(CDA0)'])
-        # print('safe_model', safe_model)
+
         for i, p in enumerate(safe_model.as_posyslt1()):
 
             if i < number_of_no_data_constraints:
@@ -171,7 +163,7 @@ class TractableModel:
                     p_uncertain_vars = []
 
                     for j in xrange(len(p.exps)):
-                        # print('TractableModel:', i)
+
                         m_uncertain_vars = [var for var in p.exps[j].keys()
                                             if var in uncertain_vars]
 
@@ -191,7 +183,7 @@ class TractableModel:
 
                 else:
                     data_constraints += [p <= 1]
-        # print('TractableModel: after looping')
+
         self.number_of_no_data_constraints = len(no_data_constraints_upper)
 
         self.upper_model = Model(safe_model.cost, [no_data_constraints_upper, data_constraints])

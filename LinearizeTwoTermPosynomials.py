@@ -75,33 +75,32 @@ class LinearizeTwoTermPosynomials:
         eps_min = 0
         eps_max = np.log(2)
         delta = 100
-        # print('two_term_exp_linearization: before looping')
+
         while delta > tol:
             eps = (eps_max + eps_min) / 2
             x_final_theoretical = -np.log(np.exp(eps) - 1)
-            # print('two_term_exp_linearization: before iterating')
+
             try:
                 (a, b, x_final_actual) = \
                     LinearizeTwoTermPosynomials.iterate_two_term_exp_linearization_coeff(r, eps)
             except:
                 x_final_actual = x_final_theoretical + 2 * tol
-            # print('two_term_exp_linearization: after iterating')
+
             if x_final_actual < x_final_theoretical:
                 eps_min = eps
             else:
                 eps_max = eps
             delta = np.abs(x_final_actual - x_final_theoretical)
-            # print('two_term_exp_linearization: eps ', eps)
-        # print('two_term_exp_linearization: end looping')
+
         return a, b, eps
 
     def linearize_two_term_exp(self, m, r, tol):
-        # print('linearize_two_term_exp: begin with r = ', r)
+
         if len(self.p.exps) != 2:
             raise Exception('The Posynomial is not a two term posynomial')
-        # print('linearize_two_term_exp: before finding coeff')
+
         (a, b, eps) = LinearizeTwoTermPosynomials.two_term_exp_linearization_coeff(r, tol)
-        # print('linearize_two_term_exp: after finding coeff')
+
         data_constraints = []
         w = Variable('w_%s' % m)
         no_data_constraints_upper = [w * np.exp(eps) <= 1]
@@ -113,5 +112,5 @@ class LinearizeTwoTermPosynomials:
             data_constraints += [first_monomial ** a[r - 3 - i] *
                                  second_monomial ** a[i] * np.exp(b[i]) <= w]
         data_constraints += [second_monomial <= w]
-        # print('linearize_two_term_exp: end!!')
+
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints
