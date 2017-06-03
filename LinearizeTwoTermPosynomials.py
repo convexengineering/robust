@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.optimize as op
+import warnings
 from gpkit import Variable, Monomial, Posynomial
 
 
@@ -22,6 +23,7 @@ class LinearizeTwoTermPosynomials:
         :param eps: the error
         :return: the function
         """
+        warnings.simplefilter("ignore")
         return np.log(1 + np.exp(x)) - eps - np.log(1 + np.exp(k)) - np.exp(k) * (x - k) / (1 + np.exp(k))
 
     @staticmethod

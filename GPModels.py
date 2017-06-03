@@ -239,7 +239,6 @@ def solveModel(model, *args):
     initialGuess = {}
     if args:
         initialGuess = args[0]
-        # del initialGuess["S"]
     try:
         sol = model.solve(verbosity=0)
     except:
@@ -324,8 +323,8 @@ def probabilityOfFailure(model,numberOfIterations):
         probBox.append(failureBox/(failureBox+successBox+0.0))
         probEll.append(failureEll/(failureEll+successEll+0.0))
     return probBox, probEll,costBox,costEll
-
-
-if __name__ == '__main__':
-    m = simpleWing()
-    sol = m.solve()
+#
+#
+# if __name__ == '__main__':
+    # m = simpleWing()
+    # sol = m.solve()

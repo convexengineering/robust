@@ -52,7 +52,7 @@ class EquivalentModel(Model):
         data_constraints, no_data_constraints = [], []
         # print(model['(CDA0)'])
         uncertain_vars = SameModel.uncertain_model_variables(model)
-        # print('EquivalentModel: before looping over the constraints')
+        # print('EquivalentModel: ', dependent_uncertainties)
         for i, p in enumerate(model.as_posyslt1()):
             # print('EquivalentModel', i)
             equivalent_p = EquivalentPosynomials(p)
@@ -143,7 +143,7 @@ class TractableModel:
         :return: the safe model, the relaxed model, and the number of data deprived constraints
         """
         data_constraints, no_data_constraints_upper, no_data_constraints_lower = [], [], []
-        # print('TractableModel:before creating safe model')
+        # print('TractableModel:before creating safe model', dependent_uncertainties)
         if boyd:
             safe_model = TwoTermModel(model, False, False, True, maximum_number_of_permutations)
 
@@ -156,7 +156,7 @@ class TractableModel:
         number_of_no_data_constraints = safe_model.get_number_of_no_data_constraints()
         # print('TractableModel: before looping over the constraints')
         # print(model['(CDA0)'])
-        # print(safe_model)
+        # print('safe_model', safe_model)
         for i, p in enumerate(safe_model.as_posyslt1()):
 
             if i < number_of_no_data_constraints:

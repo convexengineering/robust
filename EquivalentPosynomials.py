@@ -150,7 +150,7 @@ class EquivalentPosynomials:
         :param dependent_uncertainties: if the uncertainty set is dependent or not
         :return: the set of equivalent posynomials
         """
-
+        # print(self.p)
         p_uncertain_vars = [var for var in self.p.varkeys if var in uncertain_vars]
         l_p = len(p_uncertain_vars)
 
@@ -165,21 +165,26 @@ class EquivalentPosynomials:
             # Check if the posynomial is a monomial:
             else:
                 return [], [self.p <= 1]
-
+        # print(dependent_uncertainties)
         # Check if uncertainties are common between all monomials:
+        flag = 0
         for i in xrange(len(self.p.exps)):
             m_uncertain_vars = [var for var in self.p.exps[i].keys()
                                 if var in uncertain_vars]
             l = len(m_uncertain_vars)
+            # print(l, l_p)
             if l != l_p:
-                dependent_uncertainties = False
-
+                flag = 1
+                break
+        if flag == 0:
+            dependent_uncertainties = False
+        # print(dependent_uncertainties)
         # Check if a simple model is preferred:
         if not simple_model:
             coupled_monomial_partitions = self.correlated_monomials(p_uncertain_vars, dependent_uncertainties)
         else:
             coupled_monomial_partitions = []
-
+        # print(coupled_monomial_partitions)
         # Check if all the monomials are related:
         if len(coupled_monomial_partitions) != 0 and len(coupled_monomial_partitions[0]) == len(self.p.exps):
             return [], [self.p <= 1]

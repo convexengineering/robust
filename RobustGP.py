@@ -15,7 +15,8 @@ class UncertainCoefficientsModel(Model):
 
     def setup(self, model, gamma, type_of_uncertainty_set, r_min=5, tol=0.001,
               simple_model=False, number_of_regression_points=2,
-              linearize_two_term=True, enable_sp=True, boyd=False, *two_term_stuff):
+              linearize_two_term=True, enable_sp=True, boyd=False, two_term=None,
+              simple_two_term=True, maximum_number_of_permutations=30):
         """
         Constructs a robust model starting from a model with uncertain coefficients
         :param model: the original uncertain model
@@ -29,6 +30,9 @@ class UncertainCoefficientsModel(Model):
         :param linearize_two_term: linearize two term functions rather than considering them large posynomials
         :param enable_sp: choose to solve an SP to get a better solution
         :param boyd: choose to apply boyd's two term approximation
+        :param two_term: whether two term approximation is preferred
+        :param simple_two_term: whether a simple two term approximation is preferred
+        :param maximum_number_of_permutations: the number of maximum two term approximations
         :return: The robust Model, The initial guess if the robust model is an SP, and the number of PWL functions used
         to approximate two term monomials
         """
@@ -36,31 +40,11 @@ class UncertainCoefficientsModel(Model):
         error = 1
         sol = 0
 
-        two_term = None
-        # simple_two_term = None
-        # maximum_number_of_permutations = None
-        if len(two_term_stuff) == 0:
-            simple_two_term = True
-            maximum_number_of_permutations = 30
+        if two_term is None:
             if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
                 two_term = True
             elif type_of_uncertainty_set == 'elliptical':
                 two_term = False
-        elif len(two_term_stuff) == 1:
-            two_term = two_term_stuff[0]
-            maximum_number_of_permutations = 30
-            if len(two_term_stuff) == 1:
-                simple_two_term = True
-            else:
-                simple_two_term = two_term_stuff[1]
-        else:
-            two_term = two_term_stuff[0]
-            simple_two_term = two_term_stuff[1]
-
-            if len(two_term_stuff) == 2:
-                maximum_number_of_permutations = 30
-            else:
-                maximum_number_of_permutations = two_term_stuff[2]
 
         no_data_constraints_upper, no_data_constraints_lower, data_constraints = UncertainCoefficientsModel. \
             robust_model_fixed_r(model, gamma, r, type_of_uncertainty_set,
@@ -233,7 +217,7 @@ class UncertainCoefficientsModel(Model):
             dependent_uncertainty_set = False
         else:
             dependent_uncertainty_set = True
-        # print(model['(CDA0)'])
+        # print(dependent_uncertainty_set)
         uncertain_vars = SameModel.uncertain_model_variables(model)
         # print('RobustGP:before creating tractable model')
         tractable_model = TractableModel(model, r, tol, uncertain_vars, simple_model, dependent_uncertainty_set,
