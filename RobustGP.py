@@ -253,6 +253,7 @@ class RobustGPModel(Model):
         if exps_of_uncertain_vars.size > 0:
             centering_vector, scaling_vector = RobustGPModel. \
                 normalize_perturbation_vector(uncertain_vars)
+            # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, gamma,
                                                        type_of_uncertainty_set,
