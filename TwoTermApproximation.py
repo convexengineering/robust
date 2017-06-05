@@ -53,21 +53,19 @@ class TwoTermApproximation:
             maximum_number_of_permutations = 1
 
         zs = []
-        # print('TwoTermApproximation: before finding bad relations')
+
         bad_relations, sizes = self.bad_relations(uncertain_vars)
-        # print('TwoTermApproximation: after finding bad relations and before choosing couples')
         list_of_couples, new_list_to_permute = TwoTermApproximation. \
             choose_convenient_couples(bad_relations, sizes, number_of_monomials)
-        # print('list_of_couples: ',list_of_couples)
-        # print('to permute: ', new_list_to_permute)
+
         number_of_couples = len(list_of_couples)
-        # print('TwoTermApproximation: before decoupling related couples')
+
         for i, couple in enumerate(list_of_couples):
             z = Variable("z^%s_(%s)" % (i, m))
             zs.append(z)
             data_constraints += [Monomial(self.p.exps[couple[0]], self.p.cs[couple[0]]) +
                                  Monomial(self.p.exps[couple[1]], self.p.cs[couple[1]]) <= z]
-        # print('TwoTermApproximation: after decoupling')
+
         length_of_permutation = len(new_list_to_permute)
 
         total_number_of_possible_permutations = \
@@ -78,20 +76,19 @@ class TwoTermApproximation:
         counter = 0
 
         number_of_permutations = min(maximum_number_of_permutations, total_number_of_possible_permutations)
-        # print('TwoTermApproximation:', number_of_permutations)
+
         data_constraints = [data_constraints] * number_of_permutations
-        # print('TwoTermApproximation: before finding permutations')
+
         while counter < number_of_permutations:
-            # print(counter)
             temp = copy(new_list_to_permute)
             random.shuffle(temp)
-            # print('TwoTermApproximation', TwoTermApproximation.check_if_permutation_exists(permutations, temp))
+
             if TwoTermApproximation.check_if_permutation_exists(permutations, temp):
                 continue
             else:
                 permutations.append(temp)
                 counter += 1
-        # print('TwoTermApproximation: after finding permutations and before looping over them')
+
         for i, permutation in enumerate(permutations):
             perm_zs = []
             number_of_iterations = int(np.floor(length_of_permutation / 2.0))
@@ -110,7 +107,7 @@ class TwoTermApproximation:
                                                  self.p.cs[permutation[length_of_permutation - 1]]) <= z]
 
             no_data_constraints.append([sum(zs) + sum(perm_zs) <= 1])
-        # print('TwoTermApproximation: after looping')
+
         return no_data_constraints, data_constraints
 
     @staticmethod
