@@ -263,11 +263,11 @@ class RobustGPModel(Model):
 
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints
 
-    def solve(self, verbosity=0, initial_guess=None):
-        if initial_guess is None:
-            initial_guess = {}
+    def solve(self, verbosity=0):
+        if self.initial_guess is None:
+            self.initial_guess = {}
         try:
             sol = self.solve(verbosity=verbosity)
         except:
-            sol = self.localsolve(verbosity=verbosity, x0=initial_guess)
+            sol = self.localsolve(verbosity=verbosity, x0=self.initial_guess)
         return sol
