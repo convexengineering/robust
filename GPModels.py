@@ -1,26 +1,37 @@
+# coding=utf-8
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 import numpy as np
 import RobustGP as RGP
 import EquivalentModels as EM
 
+
 def simpleWing():
-    k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
-    e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
-    mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
-    #pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
-    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")
-    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=33.333333)
-    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=33.333333)
-    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
-    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)
-    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
+    k = Variable("k", 1.17, "-", "form factor", pr=11.111111)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
+    e = Variable("e", 0.92, "-", "Oswald efficiency factor",
+                 pr=7.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
+    mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",
+                  pr=4.225352)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
+    # pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
+    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
+    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio",
+                   pr=33.333333)  # [0.08 - 0.16] -> [-2.5257 - -1.8325] -> 0.1131 -> 16
+    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor",
+                     pr=33.333333)  # [2.2 - 4.4] -> [0.7884 - 1.4816] -> 3.1112 -> 30.5
+    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)  # [20 - 30] -> [2.9957 - 3.4011] -> 24.4948 -> 6.33
+    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down",
+                      pr=25)  # [1.2 - 2] -> [0.1823, 0.6931] -> 1.5491 -> 58.4
+    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio",
+                          pr=3.6144578)  # [2 - 2.15] -> [0.6931 - 0.7654] -> 2.0736 -> 4.95
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m",
-                          "Wing Weight Coefficent 1", pr=66.666666)
+                          "Wing Weight Coefficent 1",
+                          pr=66.666666)  # [4e-5 - 20e-5] ->[-10.1266 - -8.5171 -> 8.9442 -> 8.63
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
-                          "Wing Weight Coefficent 2", pr=66.666666)
-    CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
-    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
-    toz = Variable("toz",1,"-",pr = 15)
+                          "Wing Weight Coefficent 2", pr=66.666666)  # [20 - 100] ->[2.9957 - 4.6051] -> 44.7213 -> 21.2
+    CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area",
+                    pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
+    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
+                   pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
+    toz = Variable("toz", 1, "-", pr=15)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
 
     # Free Variables
     D = Variable("D", "N", "total drag force")
@@ -37,33 +48,34 @@ def simpleWing():
     constraints = []
 
     # Drag model
-    C_D_fuse = CDA0/S
-    C_D_wpar = k*C_f*S_wetratio
-    C_D_ind = C_L**2/(np.pi*A*e)
-    constraints += [C_D >= C_D_fuse*toz + C_D_wpar/toz + C_D_ind*toz]
+    C_D_fuse = CDA0 / S
+    C_D_wpar = k * C_f * S_wetratio
+    C_D_ind = C_L ** 2 / (np.pi * A * e)
+    constraints += [C_D >= C_D_fuse * toz + C_D_wpar / toz + C_D_ind * toz]
 
     # Wing weight model
-    W_w_strc = W_W_coeff1*(N_ult*A**1.5*(W_0*W*S)**0.5)/tau
+    W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
     W_w_surf = W_W_coeff2 * S
     constraints += [W_w >= W_w_surf + W_w_strc]
 
     # and the rest of the models
-    constraints += [D >= 0.5*rho*S*C_D*V**2,
-                    Re <= (rho/mu)*V*(S/A)**0.5,
-                          C_f >= 0.074/Re**0.2,
-                          W <= 0.5*rho*S*C_L*V**2,
-                          W <= 0.5*rho*S*C_Lmax*V_min**2,
-                          W >= W_0 + W_w]
-    #for key in subs.keys():
+    constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
+                    Re <= (rho / mu) * V * (S / A) ** 0.5,
+                    C_f >= 0.074 / Re ** 0.2,
+                    W <= 0.5 * rho * S * C_L * V ** 2,
+                    W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
+                    W >= W_0 + W_w]
+    # for key in subs.keys():
 
     return Model(D, constraints)
+
 
 def simpleWingSP():
     # Env. constants
     g = Variable("g", 9.81, "m/s^2", "gravitational acceleration")
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.)
     # mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air")
-    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air",pr=5.)
+    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=5.)
     rho_f = Variable("\\rho_f", 817, "kg/m^3", "density of fuel")
 
     # Non-dimensional constants
@@ -74,20 +86,20 @@ def simpleWingSP():
     S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.)
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=10.)
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 2e-5, "1/m",
-                          "Wing Weight Coefficent 1", pr= 30.) #orig  12e-5
+                          "Wing Weight Coefficent 1", pr=30.)  # orig  12e-5
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60., "Pa",
                           "Wing Weight Coefficent 2", pr=10.)
-    p_labor = Variable('p_{labor}',1.,'1/min','cost of labor', pr = 20.)
+    p_labor = Variable('p_{labor}', 1., '1/min', 'cost of labor', pr=20.)
     # Dimensional constants
-    CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area") #0.035 originally
-    Range = Variable("Range",3000, "km", "aircraft range")
+    CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area")  # 0.035 originally
+    Range = Variable("Range", 3000, "km", "aircraft range")
     toz = Variable("toz", 1, "-", pr=15.)
     TSFC = Variable("TSFC", 0.6, "1/hr", "thrust specific fuel consumption")
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20.)
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=20.)
 
     # Free Variables
-    LoD = Variable('L/D','-','lift-to-drag ratio')
+    LoD = Variable('L/D', '-', 'lift-to-drag ratio')
     D = Variable("D", "N", "total drag force")
     V = Variable("V", "m/s", "cruising speed")
     W = Variable("W", "N", "total aircraft weight")
@@ -102,14 +114,14 @@ def simpleWingSP():
     T_flight = Variable("T_{flight}", "hr", "flight time")
 
     # Free variables (fixed for performance eval.)
-    A = Variable("A", "-", "aspect ratio",fix = True)
-    S = Variable("S", "m^2", "total wing area", fix = True)
-    W_w = Variable("W_w", "N", "wing weight")#, fix = True)
-    W_w_strc = Variable('W_w_strc','N','wing structural weight', fix = True)
-    W_w_surf = Variable('W_w_surf','N','wing skin weight', fix = True)
-    V_f_wing = Variable("V_f_wing",'m^3','fuel volume in the wing', fix = True)
-    V_f_fuse = Variable('V_f_fuse','m^3','fuel volume in the fuselage', fix = True)
-    V_f_avail = Variable("V_{f_{avail}}","m^3","fuel volume available")#, fix = True)
+    A = Variable("A", "-", "aspect ratio", fix=True)
+    S = Variable("S", "m^2", "total wing area", fix=True)
+    W_w = Variable("W_w", "N", "wing weight")  # , fix = True)
+    W_w_strc = Variable('W_w_strc', 'N', 'wing structural weight', fix=True)
+    W_w_surf = Variable('W_w_surf', 'N', 'wing skin weight', fix=True)
+    V_f_wing = Variable("V_f_wing", 'm^3', 'fuel volume in the wing', fix=True)
+    V_f_fuse = Variable('V_f_fuse', 'm^3', 'fuel volume in the fuselage', fix=True)
+    V_f_avail = Variable("V_{f_{avail}}", "m^3", "fuel volume available")  # , fix = True)
     constraints = []
     # Drag model
     C_D_fuse = CDA0 / S
@@ -117,38 +129,39 @@ def simpleWingSP():
     C_D_ind = C_L ** 2 / (np.pi * A * e)
     constraints += [C_D >= C_D_fuse * toz + C_D_wpar / toz + C_D_ind * toz]
 
-
     with SignomialsEnabled():
-            # Wing weight model
-            #NOTE: This is a signomial constraint that has been GPified. Could revert back to signomial?
+        # Wing weight model
+        # NOTE: This is a signomial constraint that has been GPified. Could revert back to signomial?
         constraints += [W_w >= W_w_surf + W_w_strc,
                         # W_w_strc >= W_W_coeff1 * (N_ult * A ** 1.5 * ((W_0+V_f_fuse*g*rho_f) * W * S) ** 0.5) / tau, #[GP]
-                        W_w_strc**2. >= W_W_coeff1**2. * (N_ult**2. * A ** 3. * ((W_0+V_f_fuse*g*rho_f) * W * S)) / tau**2.,
+                        W_w_strc ** 2. >= W_W_coeff1 ** 2. * (
+                            N_ult ** 2. * A ** 3. * ((W_0 + V_f_fuse * g * rho_f) * W * S)) / tau ** 2.,
                         W_w_surf >= W_W_coeff2 * S]
 
-    # and the rest of the models
-        constraints += [LoD == C_L/C_D,
-                    D >= 0.5 * rho * S * C_D * V ** 2,
-                    Re <= (rho / mu) * V * (S / A) ** 0.5,
-                    C_f >= 0.074 / Re ** 0.2,
-                    T_flight >= Range / V,
-                    W_0 + W_w + 0.5 * W_f <= 0.5 * rho * S * C_L * V ** 2,
-                    W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
-                    W >= W_0 + W_w + W_f,
-                    V_f == W_f / g / rho_f,
-                    V_f_avail <= V_f_wing + V_f_fuse, #[SP]
-                    V_f_wing**2 <= 0.0009*S**3/A*tau**2, #linear with b and tau, quadratic with chord!
-                    V_f_fuse <= 10*units('m')*CDA0,
-                        #TODO: Reduce volume available by the structure!
-                    V_f_avail >= V_f,
-                    W_f >= TSFC * T_flight * D]
+        # and the rest of the models
+        constraints += [LoD == C_L / C_D,
+                        D >= 0.5 * rho * S * C_D * V ** 2,
+                        Re <= (rho / mu) * V * (S / A) ** 0.5,
+                        C_f >= 0.074 / Re ** 0.2,
+                        T_flight >= Range / V,
+                        W_0 + W_w + 0.5 * W_f <= 0.5 * rho * S * C_L * V ** 2,
+                        W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
+                        W >= W_0 + W_w + W_f,
+                        V_f == W_f / g / rho_f,
+                        V_f_avail <= V_f_wing + V_f_fuse,  # [SP]
+                        V_f_wing ** 2 <= 0.0009 * S ** 3 / A * tau ** 2,  # linear with b and tau, quadratic with chord!
+                        V_f_fuse <= 10 * units('m') * CDA0,
+                        # TODO: Reduce volume available by the structure!
+                        V_f_avail >= V_f,
+                        W_f >= TSFC * T_flight * D]
 
     # return Model(W_f/LoD, constraints)
     return Model(D, constraints)
-    #return Model(W_f, constraints)
+    # return Model(W_f, constraints)
     # return Model(W,constraints)
     # return Model(W_f*T_flight,constraints)
     # return Model(W_f + 1*T_flight*units('N/min'),constraints)
+
 
 def simpleWingTwoDimensionalUncertainty():
     k = Variable("k", 1.17, "-", "form factor", pr=11.111111)
@@ -216,21 +229,22 @@ def testModel():
     x = Variable('x')
     y = Variable('y')
 
-    a = Variable('a', 1.1, pr = 10)
-    b = Variable('b', 1, pr = 10)
-    
-    constraints = [a*b*x + a*b*y <= 1,
-                    b*x/y + b*x*y + b*x**2 <= 1]
-    return Model((x*y)**-1, constraints)
+    a = Variable('a', 1.1, pr=10)
+    b = Variable('b', 1, pr=10)
+
+    constraints = [a * b * x + a * b * y <= 1,
+                   b * x / y + b * x * y + b * x ** 2 <= 1]
+    return Model((x * y) ** -1, constraints)
+
 
 def exampleSP():
     x = Variable('x')
     y = Variable('y')
-    a = Variable('a',1,pr = 10)
-    b = Variable('b',1, pr = 10)
+    a = Variable('a', 1, pr=10)
+    b = Variable('b', 1, pr=10)
     constraints = []
     with SignomialsEnabled():
-        constraints = constraints + [x >= 1 - a*y, b*y <= 0.1]
+        constraints = constraints + [x >= 1 - a * y, b * y <= 0.1]
     return Model(x, constraints)
 
 
@@ -238,19 +252,19 @@ def MikeSolarModel():
     import gassolar.solar.solar as solarMike
     model = solarMike.Mission(latitude=25)
     model.cost = model["W_{total}"]
-    uncertainVarDic = {"W_{pay}":5,"B_{PM}":0,"\\eta":0.0000001,"\\eta_{charge}":1,"\\eta_{discharge}":1,
-                                "h_{batt}":2,"W_{total}":2,"W_{cent}":2,"W_{wing}":2,"\\tau":2,"C_M":0,"e":2,
-                                "(E/\\mathcal{V})":1,"C_{L_{max}}":1,"m_w":1,}
+    uncertainVarDic = {"W_{pay}": 5, "B_{PM}": 0, "\\eta": 0.0000001, "\\eta_{charge}": 1, "\\eta_{discharge}": 1,
+                       "h_{batt}": 2, "W_{total}": 2, "W_{cent}": 2, "W_{wing}": 2, "\\tau": 2, "C_M": 0, "e": 2,
+                       "(E/\\mathcal{V})": 1, "C_{L_{max}}": 1, "m_w": 1, }
     keys = uncertainVarDic.keys()
     for i in xrange(len(uncertainVarDic)):
-        #limits = uncertainVarDic.get(keys[i])
-        #value = sum(limits)/2.0
+        # limits = uncertainVarDic.get(keys[i])
+        # value = sum(limits)/2.0
         for j in xrange(len(model.variables_byname(keys[i]))):
-            print(keys[i],uncertainVarDic.get(keys[i]),len(model.variables_byname(keys[i])))
+            print(keys[i], uncertainVarDic.get(keys[i]), len(model.variables_byname(keys[i])))
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
-            copy_key.key.descr["pr"] = uncertainVarDic.get(keys[i])#((value - limits[0])/(value + 0.0))*100
-            model.subinplace({model.variables_byname(keys[i])[j].key:copy_key})
-            #model.substitutions[copy_key] = sum(limits)/2
+            copy_key.key.descr["pr"] = uncertainVarDic.get(keys[i])  # ((value - limits[0])/(value + 0.0))*100
+            model.subinplace({model.variables_byname(keys[i])[j].key: copy_key})
+            # model.substitutions[copy_key] = sum(limits)/2
     return model
 
 
@@ -261,17 +275,18 @@ def solveModel(model, *args):
     try:
         sol = model.solve(verbosity=0)
     except:
-        sol  = model.localsolve(verbosity=0,x0 = initialGuess)
+        sol = model.localsolve(verbosity=0, x0=initialGuess)
     print (sol.summary())
     return sol
 
-def evaluateRandomModel(oldModel,solutionBox, solutionEll):
+
+def evaluateRandomModel(oldModel, solutionBox, solutionEll):
     modelBox = EM.sameModel(oldModel)
     modelEll = EM.sameModel(oldModel)
     freeVars = [var for var in modelBox.varkeys.keys()
-    if var not in modelBox.substitutions.keys()]
+                if var not in modelBox.substitutions.keys()]
     uncertainVars = [var for var in modelBox.substitutions.keys()
-                    if "pr" in var.key.descr]             
+                     if "pr" in var.key.descr]
     for key in freeVars:
         if key.descr['name'] == "A" or key.descr['name'] == "S":
             try:
@@ -284,23 +299,25 @@ def evaluateRandomModel(oldModel,solutionBox, solutionEll):
         val = modelBox[key].key.descr["value"]
         pr = modelBox[key].key.descr["pr"]
         if pr != 0:
-            sigma = pr*val/300.0
-            #newVal = np.random.normal(val,sigma)
-            newVal = np.random.uniform(val-pr*val/100.0,val+pr*val/100.0)
+            sigma = pr * val / 300.0
+            # newVal = np.random.normal(val,sigma)
+            newVal = np.random.uniform(val - pr * val / 100.0, val + pr * val / 100.0)
             modelBox.substitutions[key] = newVal
             modelEll.substitutions[key] = newVal
     return modelBox, modelEll
-    
+
+
 def failOrSuccess(model):
     try:
-       #model.as_posyslt1(model.substitutions)
-       sol = solveModel(model);
-       vars = sol.get('variables')
-       return True, vars.get("D")
+        # model.as_posyslt1(model.substitutions)
+        sol = solveModel(model);
+        vars = sol.get('variables')
+        return True, vars.get("D")
     except:
-        return False,0
+        return False, 0
 
-def probabilityOfFailure(model,numberOfIterations):
+
+def probabilityOfFailure(model, numberOfIterations):
     probBox = []
     costBox = []
     probEll = []
@@ -310,12 +327,12 @@ def probabilityOfFailure(model,numberOfIterations):
         successBox = 0
         failureEll = 0
         successEll = 0
-        robModelBox = RGP.robustModelBoxUncertainty(model,(Gamma)/6.0)
-        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma)/6.0)
-        #print('Done Creating Robust Models')
+        robModelBox = RGP.robustModelBoxUncertainty(model, (Gamma) / 6.0)
+        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma) / 6.0)
+        # print('Done Creating Robust Models')
         solBox = solveModel(robModelBox[0])
         solEll = solveModel(robModelEll[0])
-        #print('Done Solving')
+        # print('Done Solving')
         solutionBox = solBox.get('variables')
         solutionEll = solEll.get('variables')
         del solutionBox["D"]
@@ -323,27 +340,28 @@ def probabilityOfFailure(model,numberOfIterations):
         sumCostBox = 0
         sumCostEll = 0
         for i in xrange(numberOfIterations):
-            print('Gamma = %s'%Gamma, 'iteration: %s' %i)
-            newModelBox, newModelEll = evaluateRandomModel(model,solutionBox, solutionEll)
-            FSBox,cost = failOrSuccess(newModelBox)
+            print('Gamma = %s' % Gamma, 'iteration: %s' % i)
+            newModelBox, newModelEll = evaluateRandomModel(model, solutionBox, solutionEll)
+            FSBox, cost = failOrSuccess(newModelBox)
             sumCostBox = sumCostBox + cost
             if FSBox:
                 successBox = successBox + 1
             else:
                 failureBox = failureBox + 1
-            FSEll,cost = failOrSuccess(newModelEll)
+            FSEll, cost = failOrSuccess(newModelEll)
             sumCostEll = sumCostEll + cost
             if FSEll:
                 successEll = successEll + 1
             else:
                 failureEll = failureEll + 1
-        costBox.append(sumCostBox/(successBox+0.0))
-        costEll.append(sumCostEll/(successEll+0.0))
-        probBox.append(failureBox/(failureBox+successBox+0.0))
-        probEll.append(failureEll/(failureEll+successEll+0.0))
-    return probBox, probEll,costBox,costEll
+        costBox.append(sumCostBox / (successBox + 0.0))
+        costEll.append(sumCostEll / (successEll + 0.0))
+        probBox.append(failureBox / (failureBox + successBox + 0.0))
+        probEll.append(failureEll / (failureEll + successEll + 0.0))
+    return probBox, probEll, costBox, costEll
+
 #
 #
 # if __name__ == '__main__':
-    # m = simpleWing()
-    # sol = m.solve()
+# m = simpleWing()
+# sol = m.solve()
