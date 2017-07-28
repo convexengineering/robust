@@ -82,8 +82,12 @@ class TwoTermModel(Model):
         :param maximum_number_of_permutations: the maximum allowed number of permutations for two term approximation
         :return: two term model and the number of no data constraints
         """
-        equivalent_model = EquivalentModel(model, False, dependent_uncertainties)
-        number_of_no_data_constraints = equivalent_model.get_number_of_no_data_constraints()
+        if boyd == False:
+            equivalent_model = EquivalentModel(model, False, dependent_uncertainties)
+            number_of_no_data_constraints = equivalent_model.get_number_of_no_data_constraints()
+        else:
+            equivalent_model = model
+            number_of_no_data_constraints = 0
 
         data_constraints, no_data_constraints = [], []
 
