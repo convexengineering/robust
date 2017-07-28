@@ -3,6 +3,7 @@ from RobustifyLargePosynomial import RobustifyLargePosynomial
 from gpkit import Model
 
 import numpy as np
+import time
 
 
 class RobustGPModel(Model):
@@ -13,7 +14,7 @@ class RobustGPModel(Model):
     initial_guess = None
     number_of_pwl_approximations = None
 
-    def setup(self, model, gamma, type_of_uncertainty_set, r_min=5, tol=0.001,
+    def setup(self, model, gamma, type_of_uncertainty_set, r_min=10, tol=0.001,
               simple_model=False, number_of_regression_points=2,
               linearize_two_term=True, enable_sp=True, boyd=False, two_term=None,
               simple_two_term=True, maximum_number_of_permutations=30):
@@ -36,6 +37,8 @@ class RobustGPModel(Model):
         :return: The robust Model, The initial guess if the robust model is an SP, and the number of PWL functions used
         to approximate two term monomials
         """
+        start_time = time.time()
+
         r = r_min
         error = 1
         sol = 0
@@ -71,7 +74,7 @@ class RobustGPModel(Model):
                 sol_lower = model_lower.solve(verbosity=0)
             except RuntimeError:
                 r = 21
-                sol = self.solve(verbosity=0)
+                sol = model_lower.solve(verbosity=0)
                 break
 
             if flag != 1:
@@ -122,6 +125,8 @@ class RobustGPModel(Model):
         self.initial_guess = initial_guess
         self.cost = model.cost
 
+        print("--- %s seconds ---" % (time.time() - start_time))
+
         return [no_data_constraints_upper, data_constraints]
 
     @staticmethod
@@ -145,9 +150,12 @@ class RobustGPModel(Model):
         :return: the centering and scaling vector
         """
         prs = np.array([var.key.pr for var in uncertain_vars])
+        # mean_values = np.array([np.log(var.key.value) for var in uncertain_vars])
         eta_max = np.log(1 + prs / 100.0)
         eta_min = np.log(1 - prs / 100.0)
+        # centering_vector = 0
         centering_vector = (eta_min + eta_max) / 2.0
+        # scaling_vector = [a*b/100 for a, b in zip(mean_values, prs)]
         scaling_vector = eta_max - centering_vector
         return centering_vector, scaling_vector
 
@@ -263,12 +271,13 @@ class RobustGPModel(Model):
 
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints
 
-    def solve(self, verbosity=0):
-        if self.initial_guess is None:
-            self.initial_guess = {}
-        try:
-            sol = self.solve(verbosity=verbosity)
-        except:
-            sol = self.localsolve(verbosity=verbosity, x0=self.initial_guess)
-        return sol
-# something
+    # def solve(self, verbosity=0):
+        # start_time = time.time()
+        # if self.initial_guess is None:
+            # self.initial_guess = {}
+        # try:
+            # sol = self.solve(verbosity=verbosity)
+        # except:
+            # sol = self.localsolve(verbosity=verbosity, x0=self.initial_guess)
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # return sol
