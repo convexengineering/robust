@@ -46,6 +46,9 @@ class LinearizeTwoTermPosynomials:
         :param eps: error
         :return: the slope, intercept, and new x
         """
+        if r < 2:
+            raise Exception('The number of piece-wise sections should two or larger')
+
         a, b = [], []
 
         x_intersection = []
@@ -81,6 +84,8 @@ class LinearizeTwoTermPosynomials:
         :param tol: tolerance
         :return: the slope, intercept, and new x
         """
+        if r < 2:
+            raise Exception('The number of piece-wise sections should two or larger')
 
         a = None
         b = None
@@ -117,6 +122,8 @@ class LinearizeTwoTermPosynomials:
         :param tol: the tolerance allowed on the position of the intersection points
         :return: the deprived of data upper and lower constraints and the common data containing constraints
         """
+        if r < 2:
+            raise Exception('The number of piece-wise sections should two or larger')
 
         if len(self.p.exps) != 2:
             raise Exception('The Posynomial is not a two term posynomial')
