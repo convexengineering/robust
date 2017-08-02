@@ -25,19 +25,14 @@ class EquivalentPosynomials:
 
         half = int(np.floor(l / 2.0))
 
-        first_half_partitions = EquivalentPosynomials.merge_intersected_lists(
-            coupled_partition[0:half])
-        second_half_partitions = EquivalentPosynomials.merge_intersected_lists(
-            coupled_partition[half:l])
+        first_half_partitions = EquivalentPosynomials.merge_intersected_lists(coupled_partition[0:half])
+        second_half_partitions = EquivalentPosynomials.merge_intersected_lists(coupled_partition[half:l])
 
-        len_first = len(first_half_partitions)
-        len_second = len(second_half_partitions)
+        len_first, len_second = len(first_half_partitions), len(second_half_partitions)
 
-        relations = {}
-        path = {}
+        relations, path = {}, {}
 
-        first_to_delete = set()
-        second_to_delete = set()
+        first_to_delete, second_to_delete = set(), set()
 
         i = 0
         while i < len_first:
@@ -47,17 +42,18 @@ class EquivalentPosynomials:
                     second_to_delete.add(j)
                     temp_one = i
                     while temp_one in path:
-                        temp_one = path[i]
+                        temp_one = path[temp_one]  # i]
                     first_half_partitions[temp_one] = \
                         list(set(first_half_partitions[temp_one]) | set(second_half_partitions[j]))
                     if j in relations:
-                        first_to_delete.add(temp_one)
                         temp_two = relations[j]
                         while temp_two in path:
-                            temp_two = path[i]
-                        path[temp_one] = temp_two
-                        first_half_partitions[temp_two] = \
-                            list(set(first_half_partitions[temp_two]) | set(first_half_partitions[temp_one]))
+                            temp_two = path[temp_two]  # i]
+                        if temp_two != temp_one:
+                            first_to_delete.add(temp_one)
+                            path[temp_one] = temp_two
+                            first_half_partitions[temp_two] = \
+                                list(set(first_half_partitions[temp_two]) | set(first_half_partitions[temp_one]))
                     else:
                         relations[j] = temp_one
                 j += 1
@@ -72,6 +68,7 @@ class EquivalentPosynomials:
             del first_half_partitions[k]
         for k in second_to_delete:
             del second_half_partitions[k]
+
         return first_half_partitions + second_half_partitions
 
     @staticmethod
@@ -81,8 +78,18 @@ class EquivalentPosynomials:
         :param a: the list to be checked
         :return: True or False
         """
+        j = 0
+        while j < len(a):
+            if a[j] == 0:
+                j += 1
+            else:
+                break
+
+        if j == len(a):
+            return True
+
         for i in xrange(len(a) - 1):
-            if a[0] * a[i + 1] < 0:
+            if a[j] * a[i + 1] < 0:
                 return False
         return True
 
@@ -117,7 +124,7 @@ class EquivalentPosynomials:
                 if not EquivalentPosynomials.same_sign(check_sign):
                     coupled_partition.append(partition)
 
-            EquivalentPosynomials.merge_intersected_lists(coupled_partition)
+            coupled_partition = EquivalentPosynomials.merge_intersected_lists(coupled_partition)
             return coupled_partition
 
     @staticmethod
