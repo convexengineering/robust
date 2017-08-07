@@ -3,7 +3,6 @@ from gpkit import Variable, Monomial, Posynomial
 import random
 import math
 from copy import copy
-from RobustGP import RobustGPModel
 
 
 class TwoTermApproximation:
@@ -21,7 +20,7 @@ class TwoTermApproximation:
         if simple:
             maximum_number_of_permutations = 1
         if not boyd:
-            bad_relations, sizes = self.bad_relations(uncertain_vars)
+            bad_relations, sizes = self.bad_relations(self.p, uncertain_vars)
             list_of_couples, new_list_to_permute = TwoTermApproximation. \
                 choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
 
@@ -44,31 +43,34 @@ class TwoTermApproximation:
                     self.list_of_permutations.append(list_of_couples + temp)
                     counter += 1
 
-    def two_term_equivalent_posynomial(self, m, permutation, boyd):
+    @staticmethod
+    def two_term_equivalent_posynomial(p, m, permutation, boyd):
         """
         returns a two term posynomial equivalent to the original large posynomial
+        :param p: the posynomial
         :param m: the index of the posynomial
         :param boyd: whether or not a boyd two term approximation is preferred
         :param permutation: the permutation to be used for two term approximation
         :return: the no data constraints and the data constraints
         """
-        if self.number_of_monomials <= 2:
-            return [[]], [[self.p <= 1]]
+        number_of_monomials = len(p.exps)
+        if number_of_monomials <= 2:
+            return [[]], [[p <= 1]]
 
         data_constraints, no_data_constraints = [], []
 
         if boyd:
             z_1 = Variable("z^1_(%s)" % m)
-            data_constraints += [Monomial(self.p.exps[0], self.p.cs[0]) + z_1 <= 1]
-            for i in xrange(self.number_of_monomials - 3):
+            data_constraints += [Monomial(p.exps[0], p.cs[0]) + z_1 <= 1]
+            for i in xrange(number_of_monomials - 3):
                 if i > 0:
                     z_1 = Variable("z^%s_(%s)" % (i + 1, m))
                 z_2 = Variable("z^%s_(%s)" % (i + 2, m))
-                data_constraints += [Monomial(self.p.exps[i + 1], self.p.cs[i + 1]) + z_2 / z_1 <= 1]
-            z_2 = Variable("z^%s_(%s)" % (self.number_of_monomials - 2, m))
+                data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1]) + z_2 / z_1 <= 1]
+            z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
             data_constraints += [
-                Monomial(self.p.exps[self.number_of_monomials - 2], self.p.cs[self.number_of_monomials - 2]) / z_2 +
-                Monomial(self.p.exps[self.number_of_monomials - 1], self.p.cs[self.number_of_monomials - 1]) / z_2 <= 1]
+                Monomial(p.exps[number_of_monomials - 2], p.cs[number_of_monomials - 2]) / z_2 +
+                Monomial(p.exps[number_of_monomials - 1], p.cs[number_of_monomials - 1]) / z_2 <= 1]
             return [[]], [data_constraints]
 
         length_of_permutation = len(permutation)
@@ -79,15 +81,14 @@ class TwoTermApproximation:
         for j in xrange(number_of_iterations):
             z = Variable("z^%s_%s" % (j, m))
             zs.append(z)
-            data_constraints += [Monomial(self.p.exps[permutation[2 * j]], self.p.cs[permutation[2 * j]]) +
-                                 Monomial(self.p.exps[permutation[2 * j + 1]],
-                                          self.p.cs[permutation[2 * j + 1]]) <= z]
+            data_constraints += [Monomial(p.exps[permutation[2 * j]], p.cs[permutation[2 * j]]) +
+                                 Monomial(p.exps[permutation[2 * j + 1]], p.cs[permutation[2 * j + 1]]) <= z]
 
         if length_of_permutation % 2 == 1:
             z = Variable("z^%s_%s" % (number_of_iterations, m))
             zs.append(z)
-            data_constraints += [Monomial(self.p.exps[permutation[length_of_permutation - 1]],
-                                          self.p.cs[permutation[length_of_permutation - 1]]) <= z]
+            data_constraints += [Monomial(p.exps[permutation[length_of_permutation - 1]],
+                                          p.cs[permutation[length_of_permutation - 1]]) <= z]
 
         no_data_constraints.append([sum(zs) <= 1])
 
@@ -102,7 +103,7 @@ class TwoTermApproximation:
         :return: True or false
         """
         if permutation in permutations:
-            return False
+            return True
 
         true_or_false = [1] * len(permutations)
         for i in xrange(int(len(permutation) / 2)):
@@ -145,20 +146,22 @@ class TwoTermApproximation:
             n -= 2
         return prod / math.factorial(length_of_permutation / 2)
 
-    def bad_relations(self, uncertain_vars):
+    @staticmethod
+    def bad_relations(p, uncertain_vars):
         """
         Investigates the relations between the monomials in a posynomial
+        :param p: the posynomial
         :param uncertain_vars: the model's uncertain variables
         :return: the dictionary of relations, and some other assisting dictionary
         """
-        number_of_monomials = len(self.p.exps)
+        number_of_monomials = len(p.exps)
         inverse_relations = {}
         sizes = {}
         for i in xrange(number_of_monomials):
-            ith_monomial_exps = self.p.exps[i]
+            ith_monomial_exps = p.exps[i]
             m_uncertain_vars = [var for var in ith_monomial_exps.keys() if var in uncertain_vars]
             for j in range(0, number_of_monomials):
-                jth_monomial_exps = self.p.exps[j]
+                jth_monomial_exps = p.exps[j]
                 for var in m_uncertain_vars:
                     if ith_monomial_exps.get(var.key, 0) * jth_monomial_exps.get(var.key, 0) < 0:
                         if i in inverse_relations:
@@ -219,155 +222,3 @@ class TwoTermApproximation:
             list_of_couples.append(couple)
 
         return list_of_couples, to_permute
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import numpy as np
-from gpkit import Variable, Monomial, Posynomial
-import random
-import math
-from copy import copy
-
-
-class TwoTermApproximation:
-    """
-    replaces a large posynomial by a data-deprived large posynomial and a set of two term posynomials
-    """
-
-    def __init__(self, p):
-        self.p = p
-
-    p = Posynomial()
-    list_of_possibilities = []
-
-    def two_term_equivalent_posynomial(self, uncertain_vars, m, simple,
-                                       boyd, maximum_number_of_permutations):
-        """
-        returns a two term posynomial equivalent to the original large posynomial
-        :param uncertain_vars: the uncertain variables of the model containing the posynomial
-        :param m: the index of the posynomial
-        :param simple: whether or not a simple two term approximation is preferred
-        :param boyd: whether or not a boyd two term approximation is preferred
-        :param maximum_number_of_permutations: the maximum number of allowed two term approximations
-        per posynomial
-        :return: the no data constraints and the data constraints
-        """
-        number_of_monomials = len(self.p.exps)
-
-        if number_of_monomials <= 2:
-            return [[]], [[self.p <= 1]]
-
-        data_constraints, no_data_constraints = [], []
-
-        if boyd:
-            z_1 = Variable("z^1_(%s)" % m)
-            data_constraints += [Monomial(self.p.exps[0], self.p.cs[0]) + z_1 <= 1]
-            for i in xrange(number_of_monomials - 3):
-                if i > 0:
-                    z_1 = Variable("z^%s_(%s)" % (i + 1, m))
-                z_2 = Variable("z^%s_(%s)" % (i + 2, m))
-                data_constraints += [Monomial(self.p.exps[i + 1], self.p.cs[i + 1]) + z_2 / z_1 <= 1]
-            z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
-            data_constraints += [
-                Monomial(self.p.exps[number_of_monomials - 2], self.p.cs[number_of_monomials - 2]) / z_2 +
-                Monomial(self.p.exps[number_of_monomials - 1], self.p.cs[number_of_monomials - 1]) / z_2 <= 1]
-            return [[]], [data_constraints]
-
-        if simple:
-            maximum_number_of_permutations = 1
-
-        zs = []
-
-        bad_relations, sizes = self.bad_relations(uncertain_vars)
-        list_of_couples, new_list_to_permute = TwoTermApproximation. \
-            choose_convenient_couples(bad_relations, sizes, number_of_monomials)
-
-        number_of_couples = len(list_of_couples)
-
-        for i, couple in enumerate(list_of_couples):
-            z = Variable("z^%s_(%s)" % (i, m))
-            zs.append(z)
-            data_constraints += [Monomial(self.p.exps[couple[0]], self.p.cs[couple[0]]) +
-                                 Monomial(self.p.exps[couple[1]], self.p.cs[couple[1]]) <= z]
-
-        length_of_permutation = len(new_list_to_permute)
-
-        total_number_of_possible_permutations = \
-            TwoTermApproximation.total_number_of_permutations(length_of_permutation)
-
-        permutations = []
-
-        counter = 0
-
-        number_of_permutations = min(maximum_number_of_permutations, total_number_of_possible_permutations)
-
-        data_constraints = [data_constraints] * number_of_permutations
-
-        while counter < number_of_permutations:
-            temp = copy(new_list_to_permute)
-            random.shuffle(temp)
-
-            if TwoTermApproximation.check_if_permutation_exists(permutations, temp):
-                continue
-            else:
-                permutations.append(temp)
-                counter += 1
-
-        for i, permutation in enumerate(permutations):
-            perm_zs = []
-            number_of_iterations = int(np.floor(length_of_permutation / 2.0))
-
-            for j in xrange(number_of_iterations):
-                z = Variable("z^%s_(%s,%s)" % (j + number_of_couples, m, i))
-                perm_zs.append(z)
-                data_constraints[i] += [Monomial(self.p.exps[permutation[2 * j]], self.p.cs[permutation[2 * j]]) +
-                                        Monomial(self.p.exps[permutation[2 * j + 1]],
-                                                 self.p.cs[permutation[2 * j + 1]]) <= z]
-
-            if length_of_permutation % 2 == 1:
-                z = Variable("z^%s_(%s,%s)" % (number_of_iterations + number_of_couples, m, i))
-                perm_zs.append(z)
-                data_constraints[i] += [Monomial(self.p.exps[permutation[length_of_permutation - 1]],
-                                                 self.p.cs[permutation[length_of_permutation - 1]]) <= z]
-
-            no_data_constraints.append([sum(zs) + sum(perm_zs) <= 1])
-
-        return no_data_constraints, data_constraints

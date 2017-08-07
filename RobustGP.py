@@ -34,6 +34,7 @@ class RobustGPModel:
     r = None
 
     initial_guess = None
+    robust_model = None
 
     def __init__(self, model, gamma, type_of_uncertainty_set, simple_model=False, number_of_regression_points=2,
                  linearize_two_term=True, enable_sp=True, boyd=False, two_term=False, simple_two_term=True,
@@ -281,7 +282,7 @@ class RobustGPModel:
             two_term_data_posynomials += self.to_linearize_posynomials
             robust_model, _ = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, self.r)
 
-            new_solution = RobustGPModel.solve(robust_model, verbosity=0)
+            new_solution = RobustGPModel.internal_solve(robust_model, self.initial_guess)
 
             same_solution = RobustGPModel.same_solution(old_solution, new_solution)
             if same_solution:
@@ -289,6 +290,7 @@ class RobustGPModel:
             else:
                 old_solution = new_solution
         print("the model need %s seconds to setup" % (time.time() - start_time))
+        self.robust_model = robust_model
         return robust_model
 
     def linearize_and_return_upper_lower_models(self, two_term_data_posynomials, r):
@@ -341,11 +343,11 @@ class RobustGPModel:
 
             upper_model_infeasible = 0
             try:
-                sol_upper = RobustGPModel.solve(model_upper, verbosity=0)
+                sol_upper = RobustGPModel.internal_solve(model_upper, self.initial_guess)
             except:
                 upper_model_infeasible = 1
             try:
-                sol_lower = RobustGPModel.solve(model_lower, verbosity=0)
+                sol_lower = RobustGPModel.internal_solve(model_lower, self.initial_guess)
             except RuntimeError:
                 return 0, None
 
@@ -366,14 +368,25 @@ class RobustGPModel:
             solution = sol_lower
         return r, solution
 
+    def solve(self, verbosity=0):
+        if self.initial_guess is None:
+            initial_guess = {}
+        else:
+            initial_guess = self.initial_guess
+        try:
+            sol = self.robust_model.solve(verbosity=verbosity)
+        except:
+            sol = self.robust_model.localsolve(verbosity=verbosity, x0=initial_guess)
+        return sol
+
     @staticmethod
-    def solve(model, verbosity=0, initial_guess=None):
+    def internal_solve(model, initial_guess):
         if initial_guess is None:
             initial_guess = {}
         try:
-            sol = model.solve(verbosity=verbosity)
+            sol = model.solve(verbosity=0)
         except:
-            sol = model.localsolve(verbosity=verbosity, x0=initial_guess)
+            sol = model.localsolve(verbosity=0, x0=initial_guess)
         return sol
 
     def new_permutation_indices(self, solution):
