@@ -1,133 +1,112 @@
-from EquivalentModels import TractableModel, SameModel
+from EquivalentModels import SameModel, EquivalentModel, TwoTermModel
+from TwoTermApproximation import TwoTermApproximation
 from RobustifyLargePosynomial import RobustifyLargePosynomial
-from gpkit import Model
+from gpkit import Model, Monomial
+from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
 
 import numpy as np
 import time
 
 
-class RobustGPModel(Model):
-    """
-    Creates robust Models starting from a model with uncertain coefficients
-    """
+class RobustGPModel:
+    ready_constraints = []
+    tractable_posynomials = []
+    to_linearize_posynomials = []
+    large_posynomials = []
+
+    model = None
+    substitutions = None
+    gamma = None
+    type_of_uncertainty_set = None
+    simple_model = None
+    number_of_regression_points = None
+    linearize_two_term = None
+    enable_sp = None
+    boyd = None
+    two_term = None
+    simple_two_term = None
+    maximum_number_of_permutations = None
+    uncertain_vars = None
+    slopes = None
+    intercepts = None
+    r_min = None
+    tol = None
+    r = None
 
     initial_guess = None
-    number_of_pwl_approximations = None
 
-    def setup(self, model, gamma, type_of_uncertainty_set, r_min=10, tol=0.001,
-              simple_model=False, number_of_regression_points=2,
-              linearize_two_term=True, enable_sp=True, boyd=False, two_term=None,
-              simple_two_term=True, maximum_number_of_permutations=30):
-        """
-        Constructs a robust model starting from a model with uncertain coefficients
-        :param model: the original uncertain model
-        :param gamma: Controls the size of the uncertainty set
-        :param type_of_uncertainty_set: box, elliptical, or one norm set
-        :param r_min: The minimum number of PWL functions
-        :param tol: Determines the accuracy of PWL
-        :param simple_model: whether or not a simple conservative robust model is preferred
-        :param number_of_regression_points: The number of points per dimension used to replace exponential uncertainty
-        function by a linear function
-        :param linearize_two_term: linearize two term functions rather than considering them large posynomials
-        :param enable_sp: choose to solve an SP to get a better solution
-        :param boyd: choose to apply boyd's two term approximation
-        :param two_term: whether two term approximation is preferred
-        :param simple_two_term: whether a simple two term approximation is preferred
-        :param maximum_number_of_permutations: the number of maximum two term approximations
-        :return: The robust Model, The initial guess if the robust model is an SP, and the number of PWL functions used
-        to approximate two term monomials
-        """
-        start_time = time.time()
+    def __init__(self, model, gamma, type_of_uncertainty_set, simple_model=False, number_of_regression_points=2,
+                 linearize_two_term=True, enable_sp=True, boyd=False, two_term=False, simple_two_term=True,
+                 maximum_number_of_permutations=30):
+        self.model = model
+        self.substitutions = model.substitutions
+        self.gamma = gamma
+        self.type_of_uncertainty_set = type_of_uncertainty_set
+        self.simple_model = simple_model
+        self.number_of_regression_points = number_of_regression_points
+        self.linearize_two_term = linearize_two_term
+        self.enable_sp = enable_sp
+        self.boyd = boyd
+        self.two_term = two_term
+        self.simple_two_term = simple_two_term
+        self.maximum_number_of_permutations = maximum_number_of_permutations
 
-        r = r_min
-        error = 1
-        sol = 0
+        if self.type_of_uncertainty_set == 'box':
+            dependent_uncertainty_set = False
+        else:
+            dependent_uncertainty_set = True
 
-        if two_term is None:
-            if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-                two_term = True
-            elif type_of_uncertainty_set == 'elliptical':
-                two_term = False
+        self.uncertain_vars = SameModel.uncertain_model_variables(model)
 
-        no_data_constraints_upper, no_data_constraints_lower, data_constraints = RobustGPModel. \
-            robust_model_fixed_r(model, gamma, r, type_of_uncertainty_set,
-                                 tol, simple_model, number_of_regression_points,
-                                 two_term, simple_two_term, maximum_number_of_permutations,
-                                 linearize_two_term, False, boyd)
+        if boyd:
+            safe_model = TwoTermModel(model, self.uncertain_vars, 0, False, True, 1)
+            safe_model_posynomials = safe_model.as_posyslt1()
+            self.to_linearize_posynomials += safe_model_posynomials
+            return
 
-        model_upper = Model(model.cost,
-                            [no_data_constraints_upper, data_constraints])
-        model_upper.substitutions.update(model.substitutions)
+        equivalent_model = EquivalentModel(model, self.uncertain_vars, simple_model, dependent_uncertainty_set)
+        equivalent_model_posynomials = equivalent_model.as_posyslt1()
+        equivalent_model_no_data_constraints_number = equivalent_model.number_of_no_data_constraints
 
-        model_lower = Model(model.cost,
-                            [no_data_constraints_lower, data_constraints])
-        model_lower.substitutions.update(model.substitutions)
+        for i, p in enumerate(equivalent_model_posynomials):
+            if i < equivalent_model_no_data_constraints_number:
+                self.ready_constraints += [p <= 1]
+            else:
+                if len(p.exps) == 1:
+                    self.tractable_posynomials += [p]
+                elif len(p.exps) == 2 and linearize_two_term:
+                    self.to_linearize_posynomials += [p]
+                else:
+                    if two_term:
+                        two_term_approximation = TwoTermApproximation(p, self.uncertain_vars, simple_two_term,
+                                                                      False, maximum_number_of_permutations)
+                        self.large_posynomials += two_term_approximation
+                    else:
+                        robust_large_p = RobustifyLargePosynomial(p)
+                        self.ready_constraints += robust_large_p. \
+                            robustify_large_posynomial(gamma, type_of_uncertainty_set, self.uncertain_vars, i,
+                                                       enable_sp, number_of_regression_points)
 
-        while r <= 20 and error > tol:
-            flag = 0
-            try:
-                sol_upper = model_upper.solve(verbosity=0)
-                sol = sol_upper
-            except:
-                flag = 1
-            try:
-                sol_lower = model_lower.solve(verbosity=0)
-            except RuntimeError:
-                r = 21
-                sol = model_lower.solve(verbosity=0)
-                break
+    def copy(self, robust_model):
+        robust_model_copy = RobustGPModel(robust_model.model, robust_model.gamma, robust_model.type_of_uncertainty_set,
+                                          robust_model.simple_model, robust_model.number_of_regression_points,
+                                          robust_model.linearize_two_term, robust_model.enable_sp, robust_model.boyd,
+                                          robust_model.two_term, robust_model.simple_two_term,
+                                          robust_model.maximum_number_of_permutations)
 
-            if flag != 1:
-                try:
-                    error = (sol_upper.get('cost').m -
-                             sol_lower.get('cost').m) / (0.0 + sol_lower.get('cost').m)
-                except:
-                    error = (sol_upper.get('cost') -
-                             sol_lower.get('cost')) / (0.0 + sol_lower.get('cost'))
-            r += 1
-            no_data_constraints_upper, no_data_constraints_lower, data_constraints = \
-                self.robust_model_fixed_r(model, gamma, r, type_of_uncertainty_set, tol,
-                                          simple_model, number_of_regression_points,
-                                          two_term, simple_two_term, maximum_number_of_permutations,
-                                          linearize_two_term, False, boyd)
+        self.ready_constraints = robust_model.ready_constraints
+        self.tractable_posynomials = robust_model.tractable_posynomials
+        self.to_linearize_posynomials = robust_model.to_linearize_posynomials
+        self.large_posynomials = robust_model.large_posynomials
 
-            model_upper = Model(model.cost,
-                                [no_data_constraints_upper, data_constraints])
-            model_upper.substitutions.update(model.substitutions)
+        self.uncertain_vars = robust_model.uncertain_vars
+        self.slopes = robust_model.slopes
+        self.intercepts = robust_model.intercepts
+        self.r_min = robust_model.r_min
+        self.tol = robust_model.tol
+        self.r = robust_model.r
 
-            model_lower = Model(model.cost,
-                                [no_data_constraints_lower, data_constraints])
-            model_lower.substitutions.update(model.substitutions)
-
-        initial_guess = sol.get("variables")
-
-        if enable_sp:
-            no_data_constraints_upper, no_data_constraints_lower, data_constraints = \
-                self.robust_model_fixed_r(model, gamma, r - 1, type_of_uncertainty_set,
-                                          tol, False, number_of_regression_points,
-                                          False, simple_two_term, maximum_number_of_permutations,
-                                          linearize_two_term, True, boyd)
-
-            model_upper = Model(model.cost,
-                                [no_data_constraints_upper, data_constraints])
-            model_upper.substitutions.update(model.substitutions)
-
-            model_lower = Model(model.cost,
-                                [no_data_constraints_lower, data_constraints])
-            model_lower.substitutions.update(model.substitutions)
-
-            subs_vars = model_upper.substitutions.keys()
-
-            for i in xrange(len(subs_vars)):
-                del initial_guess[subs_vars[i].key]
-
-        self.number_of_pwl_approximations = r
-        self.initial_guess = initial_guess
-        self.cost = model.cost
-
-        print("--- %s seconds ---" % (time.time() - start_time))
-
-        return [no_data_constraints_upper, data_constraints]
+        return robust_model_copy
 
     @staticmethod
     def uncertain_variables_exponents(data_monomials, uncertain_vars):
@@ -192,92 +171,250 @@ class RobustGPModel(Model):
             coefficient.append([np.exp(gamma * norm) / np.exp(centering)])
         return coefficient
 
-    @staticmethod
-    def robust_model_fixed_r(model, gamma, r, type_of_uncertainty_set,
-                             tol, simple_model, number_of_regression_points, two_term,
-                             simple_two_term, maximum_number_of_permutations,
-                             linearize_two_term, enable_sp, boyd):
-        """
-        generates a robust model for a fixed number of piece-wise linear functions
-        :param model: the original model
-        :param gamma: Controls the size of the uncertainty set
-        :param r: the number of piece-wise linear functions per two term constraints
-        :param type_of_uncertainty_set: box, elliptical, or one norm set
-        :param tol: Determines the accuracy of PWL
-        :param simple_model: whether or not a simple conservative robust model is preferred
-        :param number_of_regression_points: The number of points per dimension used to
-        replace exponential uncertainty
-        function by a linear function
-        :param two_term: Solve the problem using two term decoupling rather than linear
-        approximation of exponential uncertainties. If the problem is small or the
-        number of uncertain variables per constraint is small, switch two_term to True
-        :param simple_two_term: if a simple two term approximation is preferred
-        :param maximum_number_of_permutations: the maximum allowed number of permutations for two term approximation
-        :param linearize_two_term: linearize two term functions rather than considering
-        them large posynomials
-        :param enable_sp: choose to solve an SP to get a better solution
-        :param boyd: choose to apply boyd's two term approximation
-        :return: the upper-bound of the robust model and the lower-bound of the robust model
-        """
+    def calculate_value_of_two_term_approximated_posynomial(self, two_term_approximation, index_of_permutation,
+                                                            solution):
+        permutation = two_term_approximation.list_of_permutations[index_of_permutation]
+        number_of_iterations = int(len(permutation) / 2)
 
-        if type_of_uncertainty_set == 'box':
-            dependent_uncertainty_set = False
-        else:
-            dependent_uncertainty_set = True
+        values = []
 
-        uncertain_vars = SameModel.uncertain_model_variables(model)
+        for i in xrange(number_of_iterations):
+            monomials = []
 
-        tractable_model = TractableModel(model, r, tol, uncertain_vars, simple_model, dependent_uncertainty_set,
-                                         two_term, maximum_number_of_permutations, simple_two_term,
-                                         linearize_two_term, boyd)
+            first_monomial = Monomial(two_term_approximation.p.exps[2 * i], two_term_approximation.p.cs[2 * i])
+            second_monomial = Monomial(two_term_approximation.p.exps[2 * i + 1], two_term_approximation.p.cs[2 * i + 1])
 
-        simplified_model_upper, simplified_model_lower = tractable_model.get_tractable_models()
-        number_of_no_data_constraints = tractable_model.get_number_of_no_data_constraints()
+            monomials += first_monomial
+            for j in xrange(self.r - 2):
+                monomials += [first_monomial ** self.slopes[self.r - 3 - j] *
+                              second_monomial ** self.slopes[j] * np.exp(self.intercepts[j])]
+            monomials += second_monomial
 
-        no_data_constraints_upper, no_data_constraints_lower = [], []
-        data_constraints, data_monomials = [], []
-
-        posynomials_upper = simplified_model_upper.as_posyslt1()
-        posynomials_lower = simplified_model_lower.as_posyslt1()
-
-        for i, p in enumerate(posynomials_upper):
-
-            if i < number_of_no_data_constraints:
-                no_data_constraints_upper += [p <= 1]
-                no_data_constraints_lower += [posynomials_lower[i] <= 1]
-            else:
-                if len(p.exps) > 1:
-                    robust_large_p = RobustifyLargePosynomial(p)
-                    data_constraints.append(robust_large_p.
-                                            robustify_large_posynomial
-                                            (type_of_uncertainty_set, uncertain_vars, i,
-                                             enable_sp, number_of_regression_points))
-                else:
-                    data_monomials.append(p)
-
-        exps_of_uncertain_vars = RobustGPModel. \
-            uncertain_variables_exponents(data_monomials, uncertain_vars)
-
-        if exps_of_uncertain_vars.size > 0:
-            centering_vector, scaling_vector = RobustGPModel. \
-                normalize_perturbation_vector(uncertain_vars)
+            exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents(monomials, self.uncertain_vars)
+            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
-                construct_robust_monomial_coefficients(exps_of_uncertain_vars, gamma,
-                                                       type_of_uncertainty_set,
+                construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
                                                        centering_vector, scaling_vector)
-            for i in xrange(len(data_monomials)):
-                data_constraints += [coefficient[i][0] * data_monomials[i] <= 1]
 
-        return no_data_constraints_upper, no_data_constraints_lower, data_constraints
+            subs_monomials = []
+            for j in xrange(len(monomials)):
+                monomials[j] *= coefficient[j][0]
+                monomials[j] = monomials[j].sub(solution)
+                monomials[j] = monomials[j].sub(self.model.substitutions)
+                subs_monomials.append(monomials[j].cs[0])
 
-    # def solve(self, verbosity=0):
-        # start_time = time.time()
-        # if self.initial_guess is None:
-            # self.initial_guess = {}
-        # try:
-            # sol = self.solve(verbosity=verbosity)
-        # except:
-            # sol = self.localsolve(verbosity=verbosity, x0=self.initial_guess)
-        # print("--- %s seconds ---" % (time.time() - start_time))
-        # return sol
+            values.append(max(subs_monomials))
+
+        if number_of_iterations % 2 != 0:
+            the_monomial = Monomial(two_term_approximation.p.exps[number_of_iterations],
+                                    two_term_approximation.p.cs[number_of_iterations])
+
+            exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents([the_monomial], self.uncertain_vars)
+            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
+            # noinspection PyTypeChecker
+            coefficient = RobustGPModel. \
+                construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
+                                                       centering_vector, scaling_vector)
+            the_monomial *= coefficient[0][0]
+            the_monomial = the_monomial.sub(solution)
+            the_monomial = the_monomial.sub(self.model.substitutions)
+            values.append(the_monomial.cs[0])
+
+        return sum(values)
+
+    def find_permutation_with_minimum_value(self, two_term_approximation, solution):
+        minimum_value = 1e5
+        minimum_index = len(two_term_approximation.list_of_permutations)
+        for i in xrange(len(two_term_approximation.list_of_permutations)):
+            temp_value = self. \
+                calculate_value_of_two_term_approximated_posynomial(two_term_approximation, i, solution)
+            if temp_value < minimum_value:
+                minimum_value = temp_value
+                minimum_index = i
+
+        return minimum_index
+
+    def setup(self, r_min=10, tol=0.001):
+        start_time = time.time()
+        self.r_min = r_min
+        self.tol = tol
+
+        solution = None
+
+        two_term_data_posynomials = []
+        number_of_trials_until_feasibility_is_attained = 0
+
+        while number_of_trials_until_feasibility_is_attained < self.maximum_number_of_permutations:
+            for i, two_term_approximation in enumerate(self.large_posynomials):
+                permutation = np.random.choice(two_term_approximation.list_of_permutations)
+                no_data, data = two_term_approximation.two_term_equivalent_posynomial(i, permutation, False)
+                self.ready_constraints += no_data
+                two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+
+            two_term_data_posynomials += self.to_linearize_posynomials
+            self.r, solution = self.find_number_of_piece_wise_linearization(two_term_data_posynomials)
+            if self.r != 0:
+                break
+
+            number_of_trials_until_feasibility_is_attained += 1
+
+        if number_of_trials_until_feasibility_is_attained >= self.maximum_number_of_permutations:
+            print("not feasible !!")
+
+        self.slopes, self.intercepts, _, _, _ = LinearizeTwoTermPosynomials.\
+            two_term_posynomial_linearization_coeff(self.r, self.tol)
+
+        old_solution = solution
+        robust_model = None
+
+        for _ in xrange(self.maximum_number_of_permutations):
+            permutation_indices = self.new_permutation_indices(solution)
+
+            two_term_data_posynomials = []
+
+            for i, two_term_approximation in enumerate(self.large_posynomials):
+                permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
+                _, data = two_term_approximation.two_term_equivalent_posynomial(i, permutation, False)
+                two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+
+            two_term_data_posynomials += self.to_linearize_posynomials
+            robust_model, _ = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, self.r)
+
+            new_solution = RobustGPModel.solve(robust_model, verbosity=0)
+
+            same_solution = RobustGPModel.same_solution(old_solution, new_solution)
+            if same_solution:
+                break
+            else:
+                old_solution = new_solution
+        print("the model need %s seconds to setup" % (time.time() - start_time))
+        return robust_model
+
+    def linearize_and_return_upper_lower_models(self, two_term_data_posynomials, r):
+        no_data_upper_constraints = []
+        no_data_lower_constraints = []
+        data_constraints = []
+        data_posynomials = []
+
+        for i, two_term_p in enumerate(two_term_data_posynomials):
+            linearize_p = LinearizeTwoTermPosynomials(two_term_p)
+            no_data_upper, no_data_lower, data = linearize_p.linearize_two_term_posynomial(i, r, self.tol)
+
+            no_data_upper_constraints += no_data_upper
+            no_data_lower_constraints += no_data_lower
+            data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+
+        all_tractable_posynomials = self.tractable_posynomials + data_posynomials
+
+        exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents(all_tractable_posynomials,
+                                                                             self.uncertain_vars)
+
+        if exps_of_uncertain_vars.size > 0:
+            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
+            # noinspection PyTypeChecker
+            coefficient = RobustGPModel.construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma,
+                                                                               self.type_of_uncertainty_set,
+                                                                               centering_vector, scaling_vector)
+            for i in xrange(len(all_tractable_posynomials)):
+                data_constraints += [coefficient[i][0] * all_tractable_posynomials[i] <= 1]
+
+        model_upper = Model(self.model.cost, [no_data_upper_constraints, self.ready_constraints, data_constraints])
+        model_upper.substitutions.update(self.substitutions)
+
+        model_lower = Model(self.model.cost, [no_data_lower_constraints, self.ready_constraints, data_constraints])
+        model_lower.substitutions.update(self.substitutions)
+
+        return model_upper, model_lower
+
+    def find_number_of_piece_wise_linearization(self, two_term_data_posynomials):
+        error = 2 * self.tol
+        r = self.r_min
+
+        sol_upper = None
+        sol_lower = None
+
+        lower_used = 0
+
+        while r <= 20 and error > self.tol:
+            model_upper, model_lower = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, r)
+
+            upper_model_infeasible = 0
+            try:
+                sol_upper = RobustGPModel.solve(model_upper, verbosity=0)
+            except:
+                upper_model_infeasible = 1
+            try:
+                sol_lower = RobustGPModel.solve(model_lower, verbosity=0)
+            except RuntimeError:
+                return 0, None
+
+            if upper_model_infeasible != 1:
+                try:
+                    error = (sol_upper.get('cost').m -
+                             sol_lower.get('cost').m) / (0.0 + sol_lower.get('cost').m)
+                except:
+                    error = (sol_upper.get('cost') -
+                             sol_lower.get('cost')) / (0.0 + sol_lower.get('cost'))
+            elif r == 20:
+                lower_used = 1
+                print("The safe approximation is infeasible, the lower piece-wise model is considered")
+            r += 1
+        if lower_used == 0:
+            solution = sol_upper
+        else:
+            solution = sol_lower
+        return r, solution
+
+    @staticmethod
+    def solve(model, verbosity=0, initial_guess=None):
+        if initial_guess is None:
+            initial_guess = {}
+        try:
+            sol = model.solve(verbosity=verbosity)
+        except:
+            sol = model.localsolve(verbosity=verbosity, x0=initial_guess)
+        return sol
+
+    def new_permutation_indices(self, solution):
+        permutation_indices = []
+        for two_term_approximation in self.large_posynomials:
+            permutation_indices.append(self.find_permutation_with_minimum_value(two_term_approximation, solution))
+        return permutation_indices
+
+    @staticmethod
+    def same_solution(solution_one, solution_two):
+        keys_one = solution_one.keys()
+        keys_two = solution_two.keys()
+
+        if keys_one != keys_two:
+            return False
+
+        for key in keys_one:
+            relative_difference = np.abs((solution_one[key] - solution_two[key])/solution_one[key])
+            if relative_difference > 0.0001:
+                return False
+        return True
+
+    def generate_initial_guess(self, robust_model, simple=True):
+        two_term = None
+        if self.type_of_uncertainty_set == 'box' or self.type_of_uncertainty_set == 'one norm':
+            two_term = True
+        elif self.type_of_uncertainty_set == 'elliptical':
+            two_term = False
+
+        if simple:
+            robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma,
+                                                       robust_model.type_of_uncertainty_set,
+                                                       robust_model.simple_model, robust_model.number_of_regression_points,
+                                                       robust_model.linearize_two_term, False, False,
+                                                       two_term, True, 1)
+        else:
+            robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma, robust_model.type_of_uncertainty_set,
+                                                       robust_model.simple_model, robust_model.number_of_regression_points,
+                                                       robust_model.linearize_two_term, False, robust_model.boyd,
+                                                       two_term, robust_model.simple_two_term,
+                                                       robust_model.maximum_number_of_permutations)
+
+        robust_model_initial_guess.setup()
+        return robust_model_initial_guess

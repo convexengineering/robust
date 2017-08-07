@@ -110,11 +110,11 @@ class RobustifyLargePosynomial:
         return monomials
 
     @staticmethod
-    def generate_robust_constraints(type_of_uncertainty_set,
+    def generate_robust_constraints(gamma, type_of_uncertainty_set,
                                     monomials, perturbation_matrix,
                                     intercept, mean_vector, enable_sp, m):
         """
-
+        :param gamma: controls the size of the uncertainty set
         :param type_of_uncertainty_set: box, elliptical, or one norm
         :param monomials: the list of monomials
         :param perturbation_matrix: the matrix of perturbations
@@ -130,12 +130,12 @@ class RobustifyLargePosynomial:
 
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
-                                      zip(mean_vector, intercept)], monomials)]) + s_main <= 1]
+                                      zip(mean_vector, intercept)], monomials)]) + gamma*s_main <= 1]
         elif type_of_uncertainty_set == 'elliptical':
 
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
-                                      zip(mean_vector, intercept)], monomials)]) + s_main ** 0.5 <= 1]
+                                      zip(mean_vector, intercept)], monomials)]) + gamma*s_main ** 0.5 <= 1]
         ss = []
 
         for i in xrange(len(perturbation_matrix[0])):
@@ -199,10 +199,11 @@ class RobustifyLargePosynomial:
             constraints.append(sum(ss) <= s_main)
         return constraints
 
-    def robustify_large_posynomial(self, type_of_uncertainty_set, uncertain_vars, m,
+    def robustify_large_posynomial(self, gamma, type_of_uncertainty_set, uncertain_vars, m,
                                    enable_sp, number_of_regression_points):
         """
         generate a safe approximation for large posynomials with uncertain coefficients
+        :param gamma: controls the size of the uncertainty set
         :param type_of_uncertainty_set: 'box', elliptical, or 'one norm'
         :param uncertain_vars: Model's uncertain variables
         :param m: Index
@@ -220,7 +221,7 @@ class RobustifyLargePosynomial:
 
         monomials = self.no_coefficient_monomials()
         constraints = RobustifyLargePosynomial. \
-            generate_robust_constraints(type_of_uncertainty_set, monomials,
+            generate_robust_constraints(gamma, type_of_uncertainty_set, monomials,
                                         perturbation_matrix, intercept,
                                         mean_vector, enable_sp, m)
         return constraints

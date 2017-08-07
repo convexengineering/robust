@@ -41,16 +41,16 @@ class EquivalentModel(Model):
     """
     number_of_no_data_constraints = None
 
-    def setup(self, model, simple_model, dependent_uncertainties):
+    def setup(self, model, uncertain_vars, simple_model, dependent_uncertainties):
         """
         generates an equivalent model that might not be ready for robustification
+        :param uncertain_vars: the uncertain variables of the model
         :param model: the original model
         :param simple_model: whether or not a simple conservative robust model is preferred
         :param dependent_uncertainties: if the uncertainty set is dependent or not
         :return: the equivalent model
         """
         data_constraints, no_data_constraints = [], []
-        uncertain_vars = SameModel.uncertain_model_variables(model)
 
         for i, p in enumerate(model.as_posyslt1()):
 
@@ -72,6 +72,63 @@ class EquivalentModel(Model):
 class TwoTermModel(Model):
     number_of_no_data_constraints = None
 
+    def setup(self, model, uncertain_vars, number_of_no_data_constraints, simple, boyd, maximum_number_of_permutations):
+        """
+        generates a two term model that is ready to be linearized
+        :param model: the original model
+        :param uncertain_vars: model uncertain variables
+        :param number_of_no_data_constraints: number of no data constraints
+        :param simple: choose to perform simple two term approximation
+        :param boyd: choose to apply boyd's two term approximation
+        :param maximum_number_of_permutations: the maximum allowed number of permutations for two term approximation
+        :return: two term model and the number of no data constraints
+        """
+        data_constraints, no_data_constraints = [], []
+
+        for i, p in enumerate(model.as_posyslt1()):
+
+            if i < number_of_no_data_constraints:
+                no_data_constraints += [p <= 1]
+            else:
+                two_term_p = TwoTermApproximation(p)
+                (no_data, data) = two_term_p. \
+                    two_term_equivalent_posynomial(uncertain_vars, i, simple, boyd, maximum_number_of_permutations)
+
+                data_constraints += data[0]
+                no_data_constraints += no_data[0]
+
+        self.number_of_no_data_constraints = len(no_data_constraints)
+        self.cost = model.cost
+
+        return [no_data_constraints, data_constraints]
+
+    def get_number_of_no_data_constraints(self):
+        return self.number_of_no_data_constraints
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TwoTermModel(Model):
+    number_of_no_data_constraints = None
+
     def setup(self, model, dependent_uncertainties, simple, boyd, maximum_number_of_permutations):
         """
         generates a two term model that is ready to be linearized
@@ -82,16 +139,16 @@ class TwoTermModel(Model):
         :param maximum_number_of_permutations: the maximum allowed number of permutations for two term approximation
         :return: two term model and the number of no data constraints
         """
-        if boyd == False:
-            equivalent_model = EquivalentModel(model, False, dependent_uncertainties)
+        uncertain_vars = SameModel.uncertain_model_variables(model)
+
+        if not boyd:
+            equivalent_model = EquivalentModel(model, uncertain_vars, False, dependent_uncertainties)
             number_of_no_data_constraints = equivalent_model.get_number_of_no_data_constraints()
         else:
             equivalent_model = model
             number_of_no_data_constraints = 0
 
         data_constraints, no_data_constraints = [], []
-
-        uncertain_vars = SameModel.uncertain_model_variables(model)
 
         for i, p in enumerate(equivalent_model.as_posyslt1()):
 
@@ -149,7 +206,7 @@ class TractableModel:
             safe_model = TwoTermModel(model, dependent_uncertainties, simple_two_term, False,
                                       maximum_number_of_permutations)
         else:
-            safe_model = EquivalentModel(model, simple_model, dependent_uncertainties)
+            safe_model = EquivalentModel(model, uncertain_vars, simple_model, dependent_uncertainties)
 
         number_of_no_data_constraints = safe_model.get_number_of_no_data_constraints()
 
