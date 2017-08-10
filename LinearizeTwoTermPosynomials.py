@@ -123,10 +123,11 @@ class LinearizeTwoTermPosynomials:
         :return: the deprived of data upper and lower constraints and the common data containing constraints
         """
         if r < 2:
-            raise Exception('The number of piece-wise sections should two or larger')
+            raise Exception('The number of piece-wise sections should be two or larger')
 
         if len(self.p.exps) != 2:
-            raise Exception('The Posynomial is not a two term posynomial')
+            warnings.warn('The Posynomial is not a two term posynomial')
+            return [], [], [self.p <= 1]
 
         a, b, _, _, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r, tol)
 

@@ -14,33 +14,41 @@ class TwoTermApproximation:
     number_of_monomials = None
     list_of_permutations = []
 
-    def __init__(self, p, uncertain_vars, simple, boyd, maximum_number_of_permutations):
+    def __init__(self, p, uncertain_vars, simple, boyd, smart_two_term_choose, maximum_number_of_permutations):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
+
+        self.list_of_permutations = []
+
         if simple:
             maximum_number_of_permutations = 1
+
         if not boyd:
-            bad_relations, sizes = self.bad_relations(self.p, uncertain_vars)
-            list_of_couples, new_list_to_permute = TwoTermApproximation. \
-                choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
+            if smart_two_term_choose:
+                bad_relations, sizes = self.bad_relations(self.p, uncertain_vars)
+                list_of_couples, new_list_to_permute = TwoTermApproximation. \
+                    choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
+            else:
+                list_of_couples = []
+                new_list_to_permute = range(0, self.number_of_monomials)
+
+            first_elements = []
+            for couple in list_of_couples:
+                first_elements += couple
 
             length_of_permutation = len(new_list_to_permute)
-
             total_number_of_possible_permutations = \
                 TwoTermApproximation.total_number_of_permutations(length_of_permutation)
 
             counter = 0
-
             number_of_permutations = min(maximum_number_of_permutations, total_number_of_possible_permutations)
-
             while counter < number_of_permutations:
                 temp = copy(new_list_to_permute)
                 random.shuffle(temp)
-
-                if TwoTermApproximation.check_if_permutation_exists(self.list_of_permutations, temp):
+                if TwoTermApproximation.check_if_permutation_exists(self.list_of_permutations, first_elements + temp):
                     continue
                 else:
-                    self.list_of_permutations.append(list_of_couples + temp)
+                    self.list_of_permutations.append(first_elements + temp)
                     counter += 1
 
     @staticmethod
@@ -104,7 +112,8 @@ class TwoTermApproximation:
         """
         if permutation in permutations:
             return True
-
+        if len(permutation) == 1:
+            return False
         true_or_false = [1] * len(permutations)
         for i in xrange(int(len(permutation) / 2)):
             for j in xrange(len(true_or_false)):
@@ -222,3 +231,9 @@ class TwoTermApproximation:
             list_of_couples.append(couple)
 
         return list_of_couples, to_permute
+
+    def __repr__(self):
+        return "TwoTermApproximation(" + self.p.__repr__() + ")"
+
+    def __str__(self):
+        return "TwoTermApproximation(" + self.p.__str__() + ")"
