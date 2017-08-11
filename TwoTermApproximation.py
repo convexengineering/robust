@@ -79,7 +79,7 @@ class TwoTermApproximation:
             data_constraints += [
                 Monomial(p.exps[number_of_monomials - 2], p.cs[number_of_monomials - 2]) / z_2 +
                 Monomial(p.exps[number_of_monomials - 1], p.cs[number_of_monomials - 1]) / z_2 <= 1]
-            return [[]], [data_constraints]
+            return [], data_constraints
 
         length_of_permutation = len(permutation)
         number_of_iterations = int(np.floor(length_of_permutation / 2.0))

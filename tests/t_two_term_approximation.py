@@ -79,7 +79,7 @@ def test_bad_relations():
         number_of_elements_in_relation = min(number_of_monomials, int(number_of_monomials*np.random.rand()+2))
         all_elements = []
 
-        for _ in xrange(number_of_elements_in_relation):
+        for dummy_one in xrange(number_of_elements_in_relation):
             element = np.random.choice(range(0, number_of_monomials))
             while element in all_elements:
                 element = np.random.choice(range(0, number_of_monomials))
@@ -87,7 +87,7 @@ def test_bad_relations():
 
             element_map = {}
             number_of_element_map_elements = min(number_of_monomials - 1, int(number_of_monomials*np.random.rand()+2))
-            for _ in xrange(number_of_element_map_elements):
+            for dummy_two in xrange(number_of_element_map_elements):
                 element_map_element = int(np.random.rand()*number_of_monomials)
                 while element_map_element in element_map or element_map_element == element:
                     element_map_element = int(np.random.rand()*number_of_monomials)
@@ -97,7 +97,7 @@ def test_bad_relations():
                 try:
                     relations[element_map_element][element] = size
                 except:
-                    relations[element_map_element] = {element:size}
+                    relations[element_map_element] = {element: size}
 
             if element in relations:
                 relations[element].update(element_map)
@@ -159,8 +159,8 @@ def test_bad_relations():
             map_mons = {}
             for map_key in map_keys:
                 map_mons[Monomial(p.exps[map_key], p.cs[map_key])] = internal_map[map_key]
-            actual_relations_mons[Monomial(p.exps[key],p.cs[key])] = map_mons
-            actual_sizes_mons[Monomial(p.exps[key],p.cs[key])] = actual_sizes[key]
+            actual_relations_mons[Monomial(p.exps[key], p.cs[key])] = map_mons
+            actual_sizes_mons[Monomial(p.exps[key], p.cs[key])] = actual_sizes[key]
 
         keys = relations.keys()
         relations_mons = {}
@@ -178,5 +178,3 @@ def test_bad_relations():
         assert (sizes_mons == actual_sizes_mons)
 
     return
-
-

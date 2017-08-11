@@ -1,4 +1,4 @@
-from EquivalentModels import SameModel, EquivalentModel, TwoTermModel
+from EquivalentModels import SameModel, EquivalentModel, TwoTermBoydModel
 from TwoTermApproximation import TwoTermApproximation
 from RobustifyLargePosynomial import RobustifyLargePosynomial
 from gpkit import Model, Monomial
@@ -79,7 +79,7 @@ class RobustGPModel:
         self.uncertain_vars = SameModel.uncertain_model_variables(model)
 
         if boyd:
-            safe_model = TwoTermModel(model, self.uncertain_vars, 0, False, True, 1)
+            safe_model = TwoTermBoydModel(model)
             safe_model_posynomials = safe_model.as_posyslt1()
             self.to_linearize_posynomials += safe_model_posynomials
             return
@@ -450,12 +450,12 @@ class RobustGPModel:
                                                        robust_model.type_of_uncertainty_set,
                                                        robust_model.simple_model, robust_model.number_of_regression_points,
                                                        robust_model.linearize_two_term, False, False,
-                                                       two_term, True, 1)
+                                                       two_term, True, True, 1)
         else:
             robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma, robust_model.type_of_uncertainty_set,
                                                        robust_model.simple_model, robust_model.number_of_regression_points,
                                                        robust_model.linearize_two_term, False, robust_model.boyd,
-                                                       two_term, robust_model.simple_two_term,
+                                                       two_term, robust_model.simple_two_term, True,
                                                        robust_model.maximum_number_of_permutations)
 
         robust_model_initial_guess.setup()

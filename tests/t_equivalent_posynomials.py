@@ -1,4 +1,4 @@
-from gpkit import Variable, Monomial, Posynomial, SignomialsEnabled
+from gpkit import Variable, Monomial
 import numpy as np
 from EquivalentPosynomials import EquivalentPosynomials
 
@@ -87,7 +87,7 @@ def test_correlated_monomials():
         theoretical_posynomials = []
         actual_posynomials = []
 
-        for theo_list, act_list in zip(theoretical_partition,actual_partition):
+        for theo_list, act_list in zip(theoretical_partition, actual_partition):
             theoretical_posynomials.append(sum([m[i] for i in theo_list]))
             actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in act_list]))
 
@@ -159,6 +159,8 @@ def test_check_if_no_data():
 
         for i in xrange(number_of_monomials):
             if i in data_monomials:
+                # noinspection PyUnresolvedReferences
                 assert (not EquivalentPosynomials.check_if_no_data(p_uncertain_vars, m[i].exps[0]))
             else:
+                # noinspection PyUnresolvedReferences
                 assert (EquivalentPosynomials.check_if_no_data(p_uncertain_vars, m[i].exps[0]))
