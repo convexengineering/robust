@@ -17,9 +17,7 @@ class SameModel(Model):
         constraints = []
         for i, p in enumerate(model.as_posyslt1()):
             constraints.append(p <= 1)
-        # output = Model(model.cost, constraints)
         self.cost = model.cost
-        # self.substitutions.update(model.substitutions)
         return constraints
 
     @staticmethod

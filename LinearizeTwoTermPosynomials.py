@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.optimize as op
-import warnings
+import warnings, time
 from gpkit import Variable, Monomial, Posynomial
 
 
@@ -84,6 +84,7 @@ class LinearizeTwoTermPosynomials:
         :param tol: tolerance
         :return: the slope, intercept, and new x
         """
+        temp_time = time.time()
         if r < 2:
             raise Exception('The number of piece-wise sections should two or larger')
 
@@ -93,8 +94,8 @@ class LinearizeTwoTermPosynomials:
         x_intersection = None
 
         eps = None
-        eps_min = 0
-        eps_max = np.log(2)
+        eps_min = max(1.4130/r**2.0215 - 0.001, 0)
+        eps_max = min(1.4130/r**2.0215 + 0.001, np.log(2))
         delta = 100
 
         while delta > tol:
@@ -111,7 +112,6 @@ class LinearizeTwoTermPosynomials:
             else:
                 eps_min = eps
             delta = np.abs(x_final_actual - x_final_theoretical)
-
         return a, b, x_tangent, x_intersection, eps
 
     def linearize_two_term_posynomial(self, m, r, tol):

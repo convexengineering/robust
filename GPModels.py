@@ -1,8 +1,8 @@
 # coding=utf-8
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 import numpy as np
-import RobustGP as RGP
-import EquivalentModels as EM
+from RobustGP import RobustGPModel
+from EquivalentModels import SameModel
 
 
 def simpleWing():
@@ -225,7 +225,7 @@ def simpleWingTwoDimensionalUncertainty():
 #            
 #        return constraints
 
-def testModel():
+def test_model():
     x = Variable('x')
     y = Variable('y')
 
@@ -237,7 +237,7 @@ def testModel():
     return Model((x * y) ** -1, constraints)
 
 
-def exampleSP():
+def example_sp():
     x = Variable('x')
     y = Variable('y')
     a = Variable('a', 1, pr=10)
@@ -248,117 +248,96 @@ def exampleSP():
     return Model(x, constraints)
 
 
-def MikeSolarModel():
-    import gassolar.solar.solar as solarMike
-    model = solarMike.Mission(latitude=25)
+def mike_solar_model():
+    import gassolar.solar.solar as solar_mike
+    model = solar_mike.Mission(latitude=25)
     model.cost = model["W_{total}"]
-    uncertainVarDic = {"W_{pay}": 5, "B_{PM}": 0, "\\eta": 0.0000001, "\\eta_{charge}": 1, "\\eta_{discharge}": 1,
-                       "h_{batt}": 2, "W_{total}": 2, "W_{cent}": 2, "W_{wing}": 2, "\\tau": 2, "C_M": 0, "e": 2,
-                       "(E/\\mathcal{V})": 1, "C_{L_{max}}": 1, "m_w": 1, }
-    keys = uncertainVarDic.keys()
-    for i in xrange(len(uncertainVarDic)):
-        # limits = uncertainVarDic.get(keys[i])
-        # value = sum(limits)/2.0
+    uncertain_var_dic = {"W_{pay}": 5, "B_{PM}": 4, "\\eta": 6, "\\eta_{charge}": 7, "\\eta_{discharge}": 7,
+                         "h_{batt}": 8, "W_{total}": 6, "W_{cent}": 2, "W_{wing}": 4, "\\tau": 5, "C_M": 5,
+                         "e": 1, "(E/\\mathcal{V})": 3, "C_{L_{max}}": 4, "m_w": 5, }
+    keys = uncertain_var_dic.keys()
+    for i in xrange(len(uncertain_var_dic)):
         for j in xrange(len(model.variables_byname(keys[i]))):
-            print(keys[i], uncertainVarDic.get(keys[i]), len(model.variables_byname(keys[i])))
+            print(keys[i], uncertain_var_dic.get(keys[i]), len(model.variables_byname(keys[i])))
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
-            copy_key.key.descr["pr"] = uncertainVarDic.get(keys[i])  # ((value - limits[0])/(value + 0.0))*100
+            copy_key.key.descr["pr"] = uncertain_var_dic.get(keys[i])
             model.subinplace({model.variables_byname(keys[i])[j].key: copy_key})
-            # model.substitutions[copy_key] = sum(limits)/2
-    return model
+    new_model = SameModel(model)
+    new_model.substitutions.update(model.substitutions)
+    return new_model
 
 
-def solveModel(model, *args):
-    initialGuess = {}
+def solve_model(model, *args):
+    initial_guess = {}
     if args:
-        initialGuess = args[0]
+        initial_guess = args[0]
     try:
         sol = model.solve(verbosity=0)
     except:
-        sol = model.localsolve(verbosity=0, x0=initialGuess)
+        sol = model.localsolve(verbosity=0, x0=initial_guess)
     print (sol.summary())
     return sol
 
 
-def evaluateRandomModel(oldModel, solutionBox, solutionEll):
-    modelBox = EM.sameModel(oldModel)
-    modelEll = EM.sameModel(oldModel)
-    freeVars = [var for var in modelBox.varkeys.keys()
-                if var not in modelBox.substitutions.keys()]
-    uncertainVars = [var for var in modelBox.substitutions.keys()
-                     if "pr" in var.key.descr]
-    for key in freeVars:
-        if key.descr['name'] == "A" or key.descr['name'] == "S":
+def evaluate_random_model(old_model, solution, design_variables):
+    model = SameModel(old_model)
+    model.substitutions.update(old_model.substitutions)
+    free_vars = [var for var in model.varkeys.keys()
+                 if var not in model.substitutions.keys()]
+    uncertain_vars = [var for var in model.substitutions.keys()
+                      if "pr" in var.key.descr]
+    for key in free_vars:
+        if key.descr['name'] in design_variables:
             try:
-                modelBox.substitutions[key] = solutionBox.get(key).m
-                modelEll.substitutions[key] = solutionEll.get(key).m
+                model.substitutions[key] = solution.get(key).m
             except:
-                modelBox.substitutions[key] = solutionBox.get(key)
-                modelEll.substitutions[key] = solutionEll.get(key)
-    for key in uncertainVars:
-        val = modelBox[key].key.descr["value"]
-        pr = modelBox[key].key.descr["pr"]
+                model.substitutions[key] = solution.get(key)
+    for key in uncertain_vars:
+        val = model[key].key.descr["value"]
+        pr = model[key].key.descr["pr"]
         if pr != 0:
-            sigma = pr * val / 300.0
-            # newVal = np.random.normal(val,sigma)
-            newVal = np.random.uniform(val - pr * val / 100.0, val + pr * val / 100.0)
-            modelBox.substitutions[key] = newVal
-            modelEll.substitutions[key] = newVal
-    return modelBox, modelEll
+            # sigma = pr * val / 300.0
+            # new_val = np.random.normal(val,sigma)
+            new_val = np.random.uniform(val - pr * val / 100.0, val + pr * val / 100.0)
+            model.substitutions[key] = new_val
+    return model
 
 
-def failOrSuccess(model):
+def fail_or_success(model):
     try:
-        # model.as_posyslt1(model.substitutions)
-        sol = solveModel(model);
-        vars = sol.get('variables')
-        return True, vars.get("D")
+        try:
+            sol = model.solve(verbosity=0)
+        except:
+            sol = model.localsolve(verbosity=0)
+        return True, sol['cost']
     except:
         return False, 0
 
 
-def probabilityOfFailure(model, numberOfIterations):
-    probBox = []
-    costBox = []
-    probEll = []
-    costEll = []
-    for Gamma in xrange(9):
-        failureBox = 0
-        successBox = 0
-        failureEll = 0
-        successEll = 0
-        robModelBox = RGP.robustModelBoxUncertainty(model, (Gamma) / 6.0)
-        robModelEll = RGP.robustModelEllipticalUncertainty(model, (Gamma) / 6.0)
-        # print('Done Creating Robust Models')
-        solBox = solveModel(robModelBox[0])
-        solEll = solveModel(robModelEll[0])
-        # print('Done Solving')
-        solutionBox = solBox.get('variables')
-        solutionEll = solEll.get('variables')
-        del solutionBox["D"]
-        del solutionEll["D"]
-        sumCostBox = 0
-        sumCostEll = 0
-        for i in xrange(numberOfIterations):
-            print('Gamma = %s' % Gamma, 'iteration: %s' % i)
-            newModelBox, newModelEll = evaluateRandomModel(model, solutionBox, solutionEll)
-            FSBox, cost = failOrSuccess(newModelBox)
-            sumCostBox = sumCostBox + cost
-            if FSBox:
-                successBox = successBox + 1
-            else:
-                failureBox = failureBox + 1
-            FSEll, cost = failOrSuccess(newModelEll)
-            sumCostEll = sumCostEll + cost
-            if FSEll:
-                successEll = successEll + 1
-            else:
-                failureEll = failureEll + 1
-        costBox.append(sumCostBox / (successBox + 0.0))
-        costEll.append(sumCostEll / (successEll + 0.0))
-        probBox.append(failureBox / (failureBox + successBox + 0.0))
-        probEll.append(failureEll / (failureEll + successEll + 0.0))
-    return probBox, probEll, costBox, costEll
+def probability_of_failure(rob_model, number_of_iterations, design_variables):
+
+    failure = 0
+    success = 0
+
+    solution = rob_model.solve()
+    variable_solution = solution['variables']
+    sum_cost = 0
+    for i in xrange(number_of_iterations):
+        print('iteration: %s' % i)
+        new_model = evaluate_random_model(rob_model.model, variable_solution, design_variables)
+        fail_success, cost = fail_or_success(new_model)
+        print cost
+        sum_cost = sum_cost + cost
+        if fail_success:
+            success = success + 1
+        else:
+            failure = failure + 1
+    if success > 0:
+        cost_average = sum_cost / (success + 0.0)
+    else:
+        cost_average = None
+    prob = failure / (failure + success + 0.0)
+    return prob, cost_average
 
 #
 #
