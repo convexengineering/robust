@@ -7,10 +7,116 @@ class EquivalentPosynomials:
     replaces a posynomial by an equivalent set of posynomials
     """
 
-    p = Posynomial()
+    main_p = Posynomial()
+    p_uncertain_vars = []
+    m = None
+    simple_model = None
+    dependent_uncertainties = None
 
-    def __init__(self, p):
-        self.p = p
+    no_data_constraints = []
+    data_constraints = []
+
+    def __init__(self, p, uncertain_vars, m, simple_model, dependent_uncertainties):
+        """
+        :param p: the posynomial to be simplified
+        :param uncertain_vars: the model's uncertain variables
+        :param m: the index of the posynomial
+        :param simple_model: if a simple model is preferred
+        :param dependent_uncertainties: if the uncertainty set is dependent or not
+        """
+        self.simple_model = simple_model
+        self.m = m
+        self.dependent_uncertainties = dependent_uncertainties
+        self.p_uncertain_vars = [var for var in p.varkeys if var in uncertain_vars]
+
+        self.no_data_constraints = []
+        self.data_constraints = []
+
+        if len(p.exps[0]) == 0:
+            self.main_p = p
+            return
+
+        number_of_p_uncertain_vars = len(self.p_uncertain_vars)
+        if number_of_p_uncertain_vars == 0:
+            self.no_data_constraints += [p <= 1]
+            self.main_p = p
+            return
+
+        uncertain_vars_exps = []
+        uncertain_vars_exps_mons = []
+        for i in xrange(len(p.exps)):
+            m_uncertain_vars_exps = {}
+            for var in p.exps[i].keys():
+                if var in uncertain_vars:
+                    m_uncertain_vars_exps[var] = p.exps[i][var]
+            if m_uncertain_vars_exps in uncertain_vars_exps:
+                index = uncertain_vars_exps.index(m_uncertain_vars_exps)
+                uncertain_vars_exps_mons[index].append(i)
+            else:
+                uncertain_vars_exps.append(m_uncertain_vars_exps)
+                uncertain_vars_exps_mons.append([i])
+
+        all_data_mons = []
+        for i, mon_list in enumerate(uncertain_vars_exps_mons):
+            if len(mon_list) > 1 and uncertain_vars_exps[i]:
+                new_no_data_posynomial = 0
+                for j in mon_list:
+                    new_no_data_posynomial += Monomial(p.exps[j], p.cs[j])/Monomial(uncertain_vars_exps[i])
+                com_variable = Variable('com_%s^%s' % (m, i))
+                self.no_data_constraints += [new_no_data_posynomial <= com_variable]
+                all_data_mons.append(Monomial(uncertain_vars_exps[i])*com_variable)
+            else:
+                all_data_mons.append(Monomial(p.exps[mon_list[0]], p.cs[mon_list[0]]))
+
+        self.main_p = sum(all_data_mons)
+
+        if len(self.main_p.exps) == 1:
+            self.data_constraints += [self.main_p <= 1]
+            return
+
+        # if all(len(i) == 1 for i in uncertain_vars_exps_mons) and all():
+        #    self.dependent_uncertainties = False
+
+        if not simple_model:
+            coupled_monomial_partitions = self.correlated_monomials()
+        else:
+            coupled_monomial_partitions = []
+
+        # Check if all the monomials are related:
+        if len(coupled_monomial_partitions) != 0 and len(coupled_monomial_partitions[0]) == len(self.main_p.exps):
+            self.data_constraints += [self.main_p <= 1]
+            return
+
+        ts = []
+
+        elements = list(range(len(self.main_p.exps)))
+        singleton_monomials = [element for element in elements if
+                               not EquivalentPosynomials.check_if_in_list_of_lists(element,
+                                                                                   coupled_monomial_partitions)]
+
+        super_script = 0
+        for i in singleton_monomials:
+            if EquivalentPosynomials.check_if_no_data(self.p_uncertain_vars, self.main_p.exps[i]):
+                ts.append(Monomial(self.main_p.exps[i], self.main_p.cs[i]))
+            else:
+                t = Variable('t_%s^%s' % (m, super_script))
+                super_script += 1
+                ts.append(t)
+                self.data_constraints += [Monomial(self.main_p.exps[i], self.main_p.cs[i]) <= t]
+
+        for i in xrange(len(coupled_monomial_partitions)):
+            if coupled_monomial_partitions[i]:
+                posynomial = 0
+                t = Variable('t_%s^%s' % (m, super_script))
+                super_script += 1
+                ts.append(t)
+                for j in coupled_monomial_partitions[i]:
+                    posynomial += Monomial(self.main_p.exps[j], self.main_p.cs[j])
+                self.data_constraints += [posynomial <= t]
+
+        self.no_data_constraints += [sum(ts) <= 1]
+
+        return
 
     @staticmethod
     def merge_intersected_lists(coupled_partition):
@@ -93,33 +199,31 @@ class EquivalentPosynomials:
                 return False
         return True
 
-    def correlated_monomials(self, p_uncertain_vars, dependent_uncertainties):
+    def correlated_monomials(self):
         """
         Creates partitions of correlated monomials
-        :param p_uncertain_vars: the uncertain variables in the posynomial
-        :param dependent_uncertainties: whether the uncertainty set is dependent or not
         :return: the list of coupled partitions
         """
-        number_of_monomials = len(self.p.exps)
+        number_of_monomials = len(self.main_p.exps)
         coupled_partition = []
 
-        if dependent_uncertainties:
+        if self.dependent_uncertainties:
             for j in xrange(number_of_monomials):
-                for var in p_uncertain_vars:
-                    if var.key in self.p.exps[j]:
+                for var in self.p_uncertain_vars:
+                    if var.key in self.main_p.exps[j]:
                         coupled_partition.append(j)
                         break
             return [coupled_partition]
 
         else:
-            for var in p_uncertain_vars:
+            for var in self.p_uncertain_vars:
                 partition = []
                 check_sign = []
 
                 for j in xrange(number_of_monomials):
-                    if var.key in self.p.exps[j]:
+                    if var.key in self.main_p.exps[j]:
                         partition.append(j)
-                        check_sign.append(self.p.exps[j].get(var.key))
+                        check_sign.append(self.main_p.exps[j].get(var.key))
 
                 if not EquivalentPosynomials.same_sign(check_sign):
                     coupled_partition.append(partition)
@@ -147,83 +251,3 @@ class EquivalentPosynomials:
             return True
         else:
             return False
-
-    def equivalent_posynomial(self, uncertain_vars, m, simple_model, dependent_uncertainties):
-        """
-        creates a set of posynomials that are equivalent to the input posynomial
-        :param uncertain_vars: the model's uncertain variables
-        :param m: the index of the posynomial
-        :param simple_model: if a simple model is preferred
-        :param dependent_uncertainties: if the uncertainty set is dependent or not
-        :return: the set of equivalent posynomials
-        """
-
-        p_uncertain_vars = [var for var in self.p.varkeys if var in uncertain_vars]
-        l_p = len(p_uncertain_vars)
-
-        # Check if there is no uncertain parameters in the posynomial
-        if l_p == 0:
-            return [self.p <= 1], []
-
-        if len(self.p.exps) == 1:
-            # Check if the posynomial is empty !!!!:
-            if len(self.p.exps[0]) == 0:
-                return [], []
-            # Check if the posynomial is a monomial:
-            else:
-                return [], [self.p <= 1]
-
-        # Check if uncertainties are common between all monomials:
-        flag = 0
-        for i in xrange(len(self.p.exps)):
-            m_uncertain_vars = [var for var in self.p.exps[i].keys()
-                                if var in uncertain_vars]
-            l = len(m_uncertain_vars)
-
-            if l != l_p:
-                flag = 1
-                break
-        if flag == 0:
-            dependent_uncertainties = False
-
-        # Check if a simple model is preferred:
-        if not simple_model:
-            coupled_monomial_partitions = self.correlated_monomials(p_uncertain_vars, dependent_uncertainties)
-        else:
-            coupled_monomial_partitions = []
-
-        # Check if all the monomials are related:
-        if len(coupled_monomial_partitions) != 0 and len(coupled_monomial_partitions[0]) == len(self.p.exps):
-            return [], [self.p <= 1]
-
-        ts = []
-        data_constraints, no_data_constraint = [], []
-
-        elements = list(range(len(self.p.exps)))
-        singleton_monomials = [element for element in elements if
-                               not EquivalentPosynomials.check_if_in_list_of_lists(element,
-                                                                                   coupled_monomial_partitions)]
-
-        super_script = 0
-        for i in singleton_monomials:
-            if EquivalentPosynomials.check_if_no_data(p_uncertain_vars, self.p.exps[i]):
-                ts.append(Monomial(self.p.exps[i], self.p.cs[i]))
-            else:
-                t = Variable('t_%s^%s' % (m, super_script))
-                super_script += 1
-                ts.append(t)
-                data_constraints += [Monomial(self.p.exps[i], self.p.cs[i]) <= t]
-
-        for i in xrange(len(coupled_monomial_partitions)):
-            if coupled_monomial_partitions[i]:
-                posynomial = 0
-                t = Variable('t_%s^%s' % (m, super_script))
-                super_script += 1
-                ts.append(t)
-                for j in coupled_monomial_partitions[i]:
-                    posynomial += Monomial(self.p.exps[j], self.p.cs[j])
-                data_constraints += [posynomial <= t]
-
-        no_data_constraint += [sum(ts) <= 1]
-
-        return no_data_constraint, data_constraints

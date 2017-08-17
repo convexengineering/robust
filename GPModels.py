@@ -253,12 +253,22 @@ def mike_solar_model():
     model = solar_mike.Mission(latitude=25)
     model.cost = model["W_{total}"]
     uncertain_var_dic = {"W_{pay}": 5, "B_{PM}": 4, "\\eta": 6, "\\eta_{charge}": 7, "\\eta_{discharge}": 7,
-                         "h_{batt}": 8, "W_{total}": 6, "W_{cent}": 2, "W_{wing}": 4, "\\tau": 5, "C_M": 5,
-                         "e": 1, "(E/\\mathcal{V})": 3, "C_{L_{max}}": 4, "m_w": 5, }
+                         "h_{batt}": 8, "W_{total}": 6, "W_{wing}": 4, "\\tau": 5,
+                         "e": 1, "(E/\\mathcal{V})": 3, "C_{L_{max}}": 4, "m_w": 5,}# "m_{fac}": 0, 'E': 2,
+                         #'\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
+                         #'\\bar{M}_{tip}': 2, 'V_{wind-ref}': 2, '\\rho_{sl}': 2, '\\bar{S}_{tip}': 2, 'k': 2, 'V_h': 2,
+                         #'p_{wind}': 2, '\\rho_{foam}': 2, '\\theta_{root}': 2, '\\bar{A}_{NACA0008}': 2,
+                         #'\\theta_{max}': 2, 'Re**1.00_{low-bound}': 2, 'N_{max}': 2, '\\bar{J/t}': 2, '\\rho_{CFRP}': 2,
+                         #'Re**1.00_{up-bound}': 2, '\\rho_{solar}': 2, '(E/S)_{var}': 20, '\\rho_{skin}': 5,  '(1-k/2)': 5,
+                         #'t_{min}': 5, 'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 20, '\\bar{c}_{ave}': 20,
+                         #'\\sigma_{CFRP}': 20, '\\tau_{CFRP}': 20, 'C_{m_w}': 20, '\\lambda_h/(\\lambda_h+1)': 20,
+                         #'w_{lim}': 20, '\\bar{\\delta}_{root}': 20, '(E/S)_{irr}': 2, 't_{night}': 2, '\\mu': 20,
+                         #'\\bar{c}': 20, '\\lambda_v/(\\lambda_v+1)': 20, '(P/S)_{var}': 20, 'V_{gust}': 20,
+                         #}#'\\rho_{ref}': 1, 'P_{acc}': 1, "W_{cent}": 2, "C_M": 5,}
+
     keys = uncertain_var_dic.keys()
     for i in xrange(len(uncertain_var_dic)):
         for j in xrange(len(model.variables_byname(keys[i]))):
-            print(keys[i], uncertain_var_dic.get(keys[i]), len(model.variables_byname(keys[i])))
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
             copy_key.key.descr["pr"] = uncertain_var_dic.get(keys[i])
             model.subinplace({model.variables_byname(keys[i])[j].key: copy_key})

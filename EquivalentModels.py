@@ -1,4 +1,4 @@
-from gpkit import Model
+from gpkit import Model, VarKey
 from EquivalentPosynomials import EquivalentPosynomials
 from TwoTermApproximation import TwoTermApproximation
 
@@ -16,6 +16,8 @@ class SameModel(Model):
         """
         constraints = []
         for i, p in enumerate(model.as_posyslt1()):
+            if VarKey(**model.variables_byname('m_{fac}')[0].key.descr) in p.varkeys.keys():
+                print p
             constraints.append(p <= 1)
         self.cost = model.cost
         return constraints
@@ -51,9 +53,8 @@ class EquivalentModel(Model):
 
         for i, p in enumerate(model.as_posyslt1()):
 
-            equivalent_p = EquivalentPosynomials(p)
-            (no_data, data) = equivalent_p. \
-                equivalent_posynomial(uncertain_vars, i, simple_model, dependent_uncertainties)
+            equivalent_p = EquivalentPosynomials(p, uncertain_vars, i, simple_model, dependent_uncertainties)
+            no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
 
             data_constraints += data
             no_data_constraints += no_data

@@ -125,6 +125,10 @@ class RobustGPModel:
                         self.ready_constraints += robust_large_p. \
                             robustify_large_posynomial(gamma, type_of_uncertainty_set, self.uncertain_vars, i,
                                                        enable_sp, number_of_regression_points)
+
+        if not self.large_posynomials:
+            self.maximum_number_of_permutations = 0
+
         if equality_constraints:
             warnings.warn('equality constraints will not be robustified')
 
@@ -291,7 +295,7 @@ class RobustGPModel:
 
         two_term_data_posynomials = []
         number_of_trials_until_feasibility_is_attained = 0
-
+        print "start", self.maximum_number_of_permutations
         while number_of_trials_until_feasibility_is_attained <= self.maximum_number_of_permutations:
             for i, two_term_approximation in enumerate(self.large_posynomials):
                 perm_index = np.random.choice(range(0, len(two_term_approximation.list_of_permutations)))
@@ -302,20 +306,19 @@ class RobustGPModel:
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
             two_term_data_posynomials += self.to_linearize_posynomials
+            print "before choosing r"
             self.r, solution, robust_model = self.find_number_of_piece_wise_linearization(two_term_data_posynomials)
             if self.r != 0:
                 break
             number_of_trials_until_feasibility_is_attained += 1
 
         if number_of_trials_until_feasibility_is_attained > self.maximum_number_of_permutations:
-            print("not feasible !!")
             raise Exception('Not Feasible')
-
+        print "before linearization"
         self.slopes, self.intercepts, _, _, _ = LinearizeTwoTermPosynomials.\
             two_term_posynomial_linearization_coeff(self.r, self.tol)
-
+        print "before iterating "
         old_solution = solution
-
         for _ in xrange(self.maximum_number_of_permutations):
             permutation_indices = self.new_permutation_indices(solution)
             two_term_data_posynomials = []
