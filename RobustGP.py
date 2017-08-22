@@ -39,7 +39,7 @@ class RobustGPModel:
     robust_model = None
 
     def __init__(self, model, gamma, type_of_uncertainty_set, simple_model=False, number_of_regression_points=2,
-                 linearize_two_term=True, enable_sp=True, boyd=False, two_term=False, simple_two_term=True,
+                 linearize_two_term=True, enable_sp=True, boyd=False, two_term=False, simple_two_term=False,
                  smart_two_term_choose=True, maximum_number_of_permutations=30):
         if two_term:
             linearize_two_term = True
@@ -84,6 +84,8 @@ class RobustGPModel:
         if boyd:
             self.maximum_number_of_permutations = 0
             safe_model = TwoTermBoydModel(model)
+            # safe_model.substitutions.update(model.substitutions)
+            # print safe_model.solve()['cost']
             safe_model_posynomials = safe_model.as_posyslt1()
             for p in safe_model_posynomials:
                 if len(p.exps) == 1:
@@ -99,6 +101,8 @@ class RobustGPModel:
             return
 
         equivalent_model = EquivalentModel(model, self.uncertain_vars, simple_model, dependent_uncertainty_set)
+        # equivalent_model.substitutions.update(model.substitutions)
+        # print equivalent_model.solve()['cost']
         equivalent_model_posynomials = equivalent_model.as_posyslt1()
         equivalent_model_no_data_constraints_number = equivalent_model.number_of_no_data_constraints
 
@@ -272,12 +276,12 @@ class RobustGPModel:
         return sum(values)
 
     def find_permutation_with_minimum_value(self, two_term_approximation, solution):
-        minimum_value = 1e5
+        minimum_value = np.inf
         minimum_index = len(two_term_approximation.list_of_permutations)
         for i in xrange(len(two_term_approximation.list_of_permutations)):
             temp_value = self. \
                 calculate_value_of_two_term_approximated_posynomial(two_term_approximation, i, solution)
-
+            # print temp_value
             if temp_value < minimum_value:
                 minimum_value = temp_value
                 minimum_index = i
@@ -295,8 +299,8 @@ class RobustGPModel:
 
         two_term_data_posynomials = []
         number_of_trials_until_feasibility_is_attained = 0
-        print "start", self.maximum_number_of_permutations
-        while number_of_trials_until_feasibility_is_attained <= self.maximum_number_of_permutations:
+        # print "start", self.maximum_number_of_permutations
+        while number_of_trials_until_feasibility_is_attained <= min(3, self.maximum_number_of_permutations):  # self.maximum_number_of_permutations:
             for i, two_term_approximation in enumerate(self.large_posynomials):
                 perm_index = np.random.choice(range(0, len(two_term_approximation.list_of_permutations)))
                 permutation = two_term_approximation.list_of_permutations[perm_index]
@@ -306,18 +310,19 @@ class RobustGPModel:
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
             two_term_data_posynomials += self.to_linearize_posynomials
-            print "before choosing r"
+            # print "before choosing r"
             self.r, solution, robust_model = self.find_number_of_piece_wise_linearization(two_term_data_posynomials)
+            # print "after choosing r"
             if self.r != 0:
                 break
             number_of_trials_until_feasibility_is_attained += 1
 
-        if number_of_trials_until_feasibility_is_attained > self.maximum_number_of_permutations:
+        if number_of_trials_until_feasibility_is_attained > min(3, self.maximum_number_of_permutations):  # self.maximum_number_of_permutations:
             raise Exception('Not Feasible')
-        print "before linearization"
+        # print "before linearization"
         self.slopes, self.intercepts, _, _, _ = LinearizeTwoTermPosynomials.\
             two_term_posynomial_linearization_coeff(self.r, self.tol)
-        print "before iterating "
+        # print "before iterating "
         old_solution = solution
         for _ in xrange(self.maximum_number_of_permutations):
             permutation_indices = self.new_permutation_indices(solution)
@@ -389,6 +394,7 @@ class RobustGPModel:
         lower_used = 0
 
         while r <= 20 and error > self.tol:
+
             model_upper, model_lower = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, r)
 
             upper_model_infeasible = 0
@@ -420,9 +426,9 @@ class RobustGPModel:
             robust_model = model_lower
         return r, solution, robust_model
 
-    def solve(self, verbosity=0):
+    def solve(self, verbosity=0, r_min=15, tol=0.01):
         if self.robust_model is None:
-            self.setup()
+            self.setup(r_min, tol)
         if self.initial_guess is None:
             initial_guess = {}
         else:

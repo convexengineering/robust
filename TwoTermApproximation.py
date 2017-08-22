@@ -74,7 +74,7 @@ class TwoTermApproximation:
                 if i > 0:
                     z_1 = Variable("z^%s_(%s)" % (i + 1, m))
                 z_2 = Variable("z^%s_(%s)" % (i + 2, m))
-                data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1]) + z_2 / z_1 <= 1]
+                data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1])/z_1 + z_2 / z_1 <= 1]
             z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
             data_constraints += [
                 Monomial(p.exps[number_of_monomials - 2], p.cs[number_of_monomials - 2]) / z_2 +

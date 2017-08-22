@@ -252,21 +252,22 @@ def mike_solar_model():
     import gassolar.solar.solar as solar_mike
     model = solar_mike.Mission(latitude=25)
     model.cost = model["W_{total}"]
-    uncertain_var_dic = {"W_{pay}": 5, "B_{PM}": 4, "\\eta": 6, "\\eta_{charge}": 7, "\\eta_{discharge}": 7,
-                         "h_{batt}": 8, "W_{total}": 6, "W_{wing}": 4, "\\tau": 5,
-                         "e": 1, "(E/\\mathcal{V})": 3, "C_{L_{max}}": 4, "m_w": 5,}# "m_{fac}": 0, 'E': 2,
-                         #'\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
-                         #'\\bar{M}_{tip}': 2, 'V_{wind-ref}': 2, '\\rho_{sl}': 2, '\\bar{S}_{tip}': 2, 'k': 2, 'V_h': 2,
-                         #'p_{wind}': 2, '\\rho_{foam}': 2, '\\theta_{root}': 2, '\\bar{A}_{NACA0008}': 2,
-                         #'\\theta_{max}': 2, 'Re**1.00_{low-bound}': 2, 'N_{max}': 2, '\\bar{J/t}': 2, '\\rho_{CFRP}': 2,
-                         #'Re**1.00_{up-bound}': 2, '\\rho_{solar}': 2, '(E/S)_{var}': 20, '\\rho_{skin}': 5,  '(1-k/2)': 5,
-                         #'t_{min}': 5, 'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 20, '\\bar{c}_{ave}': 20,
-                         #'\\sigma_{CFRP}': 20, '\\tau_{CFRP}': 20, 'C_{m_w}': 20, '\\lambda_h/(\\lambda_h+1)': 20,
-                         #'w_{lim}': 20, '\\bar{\\delta}_{root}': 20, '(E/S)_{irr}': 2, 't_{night}': 2, '\\mu': 20,
-                         #'\\bar{c}': 20, '\\lambda_v/(\\lambda_v+1)': 20, '(P/S)_{var}': 20, 'V_{gust}': 20,
-                         #}#'\\rho_{ref}': 1, 'P_{acc}': 1, "W_{cent}": 2, "C_M": 5,}
+    uncertain_var_dic = {'V_{wind-ref}': 0.8, "m_{fac}": 1.6, "B_{PM}": 3.2, "\\eta": 4.8, "\\eta_{charge}": 5.6,
+                         "\\eta_{discharge}": 3.2, "h_{batt}": 6.4, "\\tau": 4, "(E/\\mathcal{V})": 2.4,
+                         '\\eta_{prop}': 0.8, '\\kappa': 2.4, '\\bar{q}': 1.6, 'V_{NE}': 1.6, '1-cos(\\eta)': 1.6,
+                         '\\bar{M}_{tip}': 1.6, "W_{pay}": 1.6, '\\rho_{sl}': 1.6, '\\bar{S}_{tip}': 16, 'k': 1.6,
+                         'p_{wind}': 1.6, '\\rho_{foam}': 1.6, '\\theta_{root}': 1.6, '\\bar{A}_{NACA0008}': 1.6,
+                         '\\theta_{max}': 1.6, 'Re**1.00_{low-bound}': 1.6, 'N_{max}': 1.6, '\\bar{J/t}': 1.6,
+                         '\\rho_{CFRP}': 1.6, 'Re**1.00_{up-bound}': 1.6, '\\rho_{solar}': 1.6, '(E/S)_{var}': 4,
+                         '\\rho_{skin}': 1.6,  '(1-k/2)': 1.6, 't_{min}': 1.6, '\\bar{c}_{ave}': 10.4,
+                         'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 3.2,
+                         '\\sigma_{CFRP}': 8.8, '\\tau_{CFRP}': 7.2, 'C_{m_w}': 11.2, '\\bar{\\delta}_{root}': 6.4,
+                         'w_{lim}': 9.6, '(E/S)_{irr}': 1.6, 't_{night}': 1.6, '\\mu': 6.4, '\\bar{c}': 7.2,
+                         '\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 1.6, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
+                         "C_{L_{max}}": 3, '\\rho_{ref}': 1, }  # 'P_{acc}': 0.1,
 
     keys = uncertain_var_dic.keys()
+    print keys
     for i in xrange(len(uncertain_var_dic)):
         for j in xrange(len(model.variables_byname(keys[i]))):
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
@@ -274,6 +275,7 @@ def mike_solar_model():
             model.subinplace({model.variables_byname(keys[i])[j].key: copy_key})
     new_model = SameModel(model)
     new_model.substitutions.update(model.substitutions)
+    # print new_model.variables_byname('V_h')[0].key.descr
     return new_model
 
 

@@ -15,9 +15,19 @@ class SameModel(Model):
         :return: the new model
         """
         constraints = []
+        unc = SameModel.uncertain_model_variables(model)
         for i, p in enumerate(model.as_posyslt1()):
-            if VarKey(**model.variables_byname('m_{fac}')[0].key.descr) in p.varkeys.keys():
+            p_unc = [var.key.name for var in p.varkeys if var in unc]
+            if 'P_{acc}' in p_unc:
                 print p
+                print p_unc
+                print len(p.exps)
+                eq_p = EquivalentPosynomials(p,unc,0,False, False)
+                print("------------------------------------")
+                print(eq_p.no_data_constraints)
+                print(eq_p.data_constraints)
+                print("__________________________________")
+            #print p_unc
             constraints.append(p <= 1)
         self.cost = model.cost
         return constraints

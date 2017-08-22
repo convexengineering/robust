@@ -66,7 +66,8 @@ class EquivalentPosynomials:
                 self.no_data_constraints += [new_no_data_posynomial <= com_variable]
                 all_data_mons.append(Monomial(uncertain_vars_exps[i])*com_variable)
             else:
-                all_data_mons.append(Monomial(p.exps[mon_list[0]], p.cs[mon_list[0]]))
+                temp = sum([Monomial(p.exps[mon_ind], p.cs[mon_ind]) for mon_ind in mon_list])
+                all_data_mons.append(temp)
 
         self.main_p = sum(all_data_mons)
 
