@@ -267,8 +267,12 @@ def mike_solar_model():
                          "C_{L_{max}}": 3, '\\rho_{ref}': 1, }  # 'P_{acc}': 0.1,
 
     keys = uncertain_var_dic.keys()
-    print keys
+    # print keys
     for i in xrange(len(uncertain_var_dic)):
+        # if len(model.variables_byname(keys[i])) > 1:
+            # print keys[i]
+            # print model.variables_byname(keys[i])
+            # print("--------------------------------")
         for j in xrange(len(model.variables_byname(keys[i]))):
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
             copy_key.key.descr["pr"] = uncertain_var_dic.get(keys[i])

@@ -1,6 +1,7 @@
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled, Posynomial
 from sklearn import linear_model
+import operator
 
 
 class RobustifyLargePosynomial:
@@ -60,9 +61,53 @@ class RobustifyLargePosynomial:
                     output = output * perturbation_vector[j] ** input_list[i][j]
             result.append(output)
 
-        clf = linear_model.LinearRegression()
-        clf.fit(input_list, result)
-        return clf.coef_, clf.intercept_
+        max_index, max_value, min_index, min_value = None, -np.inf, None, np.inf
+        for i, element in enumerate(result):
+            if element < min_value:
+                min_value = element
+                min_index = i
+            if element >= max_value:
+                max_value = element
+                max_index = i
+
+        y = [[(min_value - max_value) / (input_list[min_index][0] - input_list[max_index][0])]]
+
+        for i in range(1, dim):
+            y.append([(input_list[min_index][i] - input_list[max_index][i]) /
+                     (input_list[min_index][0] - input_list[max_index][0])])
+
+        b = []
+        for i in xrange(number_of_regression_points ** dim):
+            if i != max_index and i != min_index:
+                b.append([result[i] - max_value - y[0][0]*(input_list[i][0] - input_list[max_index][0])])
+
+        capital_a = []
+        for i in range(0, number_of_regression_points ** dim):
+            if i != max_index and i != min_index:
+                capital_a.append([])
+                for j in range(1, dim):
+                        capital_a[-1].append(input_list[i][j] - input_list[max_index][j] -
+                                    y[j][0]*(input_list[i][0] - input_list[max_index][0]))
+
+        capital_a_trans = map(list, zip(*capital_a))
+
+        B = np.dot(capital_a_trans, capital_a)
+        r_h_s = np.dot(capital_a_trans, b)
+
+        solution = list(np.linalg.solve(B, r_h_s))
+
+        solution = [list(i) for i in solution]
+
+        temp = y[0][0] - list(list(np.dot(map(list, zip(*solution)), y[1:]))[0])
+        temp = [list(temp)]
+
+        coeff = temp + solution
+
+        intercept = max_value - np.dot(map(list, zip(*coeff)), input_list[max_index])
+        intercept = list(intercept)[0]
+
+        coeff = [i[0] for i in coeff]
+        return coeff, intercept
 
     def linearize_perturbations(self, p_uncertain_vars, number_of_regression_points):
         """
