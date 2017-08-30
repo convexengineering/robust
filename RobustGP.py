@@ -426,7 +426,7 @@ class RobustGPModel:
             robust_model = model_lower
         return r, solution, robust_model
 
-    def solve(self, verbosity=0, r_min=15, tol=0.01):
+    def solve(self, verbosity=0, r_min=20, tol=0.01):
         if self.robust_model is None:
             self.setup(r_min, tol)
         if self.initial_guess is None:
@@ -469,7 +469,7 @@ class RobustGPModel:
                 if relative_difference > 0.0001:
                     return False
             except:
-                if all(relative_difference > 0.0001):
+                if all(i > 0.0001 for i in relative_difference):
                     return False
         return True
 
@@ -482,13 +482,15 @@ class RobustGPModel:
 
         if simple:
             robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma,
-                                                       robust_model.type_of_uncertainty_set,
-                                                       robust_model.simple_model, robust_model.number_of_regression_points,
+                                                       robust_model.type_of_uncertainty_set, robust_model.simple_model,
+                                                       robust_model.number_of_regression_points,
                                                        robust_model.linearize_two_term, False, False,
                                                        two_term, True, True, 1)
         else:
-            robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma, robust_model.type_of_uncertainty_set,
-                                                       robust_model.simple_model, robust_model.number_of_regression_points,
+            robust_model_initial_guess = RobustGPModel(robust_model.model, robust_model.gamma,
+                                                       robust_model.type_of_uncertainty_set,
+                                                       robust_model.simple_model,
+                                                       robust_model.number_of_regression_points,
                                                        robust_model.linearize_two_term, False, robust_model.boyd,
                                                        two_term, robust_model.simple_two_term, True,
                                                        robust_model.maximum_number_of_permutations)

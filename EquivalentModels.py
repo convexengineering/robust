@@ -22,7 +22,7 @@ class SameModel(Model):
                 print p
                 print p_unc
                 print len(p.exps)
-                eq_p = EquivalentPosynomials(p,unc,0,False, False)
+                eq_p = EquivalentPosynomials(p, unc, 0, False, False)
                 print("------------------------------------")
                 print(eq_p.no_data_constraints)
                 print(eq_p.data_constraints)

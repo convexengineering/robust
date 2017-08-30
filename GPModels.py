@@ -259,19 +259,19 @@ def mike_solar_model():
                          'p_{wind}': 1.6, '\\rho_{foam}': 1.6, '\\theta_{root}': 1.6, '\\bar{A}_{NACA0008}': 1.6,
                          '\\theta_{max}': 1.6, 'Re**1.00_{low-bound}': 1.6, 'N_{max}': 1.6, '\\bar{J/t}': 1.6,
                          '\\rho_{CFRP}': 1.6, 'Re**1.00_{up-bound}': 1.6, '\\rho_{solar}': 1.6, '(E/S)_{var}': 4,
-                         '\\rho_{skin}': 1.6,  '(1-k/2)': 1.6, 't_{min}': 1.6, '\\bar{c}_{ave}': 10.4,
+                         '\\rho_{skin}': 1.6,  '(1-k/2)': 1.6, 't_{min}': 1.6, '\\bar{c}_{ave}': 10.4, '\\rho_{ref}': 1,
                          'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 3.2,
                          '\\sigma_{CFRP}': 8.8, '\\tau_{CFRP}': 7.2, 'C_{m_w}': 11.2, '\\bar{\\delta}_{root}': 6.4,
                          'w_{lim}': 9.6, '(E/S)_{irr}': 1.6, 't_{night}': 1.6, '\\mu': 6.4, '\\bar{c}': 7.2,
                          '\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 1.6, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
-                         "C_{L_{max}}": 3, '\\rho_{ref}': 1, }  # 'P_{acc}': 0.1,
+                         "C_{L_{max}}": 3, }  # 'P_{acc}': 0.1,
 
     keys = uncertain_var_dic.keys()
     # print keys
     for i in xrange(len(uncertain_var_dic)):
         # if len(model.variables_byname(keys[i])) > 1:
             # print keys[i]
-            # print model.variables_byname(keys[i])
+        # print model.variables_byname(keys[i])[0].key.descr
             # print("--------------------------------")
         for j in xrange(len(model.variables_byname(keys[i]))):
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
