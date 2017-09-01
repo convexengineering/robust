@@ -1,5 +1,7 @@
-from gpkit import Variable, Monomial, Posynomial
 import numpy as np
+
+from gpkit import Variable, Monomial, Posynomial
+from RobustGPTools import RobustGPTools
 
 
 class EquivalentPosynomials:
@@ -9,6 +11,7 @@ class EquivalentPosynomials:
 
     main_p = Posynomial()
     p_uncertain_vars = []
+    p_indirect_uncertain_vars = []
     m = None
     simple_model = None
     dependent_uncertainties = None
@@ -16,7 +19,7 @@ class EquivalentPosynomials:
     no_data_constraints = []
     data_constraints = []
 
-    def __init__(self, p, uncertain_vars, m, simple_model, dependent_uncertainties):
+    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, m, simple_model, dependent_uncertainties):
         """
         :param p: the posynomial to be simplified
         :param uncertain_vars: the model's uncertain variables
@@ -27,7 +30,18 @@ class EquivalentPosynomials:
         self.simple_model = simple_model
         self.m = m
         self.dependent_uncertainties = dependent_uncertainties
-        self.p_uncertain_vars = [var for var in p.varkeys if var in uncertain_vars]
+        direct_p_uncertain_vars = [var for var in p.varkeys if var in uncertain_vars]
+        self.p_indirect_uncertain_vars = [var for var in p.varkeys if var in indirect_uncertain_vars]
+
+        new_direct_uncertain_vars = []
+        for var in self.p_indirect_uncertain_vars:
+            new_direct_uncertain_vars += RobustGPTools.\
+                replace_indirect_uncertain_variable_by_equivalent(var.key.pr).varkeys
+
+        new_direct_uncertain_vars = list(set(new_direct_uncertain_vars) & set(uncertain_vars))
+
+        self.p_uncertain_vars = list(set(direct_p_uncertain_vars) | set(new_direct_uncertain_vars))
+        # print self.p_uncertain_vars
 
         self.no_data_constraints = []
         self.data_constraints = []
@@ -46,9 +60,14 @@ class EquivalentPosynomials:
         uncertain_vars_exps_mons = []
         for i in xrange(len(p.exps)):
             m_uncertain_vars_exps = {}
-            for var in p.exps[i].keys():
+
+            only_uncertain_vars_monomial = RobustGPTools.\
+                only_uncertain_vars_monomial(p.exps[i], p.cs[i], self.p_indirect_uncertain_vars)
+
+            for var in only_uncertain_vars_monomial.exps[0].keys():
                 if var in uncertain_vars:
-                    m_uncertain_vars_exps[var] = p.exps[i][var]
+
+                    m_uncertain_vars_exps[var] = only_uncertain_vars_monomial.exps[0][var]
             if m_uncertain_vars_exps in uncertain_vars_exps:
                 index = uncertain_vars_exps.index(m_uncertain_vars_exps)
                 uncertain_vars_exps_mons[index].append(i)
@@ -97,7 +116,9 @@ class EquivalentPosynomials:
 
         super_script = 0
         for i in singleton_monomials:
-            if EquivalentPosynomials.check_if_no_data(self.p_uncertain_vars, self.main_p.exps[i]):
+
+            if RobustGPTools.\
+                    check_if_no_data(self.p_uncertain_vars + self.p_indirect_uncertain_vars, self.main_p.exps[i]):
                 ts.append(Monomial(self.main_p.exps[i], self.main_p.cs[i]))
             else:
                 t = Variable('t_%s^%s' % (m, super_script))
@@ -210,8 +231,12 @@ class EquivalentPosynomials:
 
         if self.dependent_uncertainties:
             for j in xrange(number_of_monomials):
+
+                only_uncertain_vars_monomial = RobustGPTools.\
+                    only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j], self.p_indirect_uncertain_vars)
+
                 for var in self.p_uncertain_vars:
-                    if var.key in self.main_p.exps[j]:
+                    if var.key in only_uncertain_vars_monomial.exps[0]:
                         coupled_partition.append(j)
                         break
             return [coupled_partition]
@@ -222,9 +247,17 @@ class EquivalentPosynomials:
                 check_sign = []
 
                 for j in xrange(number_of_monomials):
-                    if var.key in self.main_p.exps[j]:
+                    # print("ejer")
+                    only_uncertain_vars_monomial = RobustGPTools.\
+                        only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j], self.p_indirect_uncertain_vars)
+                    # print("ejer")
+                    # print only_uncertain_vars_monomial
+                    # print var.key
+                    # print [i.key for i in only_uncertain_vars_monomial.exps[0].keys()]
+                    if var in only_uncertain_vars_monomial.exps[0]:
+                        # print "kes"
                         partition.append(j)
-                        check_sign.append(self.main_p.exps[j].get(var.key))
+                        check_sign.append(only_uncertain_vars_monomial.exps[0].get(var.key))
 
                 if not EquivalentPosynomials.same_sign(check_sign):
                     coupled_partition.append(partition)
@@ -238,17 +271,3 @@ class EquivalentPosynomials:
             if element in list_of_lists[i]:
                 return True
         return False
-
-    @staticmethod
-    def check_if_no_data(p_uncertain_vars, monomial):
-        """
-        Checks if there is no uncertain data in a monomial
-        :param p_uncertain_vars: the posynomial's uncertain variables
-        :param monomial: the monomial to be checked for
-        :return: True or False
-        """
-        intersection = [var for var in p_uncertain_vars if var.key in monomial]
-        if not intersection:
-            return True
-        else:
-            return False

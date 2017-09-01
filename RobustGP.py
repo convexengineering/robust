@@ -1,12 +1,13 @@
-from EquivalentModels import SameModel, EquivalentModel, TwoTermBoydModel
-from TwoTermApproximation import TwoTermApproximation
-from RobustifyLargePosynomial import RobustifyLargePosynomial
-from gpkit import Model, Monomial
-from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
-import warnings
-
 import numpy as np
 import time
+import warnings
+from gpkit import Model, Monomial
+
+from RobustGPTools import RobustGPTools
+from EquivalentModels import EquivalentModel, TwoTermBoydModel
+from TwoTermApproximation import TwoTermApproximation
+from RobustifyLargePosynomial import RobustifyLargePosynomial
+from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
 
 
 class RobustGPModel:
@@ -29,6 +30,7 @@ class RobustGPModel:
     smart_two_term_choose = None
     maximum_number_of_permutations = None
     uncertain_vars = None
+    indirect_uncertain_vars = None
     slopes = None
     intercepts = None
     r_min = None
@@ -79,7 +81,7 @@ class RobustGPModel:
 
         equality_constraints = False
 
-        self.uncertain_vars = SameModel.uncertain_model_variables(model)
+        self.uncertain_vars, self.indirect_uncertain_vars = RobustGPTools.uncertain_model_variables(model)
 
         if boyd:
             self.maximum_number_of_permutations = 0
@@ -100,9 +102,9 @@ class RobustGPModel:
                 warnings.warn('equality constraints will not be robustified')
             return
 
-        equivalent_model = EquivalentModel(model, self.uncertain_vars, simple_model, dependent_uncertainty_set)
+        equivalent_model = EquivalentModel(model, self.uncertain_vars, self.indirect_uncertain_vars, simple_model, dependent_uncertainty_set)
         # equivalent_model.substitutions.update(model.substitutions)
-        # print equivalent_model.solve()['cost']
+        # print equivalent_model  # .solve()['cost']
         equivalent_model_posynomials = equivalent_model.as_posyslt1()
         equivalent_model_no_data_constraints_number = equivalent_model.number_of_no_data_constraints
 
@@ -120,15 +122,16 @@ class RobustGPModel:
                     self.to_linearize_posynomials += [p]
                 else:
                     if two_term:
-                        two_term_approximation = TwoTermApproximation(p, self.uncertain_vars, simple_two_term,
-                                                                      False, smart_two_term_choose,
+                        two_term_approximation = TwoTermApproximation(p, self.uncertain_vars, self.indirect_uncertain_vars,
+                                                                      simple_two_term, False, smart_two_term_choose,
                                                                       maximum_number_of_permutations)
                         self.large_posynomials.append(two_term_approximation)
                     else:
                         robust_large_p = RobustifyLargePosynomial(p)
                         self.ready_constraints += robust_large_p. \
-                            robustify_large_posynomial(gamma, type_of_uncertainty_set, self.uncertain_vars, i,
-                                                       enable_sp, number_of_regression_points)
+                            robustify_large_posynomial(gamma, type_of_uncertainty_set, self.uncertain_vars,
+                                                       self.indirect_uncertain_vars, i, enable_sp,
+                                                       number_of_regression_points)
 
         if not self.large_posynomials:
             self.maximum_number_of_permutations = 0
@@ -158,16 +161,23 @@ class RobustGPModel:
         return robust_model_copy
 
     @staticmethod
-    def uncertain_variables_exponents(data_monomials, uncertain_vars):
+    def uncertain_variables_exponents(data_monomials, uncertain_vars, indirect_uncertain_vars):
         """
         gets the exponents of uncertain variables
         :param data_monomials:  the uncertain posynomials
         :param uncertain_vars: the uncertain variables of the model
+        :param indirect_uncertain_vars: the indirectly uncertain variables of the model
         :return: the 2 dimensional array of exponents(matrix)
         """
+        direct_uncertain_vars_data_monomials = []
+        for monomial in data_monomials:
+            new_monomial = RobustGPTools.\
+                only_uncertain_vars_monomial(monomial.exps[0], monomial.cs[0], indirect_uncertain_vars)
+            direct_uncertain_vars_data_monomials.append(new_monomial)
+
         exps_of_uncertain_vars = \
             np.array([[-p.exps[0].get(var.key, 0) for var in uncertain_vars]
-                      for p in data_monomials])
+                      for p in direct_uncertain_vars_data_monomials])
         return exps_of_uncertain_vars
 
     @staticmethod
@@ -242,8 +252,10 @@ class RobustGPModel:
                               second_monomial ** self.slopes[j] * np.exp(self.intercepts[j])]
             monomials += [second_monomial]
 
-            exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents(monomials, self.uncertain_vars)
-            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
+            exps_of_uncertain_vars = RobustGPModel.\
+                uncertain_variables_exponents(monomials, self.uncertain_vars, self.indirect_uncertain_vars)
+            centering_vector, scaling_vector = RobustGPModel.\
+                normalize_perturbation_vector(self.uncertain_vars)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
@@ -262,8 +274,10 @@ class RobustGPModel:
             the_monomial = Monomial(two_term_approximation.p.exps[permutation[len(permutation)-1]],
                                     two_term_approximation.p.cs[permutation[len(permutation)-1]])
 
-            exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents([the_monomial], self.uncertain_vars)
-            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
+            exps_of_uncertain_vars = RobustGPModel.\
+                uncertain_variables_exponents([the_monomial], self.uncertain_vars, self.indirect_uncertain_vars)
+            centering_vector, scaling_vector = RobustGPModel.\
+                normalize_perturbation_vector(self.uncertain_vars)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
@@ -332,6 +346,7 @@ class RobustGPModel:
                 permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
                 _, data = TwoTermApproximation.two_term_equivalent_posynomial(two_term_approximation.p, i,
                                                                               permutation, False)
+                # print data
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
             two_term_data_posynomials += self.to_linearize_posynomials
@@ -362,10 +377,11 @@ class RobustGPModel:
             data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
         all_tractable_posynomials = self.tractable_posynomials + data_posynomials
-        exps_of_uncertain_vars = RobustGPModel.uncertain_variables_exponents(all_tractable_posynomials,
-                                                                             self.uncertain_vars)
+        exps_of_uncertain_vars = RobustGPModel.\
+            uncertain_variables_exponents(all_tractable_posynomials, self.uncertain_vars, self.indirect_uncertain_vars)
         if exps_of_uncertain_vars.size > 0:
-            centering_vector, scaling_vector = RobustGPModel.normalize_perturbation_vector(self.uncertain_vars)
+            centering_vector, scaling_vector = RobustGPModel.\
+                normalize_perturbation_vector(self.uncertain_vars)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel.construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma,
                                                                                self.type_of_uncertainty_set,

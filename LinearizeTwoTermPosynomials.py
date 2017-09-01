@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.optimize as op
-import warnings, time
+import warnings
 from gpkit import Variable, Monomial, Posynomial
 
 
@@ -23,7 +23,7 @@ class LinearizeTwoTermPosynomials:
         :param eps: the error
         :return: the function
         """
-        warnings.simplefilter("ignore")
+        # warnings.simplefilter("ignore"): this is making things slower
         return np.log(1 + np.exp(x)) - eps - np.log(1 + np.exp(k)) - np.exp(k) * (x - k) / (1 + np.exp(k))
 
     @staticmethod
@@ -84,7 +84,6 @@ class LinearizeTwoTermPosynomials:
         :param tol: tolerance
         :return: the slope, intercept, and new x
         """
-        temp_time = time.time()
         if r < 2:
             raise Exception('The number of piece-wise sections should two or larger')
 

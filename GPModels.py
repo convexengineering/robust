@@ -1,8 +1,7 @@
 # coding=utf-8
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
 import numpy as np
-from RobustGP import RobustGPModel
-from EquivalentModels import SameModel
+from RobustGPTools import SameModel
 
 
 def simpleWing():
@@ -31,7 +30,7 @@ def simpleWing():
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
-    toz = Variable("toz", 1, "-", pr=15)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
+    toz = Variable("toz", 1, "-", pr=tau*mu*k/rho/S_wetratio)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
 
     # Free Variables
     D = Variable("D", "N", "total drag force")
@@ -41,7 +40,7 @@ def simpleWing():
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
     C_D = Variable("C_D", "-", "Drag coefficient of wing")
-    C_L = Variable("C_L", "-", "Lift coefficent of wing")
+    C_L = Variable("C_L", "-", "Lift coefficient of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
 
@@ -51,7 +50,7 @@ def simpleWing():
     C_D_fuse = CDA0 / S
     C_D_wpar = k * C_f * S_wetratio
     C_D_ind = C_L ** 2 / (np.pi * A * e)
-    constraints += [C_D >= C_D_fuse * toz + C_D_wpar / toz + C_D_ind * toz]
+    constraints += [C_D >= C_D_ind * toz + C_D_fuse * toz + C_D_wpar / toz]
 
     # Wing weight model
     W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
@@ -219,12 +218,6 @@ def simpleWingTwoDimensionalUncertainty():
     return Model(D, constraints)
 
 
-# class uncertainModel(Model):
-#    def setup(self, model, pfail, distr):
-#        for vk in model.varkeys:
-#            
-#        return constraints
-
 def test_model():
     x = Variable('x')
     y = Variable('y')
@@ -293,70 +286,3 @@ def solve_model(model, *args):
         sol = model.localsolve(verbosity=0, x0=initial_guess)
     print (sol.summary())
     return sol
-
-
-def evaluate_random_model(old_model, solution, design_variables):
-    model = SameModel(old_model)
-    model.substitutions.update(old_model.substitutions)
-    free_vars = [var for var in model.varkeys.keys()
-                 if var not in model.substitutions.keys()]
-    uncertain_vars = [var for var in model.substitutions.keys()
-                      if "pr" in var.key.descr]
-    for key in free_vars:
-        if key.descr['name'] in design_variables:
-            try:
-                model.substitutions[key] = solution.get(key).m
-            except:
-                model.substitutions[key] = solution.get(key)
-    for key in uncertain_vars:
-        val = model[key].key.descr["value"]
-        pr = model[key].key.descr["pr"]
-        if pr != 0:
-            # sigma = pr * val / 300.0
-            # new_val = np.random.normal(val,sigma)
-            new_val = np.random.uniform(val - pr * val / 100.0, val + pr * val / 100.0)
-            model.substitutions[key] = new_val
-    return model
-
-
-def fail_or_success(model):
-    try:
-        try:
-            sol = model.solve(verbosity=0)
-        except:
-            sol = model.localsolve(verbosity=0)
-        return True, sol['cost']
-    except:
-        return False, 0
-
-
-def probability_of_failure(rob_model, number_of_iterations, design_variables):
-
-    failure = 0
-    success = 0
-
-    solution = rob_model.solve()
-    variable_solution = solution['variables']
-    sum_cost = 0
-    for i in xrange(number_of_iterations):
-        print('iteration: %s' % i)
-        new_model = evaluate_random_model(rob_model.model, variable_solution, design_variables)
-        fail_success, cost = fail_or_success(new_model)
-        print cost
-        sum_cost = sum_cost + cost
-        if fail_success:
-            success = success + 1
-        else:
-            failure = failure + 1
-    if success > 0:
-        cost_average = sum_cost / (success + 0.0)
-    else:
-        cost_average = None
-    prob = failure / (failure + success + 0.0)
-    return prob, cost_average
-
-#
-#
-# if __name__ == '__main__':
-# m = simpleWing()
-# sol = m.solve()

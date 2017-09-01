@@ -1,11 +1,10 @@
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled, Posynomial
-from sklearn import linear_model
-import operator
+
+from RobustGPTools import RobustGPTools
 
 
 class RobustifyLargePosynomial:
-
     p = Posynomial()
 
     def __init__(self, p):
@@ -40,6 +39,7 @@ class RobustifyLargePosynomial:
         :return: the regression coefficients and intercept
         """
         dim = len(perturbation_vector)
+        # print(dim, number_of_regression_points)
         if dim != 1:
             x = np.meshgrid(*[np.linspace(-1, 1, number_of_regression_points)] * dim)
         else:
@@ -74,27 +74,27 @@ class RobustifyLargePosynomial:
 
         for i in range(1, dim):
             y.append([(input_list[min_index][i] - input_list[max_index][i]) /
-                     (input_list[min_index][0] - input_list[max_index][0])])
+                      (input_list[min_index][0] - input_list[max_index][0])])
 
         b = []
         for i in xrange(number_of_regression_points ** dim):
             if i != max_index and i != min_index:
-                b.append([result[i] - max_value - y[0][0]*(input_list[i][0] - input_list[max_index][0])])
+                b.append([result[i] - max_value - y[0][0] * (input_list[i][0] - input_list[max_index][0])])
 
         capital_a = []
         for i in range(0, number_of_regression_points ** dim):
             if i != max_index and i != min_index:
                 capital_a.append([])
                 for j in range(1, dim):
-                        capital_a[-1].append(input_list[i][j] - input_list[max_index][j] -
-                                    y[j][0]*(input_list[i][0] - input_list[max_index][0]))
+                    capital_a[-1].append(input_list[i][j] - input_list[max_index][j] -
+                                         y[j][0] * (input_list[i][0] - input_list[max_index][0]))
 
         capital_a_trans = map(list, zip(*capital_a))
 
-        B = np.dot(capital_a_trans, capital_a)
+        capital_b = np.dot(capital_a_trans, capital_a)
         r_h_s = np.dot(capital_a_trans, b)
 
-        solution = list(np.linalg.solve(B, r_h_s))
+        solution = list(np.linalg.solve(capital_b, r_h_s))
 
         solution = [list(i) for i in solution]
 
@@ -107,12 +107,20 @@ class RobustifyLargePosynomial:
         intercept = list(intercept)[0]
 
         coeff = [i[0] for i in coeff]
+        # print capital_b
+        # print r_h_s
+        # print y
+        # print coeff
+        # print intercept
+        # print max_value
+        # print input_list[max_index]
         return coeff, intercept
 
-    def linearize_perturbations(self, p_uncertain_vars, number_of_regression_points):
+    def linearize_perturbations(self, p_uncertain_vars, p_indirect_uncertain_vars, number_of_regression_points):
         """
         A method used to linearize uncertain exponential functions
         :param p_uncertain_vars: the uncertain variables in the posynomial
+        :param p_indirect_uncertain_vars: the indirect uncertain variables in the posynomial
         :param number_of_regression_points: The number of regression points per dimension
         :return: The linear regression of all the exponential functions, and the mean vector
         """
@@ -127,13 +135,18 @@ class RobustifyLargePosynomial:
 
         perturbation_matrix = []
         for i in xrange(len(self.p.exps)):
+
+            only_uncertain_vars_monomial = RobustGPTools.\
+                only_uncertain_vars_monomial(self.p.exps[i], self.p.cs[i], p_indirect_uncertain_vars)
+
             perturbation_matrix.append([])
-            mon_uncertain_vars = [var for var in p_uncertain_vars if var in self.p.exps[i]]
+            mon_uncertain_vars = [var for var in p_uncertain_vars if var in only_uncertain_vars_monomial.exps[0]]
+            # print mon_uncertain_vars
             mean = 1
             for j, var in enumerate(p_uncertain_vars):
                 if var.key in mon_uncertain_vars:
-                    mean = mean * center[j] ** (self.p.exps[i].get(var.key))
-                    perturbation_matrix[i].append(np.exp(self.p.exps[i].get(var.key) * scale[j]))
+                    mean = mean * center[j] ** (only_uncertain_vars_monomial.exps[0].get(var.key))
+                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial.exps[0].get(var.key) * scale[j]))
                 else:
                     perturbation_matrix[i].append(0)
             coeff.append([])
@@ -175,12 +188,12 @@ class RobustifyLargePosynomial:
 
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
-                                      zip(mean_vector, intercept)], monomials)]) + gamma*s_main <= 1]
+                                      zip(mean_vector, intercept)], monomials)]) + gamma * s_main <= 1]
         elif type_of_uncertainty_set == 'elliptical':
 
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
-                                      zip(mean_vector, intercept)], monomials)]) + gamma*s_main ** 0.5 <= 1]
+                                      zip(mean_vector, intercept)], monomials)]) + gamma * s_main ** 0.5 <= 1]
         ss = []
 
         for i in xrange(len(perturbation_matrix[0])):
@@ -240,29 +253,39 @@ class RobustifyLargePosynomial:
                                     + sum([a * b for a, b in
                                            zip(negative_pert, negative_monomials)]) ** 2 <= s]
         if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'elliptical':
-
             constraints.append(sum(ss) <= s_main)
         return constraints
 
-    def robustify_large_posynomial(self, gamma, type_of_uncertainty_set, uncertain_vars, m,
+    def robustify_large_posynomial(self, gamma, type_of_uncertainty_set, uncertain_vars, indirect_uncertain_vars, m,
                                    enable_sp, number_of_regression_points):
         """
         generate a safe approximation for large posynomials with uncertain coefficients
         :param gamma: controls the size of the uncertainty set
         :param type_of_uncertainty_set: 'box', elliptical, or 'one norm'
         :param uncertain_vars: Model's uncertain variables
+        :param indirect_uncertain_vars: Model's indirect uncertain variables
         :param m: Index
         :param enable_sp: choose whether an sp compatible model is okay
         :param number_of_regression_points: number of regression points per dimension
         :return: set of robust constraints
         """
-        p_uncertain_vars = [var for var in self.p.varkeys if var in uncertain_vars]
+        p_direct_uncertain_vars = [var for var in self.p.varkeys if var in uncertain_vars]
+        p_indirect_uncertain_vars = [var for var in self.p.varkeys if var in indirect_uncertain_vars]
+
+        new_direct_uncertain_vars = []
+        for var in p_indirect_uncertain_vars:
+            new_direct_uncertain_vars += RobustGPTools.\
+                replace_indirect_uncertain_variable_by_equivalent(var.key.pr).varkeys
+
+        new_direct_uncertain_vars = list(set(new_direct_uncertain_vars) & set(uncertain_vars))
+
+        p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))
+
+        if not p_uncertain_vars and not p_indirect_uncertain_vars:
+            return [self.p <= 1]
 
         perturbation_matrix, intercept, mean_vector = \
-            self.linearize_perturbations(p_uncertain_vars, number_of_regression_points)
-
-        if not p_uncertain_vars:
-            return [self.p <= 1]
+            self.linearize_perturbations(p_uncertain_vars, p_indirect_uncertain_vars, number_of_regression_points)
 
         monomials = self.no_coefficient_monomials()
         constraints = RobustifyLargePosynomial. \

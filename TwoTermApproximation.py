@@ -4,6 +4,8 @@ import random
 import math
 from copy import copy
 
+from RobustGPTools import RobustGPTools
+
 
 class TwoTermApproximation:
     """
@@ -14,7 +16,7 @@ class TwoTermApproximation:
     number_of_monomials = None
     list_of_permutations = []
 
-    def __init__(self, p, uncertain_vars, simple, boyd, smart_two_term_choose, maximum_number_of_permutations):
+    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, simple, boyd, smart_two_term_choose, maximum_number_of_permutations):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
 
@@ -25,7 +27,7 @@ class TwoTermApproximation:
 
         if not boyd:
             if smart_two_term_choose:
-                bad_relations, sizes = self.bad_relations(self.p, uncertain_vars)
+                bad_relations, sizes = self.bad_relations(self.p, uncertain_vars, indirect_uncertain_vars)
                 list_of_couples, new_list_to_permute = TwoTermApproximation. \
                     choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
             else:
@@ -156,21 +158,26 @@ class TwoTermApproximation:
         return prod / math.factorial(length_of_permutation / 2)
 
     @staticmethod
-    def bad_relations(p, uncertain_vars):
+    def bad_relations(p, uncertain_vars, indirect_uncertain_vars):
         """
         Investigates the relations between the monomials in a posynomial
         :param p: the posynomial
         :param uncertain_vars: the model's uncertain variables
+        :param indirect_uncertain_vars: the model's indirect uncertain variables
         :return: the dictionary of relations, and some other assisting dictionary
         """
         number_of_monomials = len(p.exps)
         inverse_relations = {}
         sizes = {}
         for i in xrange(number_of_monomials):
-            ith_monomial_exps = p.exps[i]
+            direct_vars_only_monomial_ith = RobustGPTools.\
+                only_uncertain_vars_monomial(p.exps[i], p.cs[i], indirect_uncertain_vars)
+            ith_monomial_exps = direct_vars_only_monomial_ith.exps[0]
             m_uncertain_vars = [var for var in ith_monomial_exps.keys() if var in uncertain_vars]
             for j in range(0, number_of_monomials):
-                jth_monomial_exps = p.exps[j]
+                direct_vars_only_monomial_jth = RobustGPTools.\
+                    only_uncertain_vars_monomial(p.exps[j], p.cs[j], indirect_uncertain_vars)
+                jth_monomial_exps = direct_vars_only_monomial_jth.exps[0]
                 for var in m_uncertain_vars:
                     if ith_monomial_exps.get(var.key, 0) * jth_monomial_exps.get(var.key, 0) < 0:
                         if i in inverse_relations:
