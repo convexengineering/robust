@@ -24,7 +24,8 @@ class EquivalentModel(Model):
 
         for i, p in enumerate(model.as_posyslt1()):
 
-            equivalent_p = EquivalentPosynomials(p, uncertain_vars, indirect_uncertain_vars, i, simple_model, dependent_uncertainties)
+            equivalent_p = EquivalentPosynomials(p, uncertain_vars, indirect_uncertain_vars, i, simple_model,
+                                                 dependent_uncertainties)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
 
             data_constraints += data

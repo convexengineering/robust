@@ -1,5 +1,5 @@
 from numbers import Number
-from gpkit import Monomial, Variable, Model
+from gpkit import Monomial, Model
 import numpy as np
 from copy import copy
 

@@ -16,7 +16,8 @@ class TwoTermApproximation:
     number_of_monomials = None
     list_of_permutations = []
 
-    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, simple, boyd, smart_two_term_choose, maximum_number_of_permutations):
+    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, simple, boyd, smart_two_term_choose,
+                 maximum_number_of_permutations):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
 

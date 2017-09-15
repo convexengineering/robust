@@ -34,15 +34,17 @@ class RobustGPModel:
     slopes = None
     intercepts = None
     r_min = None
+    r_max = None
     tol = None
     r = None
+    lower_approximation_used = False
 
     initial_guess = None
     robust_model = None
 
     def __init__(self, model, gamma, type_of_uncertainty_set, simple_model=False, number_of_regression_points=2,
                  linearize_two_term=True, enable_sp=True, boyd=False, two_term=False, simple_two_term=False,
-                 smart_two_term_choose=True, maximum_number_of_permutations=30):
+                 smart_two_term_choose=False, maximum_number_of_permutations=30):
         if two_term:
             linearize_two_term = True
             enable_sp = False
@@ -73,6 +75,7 @@ class RobustGPModel:
 
         self.initial_guess = None
         self.robust_model = None
+        self.setup_time = None
 
         if self.type_of_uncertainty_set == 'box':
             dependent_uncertainty_set = False
@@ -87,7 +90,7 @@ class RobustGPModel:
             self.maximum_number_of_permutations = 0
             safe_model = TwoTermBoydModel(model)
             # safe_model.substitutions.update(model.substitutions)
-            # print safe_model.solve()['cost']
+            # print safe_model
             safe_model_posynomials = safe_model.as_posyslt1()
             for p in safe_model_posynomials:
                 if len(p.exps) == 1:
@@ -102,7 +105,8 @@ class RobustGPModel:
                 warnings.warn('equality constraints will not be robustified')
             return
 
-        equivalent_model = EquivalentModel(model, self.uncertain_vars, self.indirect_uncertain_vars, simple_model, dependent_uncertainty_set)
+        equivalent_model = EquivalentModel(model, self.uncertain_vars,
+                                           self.indirect_uncertain_vars, simple_model, dependent_uncertainty_set)
         # equivalent_model.substitutions.update(model.substitutions)
         # print equivalent_model  # .solve()['cost']
         equivalent_model_posynomials = equivalent_model.as_posyslt1()
@@ -121,9 +125,11 @@ class RobustGPModel:
                 elif len(p.exps) == 2 and linearize_two_term:
                     self.to_linearize_posynomials += [p]
                 else:
+                    # print p
                     if two_term:
-                        two_term_approximation = TwoTermApproximation(p, self.uncertain_vars, self.indirect_uncertain_vars,
-                                                                      simple_two_term, False, smart_two_term_choose,
+                        two_term_approximation = TwoTermApproximation(p, self.uncertain_vars,
+                                                                      self.indirect_uncertain_vars, simple_two_term,
+                                                                      False, smart_two_term_choose,
                                                                       maximum_number_of_permutations)
                         self.large_posynomials.append(two_term_approximation)
                     else:
@@ -302,9 +308,10 @@ class RobustGPModel:
 
         return minimum_index
 
-    def setup(self, r_min=12, tol=0.01):
+    def setup(self, r_min=12, r_max=20, tol=0.01):
         start_time = time.time()
         self.r_min = r_min
+        self.r_max = r_max
         self.tol = tol
 
         solution = None
@@ -314,7 +321,7 @@ class RobustGPModel:
         two_term_data_posynomials = []
         number_of_trials_until_feasibility_is_attained = 0
         # print "start", self.maximum_number_of_permutations
-        while number_of_trials_until_feasibility_is_attained <= min(3, self.maximum_number_of_permutations):  # self.maximum_number_of_permutations:
+        while number_of_trials_until_feasibility_is_attained <= min(10, self.maximum_number_of_permutations):
             for i, two_term_approximation in enumerate(self.large_posynomials):
                 perm_index = np.random.choice(range(0, len(two_term_approximation.list_of_permutations)))
                 permutation = two_term_approximation.list_of_permutations[perm_index]
@@ -327,12 +334,14 @@ class RobustGPModel:
             # print "before choosing r"
             self.r, solution, robust_model = self.find_number_of_piece_wise_linearization(two_term_data_posynomials)
             # print "after choosing r"
-            if self.r != 0:
+            # print self.r
+            if self.r != 0 or self.lower_approximation_used:
                 break
             number_of_trials_until_feasibility_is_attained += 1
 
-        if number_of_trials_until_feasibility_is_attained > min(3, self.maximum_number_of_permutations):  # self.maximum_number_of_permutations:
-            raise Exception('Not Feasible')
+        if number_of_trials_until_feasibility_is_attained > min(10, self.maximum_number_of_permutations):
+            if not self.lower_approximation_used:
+                raise Exception('Not Feasible')
         # print "before linearization"
         self.slopes, self.intercepts, _, _, _ = LinearizeTwoTermPosynomials.\
             two_term_posynomial_linearization_coeff(self.r, self.tol)
@@ -346,7 +355,6 @@ class RobustGPModel:
                 permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
                 _, data = TwoTermApproximation.two_term_equivalent_posynomial(two_term_approximation.p, i,
                                                                               permutation, False)
-                # print data
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
             two_term_data_posynomials += self.to_linearize_posynomials
@@ -359,7 +367,7 @@ class RobustGPModel:
                 break
             else:
                 old_solution = new_solution
-        print("the model need %s seconds to setup" % (time.time() - start_time))
+        self.setup_time = time.time() - start_time
         self.robust_model = robust_model
         # return robust_model
 
@@ -407,12 +415,11 @@ class RobustGPModel:
         model_upper = None
         model_lower = None
 
-        lower_used = 0
-
-        while r <= 20 and error > self.tol:
+        while r <= self.r_max and error > self.tol:
+            print r
 
             model_upper, model_lower = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, r)
-
+            # print model_upper
             upper_model_infeasible = 0
             try:
                 sol_upper = RobustGPModel.internal_solve(model_upper, self.initial_guess)
@@ -430,11 +437,11 @@ class RobustGPModel:
                 except:
                     error = (sol_upper.get('cost') -
                              sol_lower.get('cost')) / (0.0 + sol_lower.get('cost'))
-            elif r == 20:
-                lower_used = 1
-                print("The safe approximation is infeasible, the lower piece-wise model is considered")
+            elif r == self.r_max:
+                self.lower_approximation_used = True
+                # print("The safe approximation is infeasible, the lower piece-wise model is considered")
             r += 1
-        if lower_used == 0:
+        if not self.lower_approximation_used:
             solution = sol_upper
             robust_model = model_upper
         else:
@@ -442,13 +449,15 @@ class RobustGPModel:
             robust_model = model_lower
         return r, solution, robust_model
 
-    def solve(self, verbosity=0, r_min=20, tol=0.01):
+    def solve(self, verbosity=1, r_min=12, r_max=20, tol=0.01):
         if self.robust_model is None:
-            self.setup(r_min, tol)
+            self.setup(r_min, r_max, tol)
         if self.initial_guess is None:
             initial_guess = {}
         else:
             initial_guess = self.initial_guess
+        if self.lower_approximation_used:
+            warnings.warn("the model is infeasible, the lower piece-wise approximation is used")
         try:
             sol = self.robust_model.solve(verbosity=verbosity)
         except:
@@ -480,7 +489,8 @@ class RobustGPModel:
             return False
 
         for key in keys_one:
-            relative_difference = np.abs((solution_one['variables'][key] - solution_two['variables'][key])/solution_one['variables'][key])
+            relative_difference = np.abs((solution_one['variables'][key] -
+                                          solution_two['variables'][key])/solution_one['variables'][key])
             try:
                 if relative_difference > 0.0001:
                     return False

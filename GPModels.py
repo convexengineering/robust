@@ -30,7 +30,7 @@ def simpleWing():
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
-    toz = Variable("toz", 1, "-", pr=tau*mu*k/rho/S_wetratio)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
+    toz = Variable("toz", 1, "-", pr=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
 
     # Free Variables
     D = Variable("D", "N", "total drag force")
@@ -85,10 +85,10 @@ def simpleWingSP():
     S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.)
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=10.)
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 2e-5, "1/m",
-                          "Wing Weight Coefficent 1", pr=30.)  # orig  12e-5
+                          "Wing Weight Coefficient 1", pr=30.)  # orig  12e-5
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60., "Pa",
-                          "Wing Weight Coefficent 2", pr=10.)
-    p_labor = Variable('p_{labor}', 1., '1/min', 'cost of labor', pr=20.)
+                          "Wing Weight Coefficient 2", pr=10.)
+    # p_labor = Variable('p_{labor}', 1., '1/min', 'cost of labor', pr=20.)
     # Dimensional constants
     CDA0 = Variable("(CDA0)", "m^2", "fuselage drag area")  # 0.035 originally
     Range = Variable("Range", 3000, "km", "aircraft range")
@@ -150,7 +150,6 @@ def simpleWingSP():
                         V_f_avail <= V_f_wing + V_f_fuse,  # [SP]
                         V_f_wing ** 2 <= 0.0009 * S ** 3 / A * tau ** 2,  # linear with b and tau, quadratic with chord!
                         V_f_fuse <= 10 * units('m') * CDA0,
-                        # TODO: Reduce volume available by the structure!
                         V_f_avail >= V_f,
                         W_f >= TSFC * T_flight * D]
 
@@ -222,11 +221,11 @@ def test_model():
     x = Variable('x')
     y = Variable('y')
 
-    a = Variable('a', 1.1, pr=10)
-    b = Variable('b', 1, pr=10)
+    a = Variable('a', 0.6, pr=10)
+    b = Variable('b', 0.5, pr=10)
 
-    constraints = [a * b * x + a * b * y <= 1,
-                   b * x / y + b * x * y + b * x ** 2 <= 1]
+    constraints = [a * b * x + a * b* y <= 1,
+                   b * x / y + b * x * y + a*b**2 * x ** 2 <= 1]
     return Model((x * y) ** -1, constraints)
 
 
@@ -245,18 +244,18 @@ def mike_solar_model():
     import gassolar.solar.solar as solar_mike
     model = solar_mike.Mission(latitude=25)
     model.cost = model["W_{total}"]
-    uncertain_var_dic = {'V_{wind-ref}': 0.8, "m_{fac}": 1.6, "B_{PM}": 3.2, "\\eta": 4.8, "\\eta_{charge}": 5.6,
-                         "\\eta_{discharge}": 3.2, "h_{batt}": 6.4, "\\tau": 4, "(E/\\mathcal{V})": 2.4,
-                         '\\eta_{prop}': 0.8, '\\kappa': 2.4, '\\bar{q}': 1.6, 'V_{NE}': 1.6, '1-cos(\\eta)': 1.6,
-                         '\\bar{M}_{tip}': 1.6, "W_{pay}": 1.6, '\\rho_{sl}': 1.6, '\\bar{S}_{tip}': 16, 'k': 1.6,
-                         'p_{wind}': 1.6, '\\rho_{foam}': 1.6, '\\theta_{root}': 1.6, '\\bar{A}_{NACA0008}': 1.6,
-                         '\\theta_{max}': 1.6, 'Re**1.00_{low-bound}': 1.6, 'N_{max}': 1.6, '\\bar{J/t}': 1.6,
-                         '\\rho_{CFRP}': 1.6, 'Re**1.00_{up-bound}': 1.6, '\\rho_{solar}': 1.6, '(E/S)_{var}': 4,
-                         '\\rho_{skin}': 1.6,  '(1-k/2)': 1.6, 't_{min}': 1.6, '\\bar{c}_{ave}': 10.4, '\\rho_{ref}': 1,
-                         'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 3.2,
-                         '\\sigma_{CFRP}': 8.8, '\\tau_{CFRP}': 7.2, 'C_{m_w}': 11.2, '\\bar{\\delta}_{root}': 6.4,
-                         'w_{lim}': 9.6, '(E/S)_{irr}': 1.6, 't_{night}': 1.6, '\\mu': 6.4, '\\bar{c}': 7.2,
-                         '\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 1.6, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
+    uncertain_var_dic = {'V_{wind-ref}': 10, "m_{fac}": 1.5, "B_{PM}": 4, "\\eta": 5, "\\eta_{charge}": 6,
+                         "\\eta_{discharge}": 4, "h_{batt}": 7, "\\tau": 4, "(E/\\mathcal{V})": 3,
+                         '\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
+                         '\\bar{M}_{tip}': 2, "W_{pay}": 2, '\\rho_{sl}': 2, '\\bar{S}_{tip}': 16, 'k': 2,
+                         'p_{wind}': 2, '\\rho_{foam}': 2, '\\theta_{root}': 2, '\\bar{A}_{NACA0008}': 2,
+                         '\\theta_{max}': 2, 'Re**1.00_{low-bound}': 2, 'N_{max}': 2, '\\bar{J/t}': 2,
+                         '\\rho_{CFRP}': 2, 'Re**1.00_{up-bound}': 2, '\\rho_{solar}': 2, '(E/S)_{var}': 4,
+                         '\\rho_{skin}': 2,  '(1-k/2)': 2, 't_{min}': 2, '\\bar{c}_{ave}': 10, '\\rho_{ref}': 2,
+                         'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 4,
+                         '\\sigma_{CFRP}': 9, '\\tau_{CFRP}': 8, 'C_{m_w}': 13, '\\bar{\\delta}_{root}': 7,
+                         'w_{lim}': 10, '(E/S)_{irr}': 2, 't_{night}': 2, '\\mu': 8, '\\bar{c}': 8,
+                         '\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 2, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
                          "C_{L_{max}}": 3, }  # 'P_{acc}': 0.1,
 
     keys = uncertain_var_dic.keys()

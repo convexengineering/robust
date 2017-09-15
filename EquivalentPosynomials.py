@@ -249,7 +249,8 @@ class EquivalentPosynomials:
                 for j in xrange(number_of_monomials):
                     # print("ejer")
                     only_uncertain_vars_monomial = RobustGPTools.\
-                        only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j], self.p_indirect_uncertain_vars)
+                        only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j],
+                                                     self.p_indirect_uncertain_vars)
                     # print("ejer")
                     # print only_uncertain_vars_monomial
                     # print var.key
