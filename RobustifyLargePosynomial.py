@@ -281,7 +281,7 @@ class RobustifyLargePosynomial:
 
         p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))
 
-        if not p_uncertain_vars and not p_indirect_uncertain_vars:
+        if (not p_uncertain_vars and not p_indirect_uncertain_vars) or gamma == 0:
             return [self.p <= 1]
 
         perturbation_matrix, intercept, mean_vector = \

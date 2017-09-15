@@ -108,7 +108,8 @@ class RobustGPModel:
         equivalent_model = EquivalentModel(model, self.uncertain_vars,
                                            self.indirect_uncertain_vars, simple_model, dependent_uncertainty_set)
         # equivalent_model.substitutions.update(model.substitutions)
-        # print equivalent_model  # .solve()['cost']
+        # print model.solve(verbosity=0)['cost']
+        # print equivalent_model  # .solve(verbosity=0)['cost']
         equivalent_model_posynomials = equivalent_model.as_posyslt1()
         equivalent_model_no_data_constraints_number = equivalent_model.number_of_no_data_constraints
 
@@ -187,13 +188,14 @@ class RobustGPModel:
         return exps_of_uncertain_vars
 
     @staticmethod
-    def normalize_perturbation_vector(uncertain_vars):
+    def normalize_perturbation_vector(uncertain_vars, gamma):
         """
         normalizes the perturbation elements
         :param uncertain_vars: the uncertain variables of the model
+        :param gamma: the size of the uncertainty set
         :return: the centering and scaling vector
         """
-        prs = np.array([var.key.pr for var in uncertain_vars])
+        prs = np.array([var.key.pr*gamma for var in uncertain_vars])
         # mean_values = np.array([np.log(var.key.value) for var in uncertain_vars])
         eta_max = np.log(1 + prs / 100.0)
         eta_min = np.log(1 - prs / 100.0)
@@ -261,7 +263,7 @@ class RobustGPModel:
             exps_of_uncertain_vars = RobustGPModel.\
                 uncertain_variables_exponents(monomials, self.uncertain_vars, self.indirect_uncertain_vars)
             centering_vector, scaling_vector = RobustGPModel.\
-                normalize_perturbation_vector(self.uncertain_vars)
+                normalize_perturbation_vector(self.uncertain_vars, self.gamma)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
@@ -283,7 +285,7 @@ class RobustGPModel:
             exps_of_uncertain_vars = RobustGPModel.\
                 uncertain_variables_exponents([the_monomial], self.uncertain_vars, self.indirect_uncertain_vars)
             centering_vector, scaling_vector = RobustGPModel.\
-                normalize_perturbation_vector(self.uncertain_vars)
+                normalize_perturbation_vector(self.uncertain_vars, self.gamma)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel. \
                 construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma, self.type_of_uncertainty_set,
@@ -389,7 +391,7 @@ class RobustGPModel:
             uncertain_variables_exponents(all_tractable_posynomials, self.uncertain_vars, self.indirect_uncertain_vars)
         if exps_of_uncertain_vars.size > 0:
             centering_vector, scaling_vector = RobustGPModel.\
-                normalize_perturbation_vector(self.uncertain_vars)
+                normalize_perturbation_vector(self.uncertain_vars, self.gamma)
             # noinspection PyTypeChecker
             coefficient = RobustGPModel.construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.gamma,
                                                                                self.type_of_uncertainty_set,
@@ -416,7 +418,7 @@ class RobustGPModel:
         model_lower = None
 
         while r <= self.r_max and error > self.tol:
-            print r
+            # print r
 
             model_upper, model_lower = self.linearize_and_return_upper_lower_models(two_term_data_posynomials, r)
             # print model_upper

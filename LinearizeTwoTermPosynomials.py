@@ -1,6 +1,5 @@
 import numpy as np
 import scipy.optimize as op
-import warnings
 from gpkit import Variable, Monomial, Posynomial
 
 
@@ -124,8 +123,10 @@ class LinearizeTwoTermPosynomials:
         if r < 2:
             raise Exception('The number of piece-wise sections should be two or larger')
 
-        if len(self.p.exps) != 2:
-            warnings.warn('The Posynomial is not a two term posynomial')
+        if len(self.p.exps) > 2:
+            raise Exception('The posynomial is larger than a two term posynomial')
+
+        if len(self.p.exps) < 2:
             return [], [], [self.p <= 1]
 
         a, b, _, _, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r, tol)
