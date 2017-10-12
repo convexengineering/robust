@@ -449,7 +449,7 @@ class RobustGPModel:
         else:
             solution = sol_lower
             robust_model = model_lower
-        return r, solution, robust_model
+        return r-1, solution, robust_model
 
     def solve(self, verbosity=1, r_min=12, r_max=20, tol=0.01):
         if self.robust_model is None:
