@@ -16,18 +16,14 @@ class TwoTermApproximation:
     number_of_monomials = None
     list_of_permutations = []
 
-    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, simple, boyd, smart_two_term_choose,
-                 maximum_number_of_permutations):
+    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, setting):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
 
         self.list_of_permutations = []
 
-        if simple:
-            maximum_number_of_permutations = 1
-
-        if not boyd:
-            if smart_two_term_choose:
+        if not setting.get('boyd'):
+            if setting.get('smartTwoTermChoose'):
                 bad_relations, sizes = self.bad_relations(self.p, uncertain_vars, indirect_uncertain_vars)
                 list_of_couples, new_list_to_permute = TwoTermApproximation. \
                     choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
@@ -40,11 +36,11 @@ class TwoTermApproximation:
                 first_elements += couple
 
             length_of_permutation = len(new_list_to_permute)
-            total_number_of_possible_permutations = \
+            max_num_of_perms = \
                 TwoTermApproximation.total_number_of_permutations(length_of_permutation)
 
             counter = 0
-            number_of_permutations = min(maximum_number_of_permutations, total_number_of_possible_permutations)
+            number_of_permutations = min(setting.get('allowedNumOfPerms'), max_num_of_perms)
             while counter < number_of_permutations:
                 temp = copy(new_list_to_permute)
                 random.shuffle(temp)

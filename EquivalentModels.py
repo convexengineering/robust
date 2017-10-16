@@ -10,13 +10,13 @@ class EquivalentModel(Model):
     """
     number_of_no_data_constraints = None
 
-    def setup(self, model, uncertain_vars, indirect_uncertain_vars, simple_model, dependent_uncertainties):
+    def setup(self, model, uncertain_vars, indirect_uncertain_vars, dependent_uncertainties, setting):
         """
         generates an equivalent model that might not be ready for robustification
         :param uncertain_vars: the uncertain variables of the model
         :param indirect_uncertain_vars: the indirect uncertain variables of the model
         :param model: the original model
-        :param simple_model: whether or not a simple conservative robust model is preferred
+        :param setting: robustness setting
         :param dependent_uncertainties: if the uncertainty set is dependent or not
         :return: the equivalent model
         """
@@ -24,8 +24,8 @@ class EquivalentModel(Model):
 
         for i, p in enumerate(model.as_posyslt1()):
 
-            equivalent_p = EquivalentPosynomials(p, uncertain_vars, indirect_uncertain_vars, i, simple_model,
-                                                 dependent_uncertainties)
+            equivalent_p = EquivalentPosynomials(p, uncertain_vars, indirect_uncertain_vars, i,
+                                                 setting.get('simpleModel'), dependent_uncertainties)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
 
             data_constraints += data

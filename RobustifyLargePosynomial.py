@@ -256,17 +256,15 @@ class RobustifyLargePosynomial:
             constraints.append(sum(ss) <= s_main)
         return constraints
 
-    def robustify_large_posynomial(self, gamma, type_of_uncertainty_set, uncertain_vars, indirect_uncertain_vars, m,
-                                   enable_sp, number_of_regression_points):
+    def robustify_large_posynomial(self, type_of_uncertainty_set, uncertain_vars, indirect_uncertain_vars, m,
+                                   setting):
         """
         generate a safe approximation for large posynomials with uncertain coefficients
-        :param gamma: controls the size of the uncertainty set
         :param type_of_uncertainty_set: 'box', elliptical, or 'one norm'
         :param uncertain_vars: Model's uncertain variables
         :param indirect_uncertain_vars: Model's indirect uncertain variables
         :param m: Index
-        :param enable_sp: choose whether an sp compatible model is okay
-        :param number_of_regression_points: number of regression points per dimension
+        :param setting: robustness setting
         :return: set of robust constraints
         """
         p_direct_uncertain_vars = [var for var in self.p.varkeys if var in uncertain_vars]
@@ -281,15 +279,16 @@ class RobustifyLargePosynomial:
 
         p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))
 
-        if (not p_uncertain_vars and not p_indirect_uncertain_vars) or gamma == 0:
+        if (not p_uncertain_vars and not p_indirect_uncertain_vars) or setting.get('gamma') == 0:
             return [self.p <= 1]
 
         perturbation_matrix, intercept, mean_vector = \
-            self.linearize_perturbations(p_uncertain_vars, p_indirect_uncertain_vars, number_of_regression_points)
+            self.linearize_perturbations(p_uncertain_vars, p_indirect_uncertain_vars,
+                                         setting.get('numberOfRegressionPoints'))
 
         monomials = self.no_coefficient_monomials()
         constraints = RobustifyLargePosynomial. \
-            generate_robust_constraints(gamma, type_of_uncertainty_set, monomials,
+            generate_robust_constraints(setting.get('gamma'), type_of_uncertainty_set, monomials,
                                         perturbation_matrix, intercept,
-                                        mean_vector, enable_sp, m)
+                                        mean_vector, setting.get('enableSP'), m)
         return constraints

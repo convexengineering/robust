@@ -5,7 +5,14 @@ import numpy as np
 
 
 class RobustSPModel:
+
     sequence_of_rgps = None
+
+    ready_constraints = []
+    tractable_posynomials = []
+    to_linearize_posynomials = []
+    large_posynomials = []
+
     number_of_rgp_approximations = None
     original_model = None
     gamma = None
