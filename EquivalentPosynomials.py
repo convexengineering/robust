@@ -66,7 +66,6 @@ class EquivalentPosynomials:
 
             for var in only_uncertain_vars_monomial.exps[0].keys():
                 if var in uncertain_vars:
-
                     m_uncertain_vars_exps[var] = only_uncertain_vars_monomial.exps[0][var]
             if m_uncertain_vars_exps in uncertain_vars_exps:
                 index = uncertain_vars_exps.index(m_uncertain_vars_exps)

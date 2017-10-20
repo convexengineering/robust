@@ -164,4 +164,3 @@ for gamma in [1]:  # gammas:
 
 for statement in printing_list:
     print(statement)
-

@@ -88,6 +88,7 @@ class RobustGPModel:
             robust_gp.setting.set('allowedNumOfPerms', 0)
             safe_model = TwoTermBoydModel(model)
             # print(safe_model)
+            # print(safe_model.solve(verbosity=0)['cost'])
             safe_model_posynomials = safe_model.as_posyslt1()
             for p in safe_model_posynomials:
                 if len(p.exps) == 1:
@@ -107,6 +108,8 @@ class RobustGPModel:
         equivalent_model_posynomials = equivalent_model.as_posyslt1()
         equivalent_model_no_data_constraints_number = equivalent_model.number_of_no_data_constraints
         # print(equivalent_model)
+        # print(equivalent_model.solve(verbosity=0)['cost'])
+        # print(model.solve(verbosity=0)['cost'])
         for i, p in enumerate(equivalent_model_posynomials):
             if i < equivalent_model_no_data_constraints_number:
                 robust_gp.ready_constraints += [p <= 1]
@@ -179,75 +182,40 @@ class RobustGPModel:
     #        robust_gp.intercepts = intercepts
     #        robust_gp.setting = RobustGPSetting(**options)
 
-    @staticmethod
-    def uncertain_variables_exponents(data_monomials, uncertain_vars, indirect_uncertain_vars):
-        """
-        gets the exponents of uncertain variables
-        :param data_monomials:  the uncertain posynomials
-        :param uncertain_vars: the uncertain variables of the model
-        :param indirect_uncertain_vars: the indirectly uncertain variables of the model
-        :return: the 2 dimensional array of exponents(matrix)
-        """
-        direct_uncertain_vars_data_monomials = []
-        for monomial in data_monomials:
-            new_monomial = RobustGPTools. \
-                only_uncertain_vars_monomial(monomial.exps[0], monomial.cs[0], indirect_uncertain_vars)
-            direct_uncertain_vars_data_monomials.append(new_monomial)
+    def robustify_monomial(self, monomial):
+        new_monomial = RobustGPTools. \
+            only_uncertain_vars_monomial(monomial.exps[0], monomial.cs[0], self.indirect_uncertain_vars)
+        m_direct_uncertain_vars = [var for var in new_monomial.varkeys if var in self.uncertain_vars]
+        # m_indirect_uncertain_vars = [var for var in new_monomial.varkeys if var in self.indirect_uncertain_vars]
+        total_center = 0
+        norm = 0
+        for var in m_direct_uncertain_vars:
+            pr = var.key.pr * self.setting.get('gamma')
+            eta_max = np.log(1 + pr / 100.0)
+            eta_min = np.log(1 - pr / 100.0)
+            center = (eta_min + eta_max) / 2.0
+            scale = eta_max - center
+            exponent = -new_monomial.exps[0].get(var.key)
+            pert = exponent * scale
 
-        exps_of_uncertain_vars = \
-            np.array([[-p.exps[0].get(var.key, 0) for var in uncertain_vars]
-                      for p in direct_uncertain_vars_data_monomials])
-        return exps_of_uncertain_vars
+            if self.type_of_uncertainty_set == 'box':
+                norm += np.abs(pert)
+            elif self.type_of_uncertainty_set == 'elliptical':
+                norm += pert ** 2
+            elif self.type_of_uncertainty_set == 'one norm':
+                norm = max(norm, np.abs(pert))
+            else:
+                raise Exception('This type of set is not supported')
+            total_center = total_center + exponent * center
+        if self.type_of_uncertainty_set == 'elliptical':
+            norm = np.sqrt(norm)
+        return monomial * np.exp(self.setting.get('gamma') * norm) / np.exp(total_center)
 
-    @staticmethod
-    def normalize_perturbation_vector(uncertain_vars, gamma):
-        """
-        normalizes the perturbation elements
-        :param uncertain_vars: the uncertain variables of the model
-        :param gamma: the size of the uncertainty set
-        :return: the centering and scaling vector
-        """
-        prs = np.array([var.key.pr * gamma for var in uncertain_vars])
-        eta_max = np.log(1 + prs / 100.0)
-        eta_min = np.log(1 - prs / 100.0)
-
-        centering_vector = (eta_min + eta_max) / 2.0
-        scaling_vector = eta_max - centering_vector
-
-        return centering_vector, scaling_vector
-
-    @staticmethod
-    def construct_robust_monomial_coefficients(exps_of_uncertain_vars, gamma,
-                                               type_of_uncertainty_set,
-                                               centering_vector, scaling_vector):
-        """
-        robustify monomials
-        :param exps_of_uncertain_vars: the matrix of exponents
-        :param gamma: controls the size of the uncertainty set
-        :param type_of_uncertainty_set: box, elliptical, or one norm
-        :param centering_vector: centers the perturbations around zero
-        :param scaling_vector: scales the perturbation to 1
-        :return: the coefficient that will multiply the left hand side of a constraint
-        """
-        b_pert = (exps_of_uncertain_vars * scaling_vector[np.newaxis])
-        coefficient = []
-        for i in xrange(exps_of_uncertain_vars.shape[0]):
-            norm = 0
-            centering = 0
-            for j in range(exps_of_uncertain_vars.shape[1]):
-                if type_of_uncertainty_set == 'box':
-                    norm += np.abs(b_pert[i][j])
-                elif type_of_uncertainty_set == 'elliptical':
-                    norm += b_pert[i][j] ** 2
-                elif type_of_uncertainty_set == 'one norm':
-                    norm = max(norm, np.abs(b_pert[i][j]))
-                else:
-                    raise Exception('This type of set is not supported')
-                centering = centering + exps_of_uncertain_vars[i][j] * centering_vector[j]
-            if type_of_uncertainty_set == 'elliptical':
-                norm = np.sqrt(norm)
-            coefficient.append([np.exp(gamma * norm) / np.exp(centering)])
-        return coefficient
+    def robustify_set_of_monomials(self, set_of_monomials):
+        robust_set_of_monomial_constraints = []
+        for monomial in set_of_monomials:
+            robust_set_of_monomial_constraints += [self.robustify_monomial(monomial) <= 1]
+        return robust_set_of_monomial_constraints
 
     def calculate_value_of_two_term_approximated_posynomial(self, two_term_approximation, index_of_permutation,
                                                             solution):
@@ -271,21 +239,11 @@ class RobustGPModel:
                               second_monomial ** self.slopes[j] * np.exp(self.intercepts[j])]
             monomials += [second_monomial]
 
-            exps_of_uncertain_vars = RobustGPModel. \
-                uncertain_variables_exponents(monomials, self.uncertain_vars, self.indirect_uncertain_vars)
-            centering_vector, scaling_vector = RobustGPModel. \
-                normalize_perturbation_vector(self.uncertain_vars, self.setting.get('gamma'))
-            # noinspection PyTypeChecker
-            coefficient = RobustGPModel. \
-                construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.setting.get('gamma'),
-                                                       self.type_of_uncertainty_set,
-                                                       centering_vector, scaling_vector)
-
             subs_monomials = []
             for j in xrange(len(monomials)):
-                monomials[j] *= coefficient[j][0]
-                monomials[j] = monomials[j].sub(solution)
+                monomials[j] = self.robustify_monomial(monomials[j])
                 monomials[j] = monomials[j].sub(self.model.substitutions)
+                monomials[j] = monomials[j].sub(solution['variables'])
                 subs_monomials.append(monomials[j].cs[0])
 
             values.append(max(subs_monomials))
@@ -294,18 +252,9 @@ class RobustGPModel:
             the_monomial = Monomial(two_term_approximation.p.exps[permutation[len(permutation) - 1]],
                                     two_term_approximation.p.cs[permutation[len(permutation) - 1]])
 
-            exps_of_uncertain_vars = RobustGPModel. \
-                uncertain_variables_exponents([the_monomial], self.uncertain_vars, self.indirect_uncertain_vars)
-            centering_vector, scaling_vector = RobustGPModel. \
-                normalize_perturbation_vector(self.uncertain_vars, self.setting.get('gamma'))
-            # noinspection PyTypeChecker
-            coefficient = RobustGPModel. \
-                construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.setting.get('gamma'),
-                                                       self.type_of_uncertainty_set,
-                                                       centering_vector, scaling_vector)
-            the_monomial *= coefficient[0][0]
-            the_monomial = the_monomial.sub(solution)
+            the_monomial = self.robustify_monomial(the_monomial)
             the_monomial = the_monomial.sub(self.model.substitutions)
+            the_monomial = the_monomial.sub(solution['variables'])
             values.append(the_monomial.cs[0])
 
         return sum(values)
@@ -316,7 +265,8 @@ class RobustGPModel:
         for i in xrange(len(two_term_approximation.list_of_permutations)):
             temp_value = self. \
                 calculate_value_of_two_term_approximated_posynomial(two_term_approximation, i, solution)
-            # print temp_value
+            # print "value in find", temp_value
+            # print "the corresponding perm", two_term_approximation.list_of_permutations[i]
             if temp_value < minimum_value:
                 minimum_value = temp_value
                 minimum_index = i
@@ -336,6 +286,7 @@ class RobustGPModel:
             for i, two_term_approximation in enumerate(self.large_posynomials):
                 perm_index = np.random.choice(range(0, len(two_term_approximation.list_of_permutations)))
                 permutation = two_term_approximation.list_of_permutations[perm_index]
+                # print (permutation)
                 no_data, data = TwoTermApproximation. \
                     two_term_equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 self.ready_constraints += no_data
@@ -359,11 +310,13 @@ class RobustGPModel:
 
         old_solution = solution
         for _ in xrange(self.setting.get('allowedNumOfPerms')):
-            permutation_indices = self.new_permutation_indices(solution)
+            permutation_indices = self.new_permutation_indices(old_solution)
             two_term_data_posynomials = []
 
             for i, two_term_approximation in enumerate(self.large_posynomials):
                 permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
+                # print ("used perm", permutation)
+                # print ("exps", two_term_approximation.p.exps)
                 _, data = TwoTermApproximation.two_term_equivalent_posynomial(two_term_approximation.p, i,
                                                                               permutation, False)
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
@@ -395,17 +348,8 @@ class RobustGPModel:
             data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
 
         all_tractable_posynomials = self.tractable_posynomials + data_posynomials
-        exps_of_uncertain_vars = RobustGPModel. \
-            uncertain_variables_exponents(all_tractable_posynomials, self.uncertain_vars, self.indirect_uncertain_vars)
-        if exps_of_uncertain_vars.size > 0:
-            centering_vector, scaling_vector = RobustGPModel. \
-                normalize_perturbation_vector(self.uncertain_vars, self.setting.get('gamma'))
-            # noinspection PyTypeChecker
-            coefficient = RobustGPModel. \
-                construct_robust_monomial_coefficients(exps_of_uncertain_vars, self.setting.get('gamma'),
-                                                       self.type_of_uncertainty_set, centering_vector, scaling_vector)
-            for i in xrange(len(all_tractable_posynomials)):
-                data_constraints += [coefficient[i][0] * all_tractable_posynomials[i] <= 1]
+
+        data_constraints += self.robustify_set_of_monomials(all_tractable_posynomials)
 
         model_upper = Model(self.model.cost, [no_data_upper_constraints, self.ready_constraints, data_constraints])
         model_upper.substitutions.update(self.substitutions)
@@ -493,6 +437,7 @@ class RobustGPModel:
 
     @staticmethod
     def same_solution(solution_one, solution_two):
+
         keys_one = solution_one['variables'].keys()
         keys_two = solution_two['variables'].keys()
 

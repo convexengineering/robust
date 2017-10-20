@@ -242,8 +242,9 @@ def example_sp():
 
 def mike_solar_model():
     import gassolar.solar.solar as solar_mike
-    model = solar_mike.Mission(latitude=25)
+    model = solar_mike.Mission(latitude=11)
     model.cost = model["W_{total}"]
+    """
     uncertain_var_dic = {'V_{wind-ref}': 10, "m_{fac}": 1.5, "B_{PM}": 4, "\\eta": 5, "\\eta_{charge}": 6,
                          "\\eta_{discharge}": 4, "h_{batt}": 7, "\\tau": 4, "(E/\\mathcal{V})": 3,
                          '\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
@@ -269,11 +270,11 @@ def mike_solar_model():
             copy_key = VarKey(**model.variables_byname(keys[i])[j].key.descr)
             copy_key.key.descr["pr"] = uncertain_var_dic.get(keys[i])
             model.subinplace({model.variables_byname(keys[i])[j].key: copy_key})
+    """
     new_model = SameModel(model)
-    new_model.substitutions.update(model.substitutions)
+    # new_model.substitutions.update(model.substitutions)
     # print new_model.variables_byname('V_h')[0].key.descr
     return new_model
-
 
 def solve_model(model, *args):
     initial_guess = {}
