@@ -34,7 +34,7 @@ class RobustSPModel:
         self.sequence_of_rgps = []
         self.number_of_rgp_approximations = None
         self. r = None
-        # self.solve_time = None
+        # self.solve_time = None ......
 
     def localsolve(self, verbosity=0, **options):
         try:
