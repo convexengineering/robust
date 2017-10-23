@@ -61,7 +61,7 @@ class RobustSPModel:  # 4.53
             if isinstance(cs, SignomialInequality):
                 self.sp_constraints.append(cs)
             else:
-                gp_posynomials.append(cs.as_posyslt1())
+                gp_posynomials += cs.as_posyslt1()
 
         self.offset = len(gp_posynomials)
 
@@ -148,7 +148,7 @@ class RobustSPModel:  # 4.53
         return robust_model.solve(verbosity=verbosity)
 
     def approximate_and_classify_sp_constraints(self, sp_constraints, solution):
-        sp_gp_approximation = [cs.as_approxsgt(solution) for cs in sp_constraints]
+        sp_gp_approximation = [cs.as_gpconstr(solution).as_posyslt1()[0] for cs in sp_constraints]
         return RobustSPModel. \
             classify_gp_constraints(sp_gp_approximation, self.type_of_uncertainty_set, self.uncertain_vars,
                                     self.indirect_uncertain_vars, self.setting, self.dependent_uncertainty_set)
@@ -159,12 +159,12 @@ class RobustSPModel:  # 4.53
         data_gp_posynomials = []
         ready_gp_constraints = []
         for i, p in enumerate(gp_posynomials):
+            print p
             equivalent_p = EquivalentPosynomials(p, uncertain_vars, indirect_uncertain_vars, i,
                                                  setting.get('simpleModel'), dependent_uncertainty_set)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
-
-            data_gp_posynomials += data
-            ready_gp_constraints += [posy <= 1 for posy in no_data]
+            data_gp_posynomials += [posy.as_posyslt1()[0] for posy in data]
+            ready_gp_constraints += no_data
 
         equality_constraints = False
         tractable_gp_posynomials = []
