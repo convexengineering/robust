@@ -2,6 +2,7 @@ from RobustGP import RobustGPModel, RobustGPSetting
 from gpkit import Model
 
 import numpy as np
+from time import time
 
 
 class RobustSPSetting(RobustGPSetting):
@@ -34,9 +35,10 @@ class RobustSPModel:
         self.sequence_of_rgps = []
         self.number_of_rgp_approximations = None
         self. r = None
-        # self.solve_time = None
+        self.solve_time = None
 
     def localsolve(self, verbosity=0, **options):
+        start_time = time()
         try:
             old_cost = self.nominal_cost.m
         except:
@@ -67,4 +69,5 @@ class RobustSPModel:
             except:
                 new_cost = rgp_solve['cost']
         self.number_of_rgp_approximations = len(self.sequence_of_rgps)
+        self.solve_time = time() - start_time
         return rgp_solve
