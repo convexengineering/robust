@@ -4,9 +4,13 @@
       <w>coeff</w>
       <w>linearizations</w>
       <w>linearize</w>
+      <w>nominalsolve</w>
+      <w>numoflinearsections</w>
       <w>posynomial</w>
       <w>purturbations</w>
       <w>robustify</w>
+      <w>robustsolve</w>
+      <w>setuptime</w>
       <w>signomial</w>
       <w>simp</w>
       <w>vals</w>
