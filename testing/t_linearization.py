@@ -147,4 +147,9 @@ def test_linearize_two_term_posynomial():
         assert (np.log(subs_p.cs[0]) - np.log(lower_pos[0].sub({"w_1": w_1}).cs[0]) <= eps + tol)
         assert (np.log(upper_pos[0].sub({"w_1": w_1}).cs[0]) - np.log(subs_p.cs[0]) <= eps + tol)
 
-    return
+def test():
+    test_tangent_point_func()
+    test_intersection_point_function()
+    test_iterate_two_term_posynomial_linearization_coeff()
+    test_two_term_posynomial_linearization_coeff()
+    test_linearize_two_term_posynomial()

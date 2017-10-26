@@ -177,4 +177,6 @@ def test_bad_relations():
         assert (actual_relations_mons == relations_mons)
         assert (sizes_mons == actual_sizes_mons)
 
-    return
+def test():
+    test_check_if_permutation_exists()
+    test_bad_relations()

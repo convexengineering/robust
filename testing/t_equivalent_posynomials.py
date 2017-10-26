@@ -166,3 +166,11 @@ def test_check_if_no_data():
             else:
                 # noinspection PyUnresolvedReferences
                 assert (EquivalentPosynomials.check_if_no_data(p_uncertain_vars, m[i].exps[0]))
+
+
+def test():
+    test_same_sign()
+    test_merge_intersected_lists()
+    test_correlated_monomials()
+    test_check_if_in_list_of_lists()
+    test_check_if_no_data()
