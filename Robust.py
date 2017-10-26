@@ -77,6 +77,12 @@ class RobustModel:
         else:
             self.dependent_uncertainty_set = True
 
+        self.ready_gp_constraints = []
+        self.tractable_gp_posynomials = []
+        self.to_linearize_gp_posynomials = []
+        self.large_gp_posynomials = []
+        self.sp_constraints = []
+
         if self.setting.get('boyd'):
             self.setting.set('allowedNumOfPerms', 0)
             try:
@@ -96,12 +102,12 @@ class RobustModel:
                     self.to_linearize_gp_posynomials += [p]
             if equality_constraints:
                 warnings.warn('equality constraints will not be robustified')
+            self.number_of_gp_posynomials = 0
             return
 
         all_constraints = model.flat(constraintsets=False)
 
         gp_posynomials = []
-        self.sp_constraints = []
 
         for cs in all_constraints:
             if isinstance(cs, SignomialInequality):
