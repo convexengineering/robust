@@ -92,14 +92,13 @@ class LinearizeTwoTermPosynomials:
         x_intersection = None
 
         eps = None
-        eps_min = max(1.4130/r**2.0215 - 0.001, 0)
-        eps_max = min(1.4130/r**2.0215 + 0.001, np.log(2))
+        eps_min = 0  # max(1.4130/r**2.0215 - 0.001, 0)
+        eps_max = np.log(2)  # min(1.4130/r**2.0215 + 0.001, np.log(2))
         delta = 100
 
         while delta > tol:
             eps = (eps_max + eps_min) / 2
             x_final_theoretical = -np.log(np.exp(eps) - 1)
-
             number_of_actual_r, a, b, x_tangent, x_intersection = \
                 LinearizeTwoTermPosynomials.iterate_two_term_posynomial_linearization_coeff(r, eps)
 

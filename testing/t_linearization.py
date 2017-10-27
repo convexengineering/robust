@@ -10,6 +10,7 @@ def function(x):
 
 def test_tangent_point_func():
     for _ in xrange(1000):
+
         eps = np.random.rand() * 0.2
 
         x_old = - np.random.rand() * np.log(np.exp(0.2) - 1)
@@ -39,6 +40,7 @@ def test_tangent_point_func():
 
 def test_intersection_point_function():
     for _ in xrange(1000):
+
         eps = np.random.rand() * 0.2
 
         x_old = - np.random.rand() * np.log(np.exp(0.2) - 1)
@@ -55,13 +57,14 @@ def test_intersection_point_function():
         assert (x_intersection > x_tangent)
 
         diff = function(x_intersection) - eps - tangent_slope * x_intersection - tangent_intercept
-        assert (diff < 0.0001)
 
-        return
+        assert (diff < 0.0001)
+    return
 
 
 def test_iterate_two_term_posynomial_linearization_coeff():
-    for _ in xrange(1000):
+    for _ in xrange(10):
+
         eps = np.random.rand() * np.log(2)
         r = int(np.ceil(np.random.rand()*18)) + 1
 
@@ -73,6 +76,7 @@ def test_iterate_two_term_posynomial_linearization_coeff():
             evaluations.append(x)
             return max(evaluations)
 
+        # raise Exception("ejer")
         tangent_difference = [function(k) - piece_wise_linear_function(k) for k in x_tangent]
         intersection_difference = [function(k) - piece_wise_linear_function(k) for k in x_intersection]
 
@@ -85,7 +89,8 @@ def test_two_term_posynomial_linearization_coeff():
     for r in range(3, 21):
 
         tol = np.random.rand()*0.001
-        slopes, intercepts, x_tangent, x_intersection, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r, tol)
+        slopes, intercepts, x_tangent, x_intersection, eps = LinearizeTwoTermPosynomials.\
+            two_term_posynomial_linearization_coeff(r, tol)
 
         assert (all(np.abs(slopes[i] + slopes[r - i - 3] - 1) <= 0.0001 for i in range(0, r-2)))
         assert (all(np.abs(intercepts[i] - intercepts[r - i - 3]) <= 0.001 for i in range(0, r-2)))
