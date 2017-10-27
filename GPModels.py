@@ -31,7 +31,7 @@ def simpleWing():
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
     toz = Variable("toz", 1, "-", pr=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
-
+    ejer = Variable("ejer", 10000, "N")
     # Free Variables
     D = Variable("D", "N", "total drag force")
     A = Variable("A", "-", "aspect ratio")
@@ -63,7 +63,8 @@ def simpleWing():
                     C_f >= 0.074 / Re ** 0.2,
                     W <= 0.5 * rho * S * C_L * V ** 2,
                     W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
-                    W >= W_0 + W_w]
+                    W >= W_0 + W_w,
+                    D <= ejer]
     # for key in subs.keys():
 
     return Model(D, constraints)
@@ -96,7 +97,7 @@ def simpleWingSP():
     TSFC = Variable("TSFC", 0.6, "1/hr", "thrust specific fuel consumption")
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20.)
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=20.)
-
+    ejer = Variable("ejer", 11500, "N")
     # Free Variables
     LoD = Variable('L/D', '-', 'lift-to-drag ratio')
     D = Variable("D", "N", "total drag force")
@@ -151,7 +152,8 @@ def simpleWingSP():
                         V_f_wing ** 2 <= 0.0009 * S ** 3 / A * tau ** 2,  # linear with b and tau, quadratic with chord!
                         V_f_fuse <= 10 * units('m') * CDA0,
                         V_f_avail >= V_f,
-                        W_f >= TSFC * T_flight * D]
+                        W_f >= TSFC * T_flight * D,
+                        D <= ejer]
 
     # return Model(W_f/LoD, constraints)
     return Model(D, constraints)
