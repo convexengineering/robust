@@ -55,7 +55,6 @@ def test_check_if_permutation_exists():
             assert (flag_one == flag_two)
 
             counter += 1
-    return
 
 
 def test_bad_relations():
@@ -176,6 +175,7 @@ def test_bad_relations():
 
         assert (actual_relations_mons == relations_mons)
         assert (sizes_mons == actual_sizes_mons)
+
 
 def test():
     test_check_if_permutation_exists()
