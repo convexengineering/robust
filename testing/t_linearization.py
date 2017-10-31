@@ -88,9 +88,8 @@ def test_iterate_two_term_posynomial_linearization_coeff():
 def test_two_term_posynomial_linearization_coeff():
     for r in range(3, 21):
 
-        tol = np.random.rand()*0.001
         slopes, intercepts, x_tangent, x_intersection, eps = LinearizeTwoTermPosynomials.\
-            two_term_posynomial_linearization_coeff(r, tol)
+            two_term_posynomial_linearization_coeff(r)
 
         assert (all(np.abs(slopes[i] + slopes[r - i - 3] - 1) <= 0.0001 for i in range(0, r-2)))
         assert (all(np.abs(intercepts[i] - intercepts[r - i - 3]) <= 0.001 for i in range(0, r-2)))
@@ -130,7 +129,7 @@ def test_linearize_two_term_posynomial():
 
         r = int(np.random.rand()*18) + 2
         linearized_p = LinearizeTwoTermPosynomials(p)
-        no_data_upper, no_data_lower, data = linearized_p.linearize_two_term_posynomial(1, r, tol)
+        no_data_upper, no_data_lower, data = linearized_p.linearize_two_term_posynomial(1, r)
 
         assert (len(data) == r)
         assert (len(no_data_upper) == 1)

@@ -203,8 +203,7 @@ class RobustModel:
 
             if reached_feasibility <= 1:
                 slopes, intercepts, _, _, _ = LinearizeTwoTermPosynomials. \
-                    two_term_posynomial_linearization_coeff(self.robust_solve_properties['numoflinearsections'],
-                                                            self.setting.get('linearizationTolerance'))
+                    two_term_posynomial_linearization_coeff(self.robust_solve_properties['numoflinearsections'])
                 self.robust_solve_properties['slopes'] = slopes
                 self.robust_solve_properties['intercepts'] = intercepts
 
@@ -374,7 +373,7 @@ class RobustModel:
         for i, two_term_p in enumerate(two_term_data_posynomials):
             linearize_p = LinearizeTwoTermPosynomials(two_term_p)
             no_data_upper, no_data_lower, data = linearize_p. \
-                linearize_two_term_posynomial(i, r, self.setting.get('linearizationTolerance'))
+                linearize_two_term_posynomial(i, r)
             no_data_upper_constraints += no_data_upper
             no_data_lower_constraints += no_data_lower
             data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]

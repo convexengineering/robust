@@ -76,27 +76,20 @@ class LinearizeTwoTermPosynomials:
         return r, a, b, x_tangent, x_intersection
 
     @staticmethod
-    def two_term_posynomial_linearization_coeff(r, tol):
-        """
-        Finds the appropriate r, slopes, and intercepts for a given tolerance
-        :param r: the number of PWL functions
-        :param tol: tolerance
-        :return: the slope, intercept, and new x
-        """
-        if r < 2:
-            raise Exception('The number of piece-wise sections should two or larger')
-
+    def compute_two_term_posynomial_linearization_coeff(r, tol):
         a = None
         b = None
         x_tangent = None
         x_intersection = None
 
         eps = None
-        eps_min = 0  # max(1.4130/r**2.0215 - 0.001, 0)
-        eps_max = np.log(2)  # min(1.4130/r**2.0215 + 0.001, np.log(2))
+        eps_min = 0
+        eps_max = np.log(2)
         delta = 100
+        delta_old = 200
 
-        while delta > tol:
+        while delta > tol and delta != delta_old:
+            delta_old = delta
             eps = (eps_max + eps_min) / 2
             x_final_theoretical = -np.log(np.exp(eps) - 1)
             number_of_actual_r, a, b, x_tangent, x_intersection = \
@@ -111,7 +104,38 @@ class LinearizeTwoTermPosynomials:
             delta = np.abs(x_final_actual - x_final_theoretical)
         return a, b, x_tangent, x_intersection, eps
 
-    def linearize_two_term_posynomial(self, m, r, tol):
+    @staticmethod
+    def two_term_posynomial_linearization_coeff(r):
+        """
+        Finds the appropriate r, slopes, and intercepts for a given tolerance
+        :param r: the number of PWL functions
+        :param tol: tolerance
+        :return: the slope, intercept, and new x
+        """
+        if r < 2:
+            raise Exception('The number of piece-wise sections should two or larger')
+
+        if r < 100:
+            linearization_data_file = open("data/linearization_data.txt", "r")
+            for _ in xrange(r-2):
+                linearization_data_file.readline()
+            line = linearization_data_file.readline()
+            data = line.split(": ")
+            slopes = data[0].split(", ")[0:-1]
+            slopes = [float(item) for item in slopes]
+            intercepts = data[1].split(", ")[0:-1]
+            intercepts = [float(item) for item in intercepts]
+            x_tangent = data[2].split(", ")[0:-1]
+            x_tangent = [float(item) for item in x_tangent]
+            x_intersection = data[3].split(", ")[0:-1]
+            x_intersection = [float(item) for item in x_intersection]
+            eps = float(data[4])
+            linearization_data_file.close()
+            return slopes, intercepts, x_tangent, x_intersection, eps
+        else:
+            return LinearizeTwoTermPosynomials.compute_two_term_posynomial_linearization_coeff(r, 2*np.finfo(float).eps)
+
+    def linearize_two_term_posynomial(self, m, r):
         """
         Approximates a two term posynomial constraint by upper and lower piece-wise linear constraints
         :param m: the index of the constraint
@@ -128,7 +152,7 @@ class LinearizeTwoTermPosynomials:
         if len(self.p.exps) < 2:
             return [], [], [self.p <= 1]
 
-        a, b, _, _, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r, tol)
+        a, b, _, _, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r)
 
         data_constraints = []
 
