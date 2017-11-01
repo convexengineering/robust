@@ -57,8 +57,8 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
                     yo*np.exp(center_y)*np.exp(np.sin(th))**np.log((1 + y.key.pr/100.0)), "k--",
                     linewidth=1)
         else:
-            p = Polygon(np.array([[xo/(1 + x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo/(1 + x.key.pr/100.0)],
-                                  [yo/(1 + y.key.pr/100.0)]*2 + [yo*(1 + y.key.pr/100.0)]*2]).T,
+            p = Polygon(np.array([[xo*np.exp(center_x)/(1 + x.key.pr/100.0)]+[xo*np.exp(center_x)*(1 + x.key.pr/100.0)]*2+[xo*np.exp(center_x)/(1 + x.key.pr/100.0)],
+                                  [yo*np.exp(center_y)/(1 + y.key.pr/100.0)]*2 + [yo*np.exp(center_y)*(1 + y.key.pr/100.0)]*2]).T,
                         True, edgecolor="black", facecolor="none", linestyle="dashed")
             ax.add_patch(p)
 
