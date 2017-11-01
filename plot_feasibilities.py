@@ -8,6 +8,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
         def setup(self, m, sol):
             r = 4
             th = Variable("\\theta", np.linspace(0, 2*np.pi, 120), "-")
+            print th.key.descr
             x_i = Variable("x_i", lambda c: sol(x)*np.exp(r*np.cos(c[th])), x.unitstr(), "starting point in x")
             y_i = Variable("y_i", lambda c: sol(y)*np.exp(r*np.sin(c[th])), y.unitstr(), "starting point in y")
             s_x = Variable("s_x", "-", "slack in x")
@@ -41,11 +42,19 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
 
     def plot_uncertainty_set(ax):
         xo, yo = map(mag, map(m.solution, [x, y]))
-        ax.plot(xo, yo, "kx")
+        eta_max_x = np.log(1 + x.key.pr / 100.0)
+        eta_min_x = np.log(1 - x.key.pr / 100.0)
+        center_x = (eta_min_x + eta_max_x) / 2.0
+        eta_max_y = np.log(1 + y.key.pr / 100.0)
+        eta_min_y = np.log(1 - y.key.pr / 100.0)
+        center_y = (eta_min_y + eta_max_y) / 2.0
+        x_center = xo*np.exp(center_x)
+        y_center = yo*np.exp(center_y)
+        ax.plot(x_center, y_center, "kx")
         if rmtype == "elliptical":
             th = np.linspace(0, 2*np.pi, 50)
-            ax.plot(xo*np.exp(np.cos(th))**np.log((1 + x.key.pr/100.0)),
-                    yo*np.exp(np.sin(th))**np.log((1 + y.key.pr/100.0)), "k--",
+            ax.plot(xo*np.exp(center_x)*np.exp(np.cos(th))**np.log((1 + x.key.pr/100.0)),
+                    yo*np.exp(center_y)*np.exp(np.sin(th))**np.log((1 + y.key.pr/100.0)), "k--",
                     linewidth=1)
         else:
             p = Polygon(np.array([[xo/(1 + x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo/(1 + x.key.pr/100.0)],
