@@ -1,5 +1,6 @@
 from Robust import RobustModel
 import GPModels as Models
+from plot_feasibilities import plot_feasibilities
 
 
 # for you to see the structure of the robust model, check the variables ending with _robust_model
@@ -26,25 +27,39 @@ def test():
     tm_ell_uncertain_exponents_robust_model = tm_ell_uncertain_exponents.get_robust_model()
 
     simp = Models.simpleWing()
-
+    simp.solve()
     simp_box_uncertain_coeff = RobustModel(simp, 'box', two_term=False)
     # simp_box_uncertain_coeff.setup() creates the robust model and saves it in simp_box_uncertain_coeff.robust_model
     sol_simp_box_uncertain_coeff = simp_box_uncertain_coeff.robustsolve(verbosity=1)  # calls the setup() if the robust model is not created yet,
     # otherwise it will directly solve the robust_model
     simp_box_uncertain_coeff_robust_model = simp_box_uncertain_coeff.get_robust_model()
+    plot_feasibilities(simp["W_{W_{coeff1}}"], simp["W_{W_{coeff2}}"], simp,
+                       simp_box_uncertain_coeff_robust_model, "box")
 
+    simp = Models.simpleWing()
+    simp.solve()
     simp_ell_uncertain_coeff = RobustModel(simp, 'elliptical', two_term=False)
     sol_simp_ell_uncertain_coeff = simp_ell_uncertain_coeff.robustsolve(verbosity=1)
     simp_ell_uncertain_coeff_robust_model = simp_ell_uncertain_coeff.get_robust_model()
+    plot_feasibilities(simp["W_{W_{coeff1}}"], simp["W_{W_{coeff2}}"], simp,
+                       simp_ell_uncertain_coeff_robust_model, "elliptical")
 
+    simp = Models.simpleWing()
+    simp.solve()
     simp_box_uncertain_exponents = RobustModel(simp, 'box')  # this method can handle uncertain exponents,
     # we do not need signomial constraints, and in most cases it is better than the method for uncertain coefficients.
     sol_simp_box_uncertain_exponents = simp_box_uncertain_exponents.robustsolve(verbosity=1)
     simp_box_uncertain_exponents_robust_model = simp_box_uncertain_exponents.get_robust_model()
+    plot_feasibilities(simp["W_{W_{coeff1}}"], simp["W_{W_{coeff2}}"], simp,
+                       simp_box_uncertain_exponents_robust_model, "box")
 
+    simp = Models.simpleWing()
+    simp.solve()
     simp_ell_uncertain_exponents = RobustModel(simp, 'elliptical')
     sol_simp_ell_uncertain_exponents = simp_ell_uncertain_exponents.robustsolve(verbosity=1)
     simp_ell_uncertain_exponents_robust_model = simp_ell_uncertain_exponents.get_robust_model()
+    plot_feasibilities(simp["W_{W_{coeff1}}"], simp["W_{W_{coeff2}}"], simp,
+                       simp_ell_uncertain_exponents_robust_model, "elliptical")
 
     simpSP = Models.simpleWing()
 
