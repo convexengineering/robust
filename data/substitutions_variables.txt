@@ -1,98 +1,279 @@
-\eta_{prop}: propeller efficiency: 0.8:  ['Mission', 'FlightSegment', 'SteadyLevelFlight'] 
-\bar{S}_{tip}: Tip loading: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL', 'Beam'] 
-\kappa: max tip deflection ratio: 0.2:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-g: Gravitational acceleration: 9.81:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-g: gravitational constant: 9.81:  ['Mission', 'Aircraft', 'Battery'] 
-C_{L_{max}}: maximum CL of vertical tail: 1.1:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-B_{PM}: power mass ratio: 4140.8:  ['Mission', 'Aircraft', 'Motor'] 
-\bar{q}: normalized loading: None:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL'] 
-Re**1.00_{up-bound}: Re**1.00 upper bound: 1000000.0:  ['Mission', 'FlightSegment', 'AircraftPerf', 'TailAero'] 
-p_{wind}: percentile wind speeds: 0.9:  ['Mission', 'FlightSegment', 'FlightState'] 
-\mu: viscosity: 1.42e-05:  ['Mission', 'FlightSegment', 'FlightState'] 
-g: gravitational acceleration: 9.81:  ['Mission', 'Aircraft', 'Wing', 'CapSpar'] 
-\rho_{CFRP}: density of CFRP: 1.6:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-\bar{\delta}_{root}: Base deflection: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL', 'Beam'] 
-t_{min}: wing skin min gauge: 0.012:  ['Mission', 'Aircraft', 'Wing', 'WingSkin'] 
-\rho_{solar}: solar cell area density: 0.27:  ['Mission', 'Aircraft', 'SolarCells'] 
-E: young's modulus carbon fiber: 1.5e+11:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-\bar{M}_{tip}: Tip moment: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL', 'Beam'] 
-\sigma_{CFRP}: CFRP max stress: 1700000000.0:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-g: gravitational constant: 9.81:  ['Mission', 'Aircraft', 'Motor'] 
-\lambda_h/(\lambda_h+1): horizontal tail taper ratio factor: 0.444444444444:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-g: Gravitational acceleration: 9.81:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-m_{fac}: Tail weight margin factor: 1.0:  ['Mission', 'Aircraft', 'Empennage'] 
-V_{NE}: never exceed vehicle speed: 40:  ['Mission', 'AircraftLoading', 'EmpennageLoading', 'TailBoomState'] 
-\eta_{discharge}: discharging efficiency: 0.98:  ['Mission', 'Aircraft', 'Battery'] 
-\bar{A}_{NACA0008}: cross sectional area of NACA 0008: 0.0548:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-\rho_{sl}: air density at sea level: 1.225:  ['Mission', 'AircraftLoading', 'EmpennageLoading', 'TailBoomState'] 
-\rho_{ref}: reference air density: 1.0:  ['Mission', 'FlightSegment', 'FlightState'] 
-\rho_{CFRP}: density of CFRP: 1.6:  ['Mission', 'Aircraft', 'Wing', 'WingSkin'] 
-m_{fac}: wind speed margin factor: 1.0:  ['Mission', 'FlightSegment', 'FlightState'] 
-1-cos(\eta)**1.00V**-1.00V_{gust}**1.00_{up-bound}: 1-cos(\eta)**1.00V**-1.00V_{gust}**1.00 upper bound: 0.7:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-Re**1.00_{up-bound}: Re**1.00 upper bound: 1000000.0:  ['Mission', 'FlightSegment', 'AircraftPerf', 'TailAero'] 
-(1-k/2): (1-k/2): 0.6:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-\eta: motor efficiency: 0.95:  ['Mission', 'Aircraft', 'Motor'] 
-\bar{J/t}: torsional moment of inertia: 0.01114:  ['Mission', 'Aircraft', 'Wing', 'WingSkin'] 
-\rho_{foam}: Density of formular 250: 1.5:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-\tau_{CFRP}: torsional stress limit: 210:  ['Mission', 'AircraftLoading', 'EmpennageLoading', 'VerticalBoomTorsion'] 
-\lambda_v/(\lambda_v+1): vertical tail taper ratio factor: 0.411764705882:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-\theta_{root}: Base angle: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL', 'Beam'] 
-V_v: vertical tail volume coefficient: 0.05:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-k: tail boom inertia value: 0.8:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-\eta_{charge}: charging efficiency: 0.98:  ['Mission', 'Aircraft', 'Battery'] 
-\bar{c}_{ave}: normalized mid section chord: None:  ['Mission', 'Aircraft', 'Wing'] 
-m_{fac}: horizontal tail margin factor: 1.1:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-m_{fac}: vertical tail margin factor: 1.1:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-t_{night}: night duration: 13.2094337897:  ['Mission', 'FlightSegment', 'FlightState'] 
-(P/S)_{var}: power units variable: 1:  ['Mission', 'FlightSegment', 'FlightState'] 
-\rho_{skin}: vertical tail skin density: 0.049:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-g: gravitational constant: 9.81:  ['Mission', 'Aircraft', 'SolarCells'] 
-E: Youngs modulus of CFRP: 20000000.0:  ['Mission', 'Aircraft', 'Wing', 'CapSpar'] 
-C_{m_w}: negative wing moment coefficent: 0.121:  ['Mission', 'AircraftLoading', 'WingLoading', 'WingSkinL'] 
-\theta_{max}: max tail boom deflection angle: 0.1:  ['Mission', 'AircraftLoading', 'EmpennageLoading', 'HorizontalBoomBending'] 
-\lambda: vertical tail taper ratio: 0.7:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-\theta_{root}: Base angle: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL', 'Beam'] 
-P_{acc}: Accessory power draw: 0.0:  ['Mission', 'FlightSegment', 'AircraftPerf'] 
-V_h: horizontal tail volume coefficient: None:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-h_{batt}: battery specific energy: 350:  ['Mission', 'Aircraft', 'Battery'] 
-\bar{S}_{tip}: Tip loading: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL', 'Beam'] 
-m_h: horizontal tail span effectiveness: None:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-\theta_{max}: max tail boom deflection angle: 0.1:  ['Mission', 'AircraftLoading', 'EmpennageLoading', 'VerticalBoomBending'] 
-t_{min}: minimum tail boom thickness: 0.25:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-V_{gust}: gust velocity: 10:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-\bar{M}_{tip}: Tip moment: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL', 'Beam'] 
-m_{fac}: tail boom margin factor: 1.0:  ['Mission', 'Aircraft', 'Empennage', 'TailBoom'] 
-\sigma_{CFRP}: CFRP max stress: 1700000000.0:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL'] 
-Re**1.00_{low-bound}: Re**1.00 lower bound: 20000.0:  ['Mission', 'FlightSegment', 'AircraftPerf', 'TailAero'] 
-1-cos(\eta): 1 minus cosine factor: None:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-(E/\mathcal{V}): volume battery energy density: 800:  ['Mission', 'Aircraft', 'Battery'] 
-(E/S)_{var}: energy units variable: 1:  ['Mission', 'FlightSegment', 'FlightState'] 
-\tau_{CFRP}: torsional stress limit: 570:  ['Mission', 'AircraftLoading', 'WingLoading', 'WingSkinL'] 
-\lambda: horizontal tail taper ratio: 0.8:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-\rho_{skin}: horizontal tail skin density: 0.049:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-m_{fac}: wing weight margin factor: 1.2:  ['Mission', 'Aircraft', 'Wing'] 
-V_{NE}: never exceed vehicle speed: 45:  ['Mission', 'AircraftLoading', 'WingLoading', 'WingSkinL'] 
-\rho_{foam}: Density of formular 250: 1.5:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-g: Gravitational acceleration: 9.81:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-\bar{A}_{NACA0008}: cross sectional area of NACA 0008: 0.0548:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-\eta: solar cell efficiency: 0.22:  ['Mission', 'Aircraft', 'SolarCells'] 
-w_{lim}: spar width to chord ratio: 0.15:  ['Mission', 'Aircraft', 'Wing', 'CapSpar'] 
-W_{pay}: payload weight: 10:  ['Mission', 'Aircraft'] 
-Re**1.00_{low-bound}: Re**1.00 lower bound: 20000.0:  ['Mission', 'FlightSegment', 'AircraftPerf', 'TailAero'] 
-\bar{\delta}_{root}: Base deflection: 1e-10:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL', 'Beam'] 
-\kappa: max tip deflection ratio: 0.2:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL'] 
-m_{fac}: curvature knockdown factor: 0.97:  ['Mission', 'Aircraft', 'Wing', 'CapSpar'] 
-N_{max}: load safety factor: 2:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-\tau: vertical tail thickness ratio: 0.08:  ['Mission', 'Aircraft', 'Empennage', 'VerticalTail'] 
-(E/S)_{irr}: solar energy: 6998.37730735:  ['Mission', 'FlightSegment', 'FlightState'] 
-g: gravitational acceleration: 9.81:  ['Mission', 'Aircraft', 'Wing', 'WingSkin'] 
-\rho_{CFRP}: density of CFRP: 1.6:  ['Mission', 'Aircraft', 'Wing', 'CapSpar'] 
-\tau: horizontal tail thickness ratio: 0.08:  ['Mission', 'Aircraft', 'Empennage', 'HorizontalTail'] 
-1-cos(\eta)**1.00V**-1.00V_{gust}**1.00_{low-bound}: 1-cos(\eta)**1.00V**-1.00V_{gust}**1.00 lower bound: 1e-15:  ['Mission', 'AircraftLoading', 'WingLoading', 'GustL'] 
-\bar{c}: normalized chord at mid element: None:  ['Mission', 'Aircraft', 'Wing'] 
-V_{wind-ref}: reference wind speed: 100.0:  ['Mission', 'FlightSegment', 'FlightState'] 
-\lambda: wing taper ratio: 0.5:  ['Mission', 'Aircraft', 'Wing'] 
-N_{max}: max loading: 5:  ['Mission', 'AircraftLoading', 'WingLoading', 'ChordSparL'] 
-\tau: airfoil thickness ratio: 0.115:  ['Mission', 'Aircraft', 'Wing'] 
-\rho_{sl}: air density at sea level: 1.225:  ['Mission', 'AircraftLoading', 'WingLoading', 'WingSkinL'] 
-e: span efficiency: 0.9:  ['Mission', 'FlightSegment', 'AircraftPerf', 'WingAero'] 
+Mission-FlightSegment-WingLoading-WingSkinL-: 
+                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
+                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
+                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
+                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
+                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
+                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
+                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
+                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
+                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
+                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
+                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
+                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
+
+Mission-Aircraft-Empennage-TailBoomState-: 
+                                         \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
+                                         V_{NE}: never exceed vehicle speed: 40.0 meter / second ---- 40 
+
+Mission-Aircraft-Empennage-HorizontalTail-WingSkin-: 
+                                                   t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
+                                                   \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
+                                                   g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                                                   \rho_{CFRP}: density of CFRP: 0.049 gram / centimeter ** 3 ---- 1.6 
+
+Mission-Aircraft-Empennage-HorizontalTail-: 
+                                          m_h: horizontal tail span effectiveness: 0.1 ---- None 
+                                          (C_{L_h})_{min}: max downlift coefficient: 0.75 ---- 0.75 
+                                          m_{fac}: wing weight margin factor: 1.1 ---- 1.2 
+                                          V_h: horizontal tail volume coefficient: 0.45 ---- None 
+
+Mission-Aircraft-Empennage-VerticalTail-WingInterior-: 
+                                                     \rho_{foam}: foam density: 0.024 gram / centimeter ** 3 ---- 0.036 
+                                                     \bar{A}_{jh01}: jh01 non dimensional area: 0.0548 ---- 0.0753449 
+                                                     g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+
+Mission-Aircraft-Battery-: 
+                         h_{batt}: battery specific energy: 350.0 hour * watt / kilogram ---- 350 
+                         \eta_{discharge}: discharging efficiency: 0.98 ---- 0.98 
+                         \eta_{charge}: charging efficiency: 0.98 ---- 0.98 
+                         g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
+                         (E/\mathcal{V}): volume battery energy density: 800.0 hour * watt / liter ---- 800 
+
+Mission-Aircraft-Empennage-: 
+                           m_{fac}: Tail weight margin factor: 1.0 ---- 1.0 
+
+Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
+                                                       g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                                                       \bar{A}_{jh01}: jh01 non dimensional area: 0.0548 ---- 0.0753449 
+                                                       \rho_{foam}: foam density: 0.024 gram / centimeter ** 3 ---- 0.036 
+
+Mission-Aircraft-Empennage-VerticalTail-Planform-: 
+                                                 \eta: (2y/b): [ 0.   0.5  1. ] ---- None 
+                                                 \bar{c}_{MAC}: non-dim MAC: 0.903703703704 ---- <function <lambda> at 0x7f8d05ba70c8> 
+                                                 C_M: wing moment coefficient: 0.14 ---- 0.14 
+                                                 d\eta: \Delta (2y/b): [ 0.5  0.5] ---- None 
+                                                 C_{L_{max}}: maximum CL of JHO1: 1.39 ---- 1.39 
+                                                 \lambda: wing taper ratio: 0.8 ---- 0.5 
+                                                 \tau: airfoil thickness ratio: 0.115 ---- 0.115 
+                                                 \bar{c}_{ave}: normalized mid section chord: [ 1.05555556  0.94444444] ---- None 
+                                                 \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None 
+
+Mission-Aircraft-Wing-CapSpar-: 
+                              m_{fac}: curvature knockdown factor: 0.97 ---- 0.97 
+                              \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
+                              E: Youngs modulus of CFRP: 20000000.0 pound_force_per_square_inch ---- 20000000.0 
+                              w_{lim}: spar width to chord ratio: 0.15 ---- 0.15 
+                              \rho_{foam}: foam density: 0.036 gram / centimeter ** 3 ---- 0.036 
+                              t_{shear-min}: min shear web thickness: 0.012 inch ---- 0.012 
+                              g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+
+Mission-FlightSegment-WingLoading-ChordSparL-Beam-: 
+                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+
+Mission-Aircraft-SolarCells-: 
+                            \rho_{solar}: solar cell area density: 0.27 kilogram / meter ** 2 ---- 0.27 
+                            g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
+                            \eta: solar cell efficiency: 0.22 ---- 0.22 
+
+Mission-FlightSegment-AircraftPerf-WingAero-: 
+                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
+                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
+                                            e: span efficiency: 0.9 ---- 0.9 
+                                            e: span efficiency: 0.9 ---- 0.9 
+                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
+                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                            e: span efficiency: 0.9 ---- 0.9 
+                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+
+Mission-Aircraft-Empennage-VerticalBoomTorsion-: 
+                                               \tau_{CFRP}: torsional stress limit: 210.0 megapascal ---- 210 
+
+Mission-FlightSegment-AircraftPerf-TailAero-: 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+
+Mission-FlightSegment-AircraftPerf-: 
+                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
+                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
+                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
+                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
+                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
+                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
+
+Mission-FlightSegment-FlightState-: 
+                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
+                                  t_{night}: night duration: 12.0577598641 hour ---- 12.0577598641 
+                                  (E/S)_{irr}: solar energy: 9501.80786691 hour * watt / meter ** 2 ---- 9501.80786691 
+                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
+                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
+                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
+                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
+                                  t_{night}: night duration: 12.1155582412 hour ---- 12.1155582412 
+                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
+                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
+                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
+                                  t_{night}: night duration: 12.6439724382 hour ---- 12.6439724382 
+                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
+                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
+                                  (E/S)_{irr}: solar energy: 9621.02577508 hour * watt / meter ** 2 ---- 9621.02577508 
+                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
+                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
+                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
+                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
+                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
+                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
+                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
+                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
+                                  (E/S)_{irr}: solar energy: 8328.57282753 hour * watt / meter ** 2 ---- 8328.57282753 
+                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
+                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
+                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
+                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+
+Mission-FlightSegment-SteadyLevelFlight-: 
+                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
+                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
+                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
+
+Mission-Aircraft-Empennage-VerticalTail-: 
+                                        V_v: vertical tail volume coefficient: 0.04 ---- None 
+                                        m_{fac}: wing weight margin factor: 1.1 ---- 1.2 
+
+Mission-Aircraft-Wing-: 
+                      m_{fac}: wing weight margin factor: 1.2 ---- 1.2 
+
+Mission-FlightSegment-WingLoading-GustL-: 
+                                        \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+                                        m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                        N_{max}: load safety factor: 2 ---- 2 
+                                        \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+                                        \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                        \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                        V_{gust}: gust velocity: 10.0 meter / second ---- 10 
+                                        N_{max}: load safety factor: 2 ---- 2 
+                                        \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                        m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                        \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                        1-cos(\eta): 1 minus cosine factor: [  1.00000001e-10   7.61204660e-02   2.92893231e-01   6.17316544e-01
+   1.00000000e+00] ---- None 
+                                        V_{gust}: gust velocity: 10.0 meter / second ---- 10 
+                                        1-cos(\eta): 1 minus cosine factor: [  1.00000001e-10   7.61204660e-02   2.92893231e-01   6.17316544e-01
+   1.00000000e+00] ---- None 
+                                        1-cos(\eta): 1 minus cosine factor: [  1.00000001e-10   7.61204660e-02   2.92893231e-01   6.17316544e-01
+   1.00000000e+00] ---- None 
+                                        V_{gust}: gust velocity: 10.0 meter / second ---- 10 
+                                        \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                        N_{max}: load safety factor: 2 ---- 2 
+                                        m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                        \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                        \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+
+Mission-Aircraft-Empennage-HorizontalBoomBending-: 
+                                                 \theta_{max}: max tail boom deflection angle: 0.1 ---- 0.1 
+
+Mission-FlightSegment-WingLoading-ChordSparL-: 
+                                             N_{max}: max loading: 5 ---- 5 
+                                             \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                             \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                             \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+                                             \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+                                             \bar{q}: normalized loading: [ 1.33333337  1.16666663  1.          0.83333331  0.66666669] ---- None 
+                                             \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                             \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                             N_{max}: max loading: 5 ---- 5 
+                                             \bar{q}: normalized loading: [ 1.33333337  1.16666663  1.          0.83333331  0.66666669] ---- None 
+                                             \kappa: max tip deflection ratio: 0.2 ---- 0.2 
+                                             N_{max}: max loading: 5 ---- 5 
+                                             \bar{q}: normalized loading: [ 1.33333337  1.16666663  1.          0.83333331  0.66666669] ---- None 
+                                             \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
+                                             \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
+
+Mission-Aircraft-Wing-WingSkin-: 
+                               t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
+                               g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                               \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
+                               \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
+
+Mission-Aircraft-Empennage-VerticalBoomBending-: 
+                                               \theta_{max}: max tail boom deflection angle: 0.1 ---- 0.1 
+
+Mission-Aircraft-Empennage-TailBoom-: 
+                                    \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
+                                    m_{fac}: tail boom margin factor: 1.0 ---- 1.0 
+                                    E: young's modulus carbon fiber: 1.5e+11 newton / meter ** 2 ---- 1.5e+11 
+                                    g: Gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                                    (1-k/2): (1-k/2): 0.6 ---- 0.6 
+                                    k: tail boom inertia value: 0.8 ---- 0.8 
+                                    t_{min}: minimum tail boom thickness: 0.25 millimeter ---- 0.25 
+
+Mission-Aircraft-Motor-: 
+                       g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
+                       B_{PM}: power mass ratio: 4140.8 watt / kilogram ---- 4140.8 
+                       \eta: motor efficiency: 0.95 ---- 0.95 
+
+Mission-Aircraft-Empennage-HorizontalTail-Planform-: 
+                                                   \bar{c}_{ave}: normalized mid section chord: [ 1.05555556  0.94444444] ---- None 
+                                                   C_M: wing moment coefficient: 0.14 ---- 0.14 
+                                                   \bar{c}_{MAC}: non-dim MAC: 0.903703703704 ---- <function <lambda> at 0x7f8cfe883410> 
+                                                   C_{L_{max}}: maximum CL of JHO1: 1.39 ---- 1.39 
+                                                   \eta: (2y/b): [ 0.   0.5  1. ] ---- None 
+                                                   d\eta: \Delta (2y/b): [ 0.5  0.5] ---- None 
+                                                   \lambda: wing taper ratio: 0.8 ---- 0.5 
+                                                   \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None 
+                                                   AR: aspect ratio: 4 ---- None 
+                                                   \tau: airfoil thickness ratio: 0.115 ---- 0.115 
+
+Mission-Aircraft-Wing-Planform-: 
+                               \bar{c}: normalized chord at mid element: [ 1.33333333  1.16666667  1.          0.83333333  0.66666667] ---- None 
+                               \tau: airfoil thickness ratio: 0.115 ---- 0.115 
+                               \eta: (2y/b): [ 0.    0.25  0.5   0.75  1.  ] ---- None 
+                               \bar{c}_{ave}: normalized mid section chord: [ 1.25        1.08333333  0.91666667  0.75      ] ---- None 
+                               C_{L_{max}}: maximum CL of JHO1: 1.39 ---- 1.39 
+                               \bar{c}_{MAC}: non-dim MAC: 0.777777777778 ---- <function <lambda> at 0x7f8d1a897ed8> 
+                               C_M: wing moment coefficient: 0.14 ---- 0.14 
+                               d\eta: \Delta (2y/b): [ 0.25  0.25  0.25  0.25] ---- None 
+                               \lambda: wing taper ratio: 0.5 ---- 0.5 
+
+Mission-FlightSegment-WingLoading-GustL-Beam-: 
+                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
+                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
+                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
+
+Mission-Aircraft-Empennage-VerticalTail-WingSkin-: 
+                                                 \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
+                                                 g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                                                 \rho_{CFRP}: density of CFRP: 0.049 gram / centimeter ** 3 ---- 1.6 
+                                                 t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
+
+Mission-Aircraft-: 
+                 W_{avn}: avionics weight: 8.0 force_pound ---- 8 
+                 W_{pay}: payload weight: 0.0 force_pound ---- 0 
+

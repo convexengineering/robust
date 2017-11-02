@@ -1,21 +1,47 @@
 import gassolar.solar.solar as solar_mike
-model = solar_mike.Mission(latitude=25)
+from gpkit.small_scripts import mag
+
+model = solar_mike.Mission(latitude=11)
 model.cost = model["W_{total}"]
 
-free_vars = [var for var in model.varkeys if var.key not in model.substitutions.keys()]
-subs_vars = model.substitutions.keys()
+solution = model.solve()
 
+free_vars = solution['freevariables']
+subs_vars = solution['constants']
 
-file = open("free_variables.txt", "w")
+model_freevars = {}
+model_subsvars = {}
 
 for var in free_vars:
-    file.write(var.key.name + ": " + var.key.label + ": %s:  %s \n" % (var.key.value, var.key.models))
-
-file.close()
-
-file = open("substitutions_variables.txt", "w")
+    string = ''
+    for item in var.key.models:
+        string = string + item + "-"
+    if string not in model_freevars.keys():
+        model_freevars[string] = {var: free_vars[var]}
+    else:
+        model_freevars[string].update({var: free_vars[var]})
 
 for var in subs_vars:
-    file.write(var.key.name + ": " + var.key.label + ": %s:  %s \n" % (var.key.value, var.key.models))
+    string = ''
+    for item in var.key.models:
+        string = string + item + "-"
+    if string not in model_subsvars.keys():
+        model_subsvars[string] = {var: subs_vars[var]}
+    else:
+        model_subsvars[string].update({var: subs_vars[var]})
 
-file.close()
+data_file = open("data/free_variables.txt", "w")
+for model in model_freevars:
+    data_file.write(model + ": \n")
+    for var in model_freevars[model]:
+        data_file.write(' '*len(model) + var.key.name + ": " + var.key.label + "\n")
+    data_file.write("\n")
+data_file.close()
+
+data_file = open("data/substitutions_variables.txt", "w")
+for model in model_subsvars:
+    data_file.write(model + ": \n")
+    for var in model_subsvars[model]:
+        data_file.write(' '*len(model) + var.key.name + ": " + var.key.label + ": %s ---- %s \n" % (model_subsvars[model][var], var.key.value))
+    data_file.write("\n")
+data_file.close()
