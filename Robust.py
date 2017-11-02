@@ -49,20 +49,19 @@ class RobustnessSetting:
 
 
 class RobustModel:
-
     def __init__(self, model, type_of_uncertainty_set, **options):
         self.nominal_model = model
         self.substitutions = model.substitutions
         self.type_of_uncertainty_set = type_of_uncertainty_set
 
         self.setting = RobustnessSetting(**options)
-        self.robust_solve_properties = {
-            'setuptime': 0,
-            'numoflinearsections': None,
-            'slopes': None,
-            'intercepts': None,
-        }
-
+        slopes_intercepts = LinearizeTwoTermPosynomials.\
+            two_term_posynomial_linearization_coeff(self.setting.get('minNumOfLinearSections'))
+        self.robust_solve_properties = {'setuptime': 0,
+                                        'numoflinearsections': self.setting.get('minNumOfLinearSections'),
+                                        'slopes': slopes_intercepts[0],
+                                        'intercepts': slopes_intercepts[1]
+                                        }
         self.nominal_solve = RobustModel.nominalsolve(model, verbosity=0)
         self.nominal_solution = self.nominal_solve.get('variables')
         self.nominal_cost = self.nominal_solve['cost']
@@ -135,34 +134,22 @@ class RobustModel:
         reached_feasibility = 0
 
         for _ in xrange(self.setting.get('iterationLimit')):
-
-            constraints_posynomials_tuple = self.\
+            print self.sp_constraints
+            ready_sp_constraints, tractable_sp_posynomials, to_linearize_sp_posynomials, large_sp_posynomials = self. \
                 approximate_and_classify_sp_constraints(old_solution, self.number_of_gp_posynomials)
-
-            ready_sp_constraints = constraints_posynomials_tuple[0]
-            tractable_sp_posynomials = constraints_posynomials_tuple[1]
-            to_linearize_sp_posynomials = constraints_posynomials_tuple[2]
-            large_sp_posynomials = constraints_posynomials_tuple[3]
 
             ready_constraints = self.ready_gp_constraints + ready_sp_constraints
             tractable_posynomials = self.tractable_gp_posynomials + tractable_sp_posynomials
             to_linearize_posynomials = self.to_linearize_gp_posynomials + to_linearize_sp_posynomials
             large_posynomials = self.large_gp_posynomials + large_sp_posynomials
 
-            if self.robust_solve_properties['slopes'] is None:
-                permutation_indices = [np.random.choice(range(0, len(two_term_approximation.list_of_permutations)))
-                                       for two_term_approximation in large_posynomials]
-            else:
-                permutation_indices = self.new_permutation_indices(old_solution, large_posynomials)
-                if not reached_feasibility:
-                    self.robust_solve_properties['slopes'] = None
-                    self.robust_solve_properties['intercepts'] = None
+            permutation_indices = self.new_permutation_indices(old_solution, large_posynomials)
 
             two_term_data_posynomials = []
 
             for i, two_term_approximation in enumerate(large_posynomials):
                 permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
-                no_data, data = TwoTermApproximation.\
+                no_data, data = TwoTermApproximation. \
                     two_term_equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 ready_constraints += no_data
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
@@ -170,36 +157,35 @@ class RobustModel:
             two_term_data_posynomials += to_linearize_posynomials
 
             try:
-                if self.robust_solve_properties['slopes'] is None:
-                    self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self.\
+                if not reached_feasibility:
+                    self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
                         find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints,
                                                                 tractable_posynomials)
                 else:
-                    self._robust_model, _ = self.\
+                    self._robust_model, _ = self. \
                         linearize_and_return_upper_lower_models(two_term_data_posynomials,
                                                                 self.robust_solve_properties['numoflinearsections'],
                                                                 ready_constraints, tractable_posynomials)
                     new_solution = RobustModel.nominalsolve(self._robust_model, verbosity=0)
                 reached_feasibility += 1
-                rel_tol = np.abs((new_solution['cost'] - old_solution['cost'])/old_solution['cost'])
+                rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             except:
-                if self.robust_solve_properties['slopes'] is None:
-                    self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self.\
+                if not reached_feasibility:
+                    self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
                         find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints,
                                                                 tractable_posynomials, feasible=True)
                 else:
-                    self._robust_model, _ = self.\
+                    self._robust_model, _ = self. \
                         linearize_and_return_upper_lower_models(two_term_data_posynomials,
                                                                 self.robust_solve_properties['numoflinearsections'],
                                                                 ready_constraints, tractable_posynomials, feasible=True)
                     new_solution = RobustModel.nominalsolve(self._robust_model, verbosity=0)
-                rel_tol = 2*self.setting.get('iterationsRelativeTolerance')
+                rel_tol = 2 * self.setting.get('iterationsRelativeTolerance')
 
             if reached_feasibility <= 1:
-                slopes, intercepts, _, _, _ = LinearizeTwoTermPosynomials. \
-                    two_term_posynomial_linearization_coeff(self.robust_solve_properties['numoflinearsections'])
-                self.robust_solve_properties['slopes'] = slopes
-                self.robust_solve_properties['intercepts'] = intercepts
+                self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], \
+                    _, _, _ = LinearizeTwoTermPosynomials. two_term_posynomial_linearization_coeff(
+                        self.robust_solve_properties['numoflinearsections'])
 
             self._sequence_of_rgps.append(self._robust_model)
             if rel_tol <= self.setting.get('iterationsRelativeTolerance'):
@@ -225,6 +211,8 @@ class RobustModel:
 
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
         sp_gp_approximation = [cs.as_gpconstr(solution).as_posyslt1()[0] for cs in self.sp_constraints]
+        # print solution['variables']
+        print sp_gp_approximation
         return self.classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
@@ -302,7 +290,7 @@ class RobustModel:
         robust_set_of_monomial_constraints = []
         slackvar = Variable()
         for monomial in set_of_monomials:
-            robust_set_of_monomial_constraints += [self.robustify_monomial(monomial) <= slackvar**feasible]
+            robust_set_of_monomial_constraints += [self.robustify_monomial(monomial) <= slackvar ** feasible]
         robust_set_of_monomial_constraints += [slackvar >= 1, slackvar <= 1000]
         return robust_set_of_monomial_constraints, slackvar
 
@@ -380,12 +368,14 @@ class RobustModel:
 
         data_constraints, slackvar = self.robustify_set_of_monomials(all_tractable_posynomials, feasible)
 
-        model_upper = Model(self.nominal_model.cost*slackvar**(100*feasible), [no_data_upper_constraints,
-                                                                               ready_constraints, data_constraints])
+        model_upper = Model(self.nominal_model.cost * slackvar ** (100 * feasible), [no_data_upper_constraints,
+                                                                                     ready_constraints,
+                                                                                     data_constraints])
         model_upper.substitutions.update(self.substitutions)
 
-        model_lower = Model(self.nominal_model.cost*slackvar**(100*feasible), [no_data_lower_constraints,
-                                                                               ready_constraints, data_constraints])
+        model_lower = Model(self.nominal_model.cost * slackvar ** (100 * feasible), [no_data_lower_constraints,
+                                                                                     ready_constraints,
+                                                                                     data_constraints])
         model_lower.substitutions.update(self.substitutions)
 
         return model_upper, model_lower
@@ -402,7 +392,7 @@ class RobustModel:
 
         while r <= self.setting.get('maxNumOfLinearSections') and error > self.setting.get('linearizationTolerance'):
 
-            model_upper, model_lower = self.\
+            model_upper, model_lower = self. \
                 linearize_and_return_upper_lower_models(two_term_data_posynomials, r,
                                                         ready_constraints, tractable_posynomials, feasible)
             upper_model_infeasible = 0
