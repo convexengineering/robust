@@ -134,7 +134,6 @@ class RobustModel:
         reached_feasibility = 0
 
         for _ in xrange(self.setting.get('iterationLimit')):
-            print self.sp_constraints
             ready_sp_constraints, tractable_sp_posynomials, to_linearize_sp_posynomials, large_sp_posynomials = self. \
                 approximate_and_classify_sp_constraints(old_solution, self.number_of_gp_posynomials)
 
@@ -206,13 +205,14 @@ class RobustModel:
             sol = self._robust_model.solve(verbosity=verbosity)
         except:
             sol = self._robust_model.localsolve(verbosity=verbosity)
+        if verbosity > 0:
+            print ("solving needed %s iterations." % len(self._sequence_of_rgps))
+            print ("setting up took %s seconds." % self.robust_solve_properties['setuptime'])
         sol.update(self.robust_solve_properties)
         return sol
 
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
         sp_gp_approximation = [cs.as_gpconstr(solution).as_posyslt1()[0] for cs in self.sp_constraints]
-        # print solution['variables']
-        print sp_gp_approximation
         return self.classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
