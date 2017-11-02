@@ -55,7 +55,7 @@ class RobustModel:
         self.type_of_uncertainty_set = type_of_uncertainty_set
 
         self.setting = RobustnessSetting(**options)
-        slopes_intercepts = LinearizeTwoTermPosynomials.\
+        slopes_intercepts = LinearizeTwoTermPosynomials. \
             two_term_posynomial_linearization_coeff(self.setting.get('minNumOfLinearSections'))
         self.robust_solve_properties = {'setuptime': 0,
                                         'numoflinearsections': self.setting.get('minNumOfLinearSections'),
@@ -183,10 +183,11 @@ class RobustModel:
 
             if reached_feasibility <= 1:
                 self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], \
-                    _, _, _ = LinearizeTwoTermPosynomials. two_term_posynomial_linearization_coeff(
-                        self.robust_solve_properties['numoflinearsections'])
+                _, _, _ = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(
+                    self.robust_solve_properties['numoflinearsections'])
 
             self._sequence_of_rgps.append(self._robust_model)
+
             if rel_tol <= self.setting.get('iterationsRelativeTolerance'):
                 break
             else:
@@ -212,7 +213,8 @@ class RobustModel:
         return sol
 
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
-        sp_gp_approximation = [cs.as_gpconstr(solution).as_posyslt1()[0] for cs in self.sp_constraints]
+        sp_gp_approximation = [cs.as_gpconstr(x0=solution["freevariables"], substitutions=solution["constants"]).
+                                   as_posyslt1()[0] for cs in self.sp_constraints]
         return self.classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
@@ -367,22 +369,26 @@ class RobustModel:
         all_tractable_posynomials = tractable_posynomials + data_posynomials
 
         data_constraints, slackvar = self.robustify_set_of_monomials(all_tractable_posynomials, feasible)
-
-        model_upper = Model(self.nominal_model.cost * slackvar ** (100 * feasible), [no_data_upper_constraints,
-                                                                                     ready_constraints,
-                                                                                     data_constraints])
+        upper_cons, lower_cons = [no_data_upper_constraints, ready_constraints, data_constraints], \
+                                 [no_data_upper_constraints, ready_constraints, data_constraints]
+        # st = time()
+        model_upper = Model(self.nominal_model.cost * slackvar ** (100 * feasible), upper_cons)
+        # [no_data_upper_constraints, ready_constraints, data_constraints])
+        # print "mod up", time() - st
+        # st = time()
+        model_lower = Model(self.nominal_model.cost * slackvar ** (100 * feasible), lower_cons)
+        # [no_data_lower_constraints, ready_constraints, data_constraints])
+        # print "mod low", time() - st
         model_upper.substitutions.update(self.substitutions)
-
-        model_lower = Model(self.nominal_model.cost * slackvar ** (100 * feasible), [no_data_lower_constraints,
-                                                                                     ready_constraints,
-                                                                                     data_constraints])
         model_lower.substitutions.update(self.substitutions)
+        model_upper.unique_varkeys, model_lower.unique_varkeys = [self.nominal_model.varkeys] * 2
+        model_upper.reset_varkeys()
+        model_lower.reset_varkeys()
 
         return model_upper, model_lower
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints,
                                                 tractable_posynomials, feasible=False):
-
         error = 2 * self.setting.get('linearizationTolerance')
         r = self.setting.get('minNumOfLinearSections')
 
@@ -391,7 +397,6 @@ class RobustModel:
         model_upper = None
 
         while r <= self.setting.get('maxNumOfLinearSections') and error > self.setting.get('linearizationTolerance'):
-
             model_upper, model_lower = self. \
                 linearize_and_return_upper_lower_models(two_term_data_posynomials, r,
                                                         ready_constraints, tractable_posynomials, feasible)
@@ -411,9 +416,7 @@ class RobustModel:
                 self.lower_approximation_is_feasible = True
                 raise Exception("The model is infeasible. The lower approximation of the model is feasible, try "
                                 "increasing the maximum number of linear sections")
-
             r += 1
-
         return r - 1, sol_upper, model_upper
 
     def new_permutation_indices(self, solution, large_posynomials):

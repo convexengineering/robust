@@ -247,19 +247,19 @@ def mike_solar_model():
     model = solar_mike.Mission(latitude=11)
     model.cost = model["W_{total}"]
 
-    uncertain_var_dic = {'V_{wind-ref}': 10, "m_{fac}": 1.5, "B_{PM}": 4, "\eta": 5,}# "\\eta_{charge}": 6,
-                         #"\\eta_{discharge}": 4, "h_{batt}": 7, "\\tau": 4, "(E/\\mathcal{V})": 3,
-                         #'\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
-                         #'\\bar{M}_{tip}': 2, "W_{pay}": 2, '\\rho_{sl}': 2, '\\bar{S}_{tip}': 16, 'k': 2,
-                         #'p_{wind}': 2, '\\rho_{foam}': 2, '\\theta_{root}': 2, '\\bar{A}_{NACA0008}': 2,
-                         #'\\theta_{max}': 2, 'Re**1.00_{low-bound}': 2, 'N_{max}': 2, '\\bar{J/t}': 2,
-                         #'\\rho_{CFRP}': 2, 'Re**1.00_{up-bound}': 2, '\\rho_{solar}': 2, '(E/S)_{var}': 4,
-                         #'\\rho_{skin}': 2,  '(1-k/2)': 2, 't_{min}': 2, '\\bar{c}_{ave}': 10, '\\rho_{ref}': 2,
-                         #'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 4,
-                         #'\\sigma_{CFRP}': 9, '\\tau_{CFRP}': 8, 'C_{m_w}': 13, '\\bar{\\delta}_{root}': 7,
-                         #'w_{lim}': 10, '(E/S)_{irr}': 2, 't_{night}': 2, '\\mu': 8, '\\bar{c}': 8,
-                         #'\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 2, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
-                         #"C_{L_{max}}": 3, }  # 'P_{acc}': 0.1,
+    uncertain_var_dic = {}  # 'V_{wind-ref}': 10, "m_{fac}": 1.5, "B_{PM}": 4, "\eta": 5,}# "\\eta_{charge}": 6,
+                         # "\\eta_{discharge}": 4, "h_{batt}": 7, "\\tau": 4, "(E/\\mathcal{V})": 3,
+                         # '\\eta_{prop}': 1, '\\kappa': 3, '\\bar{q}': 2, 'V_{NE}': 2, '1-cos(\\eta)': 2,
+                         # '\\bar{M}_{tip}': 2, "W_{pay}": 2, '\\rho_{sl}': 2, '\\bar{S}_{tip}': 16, 'k': 2,
+                         # 'p_{wind}': 2, '\\rho_{foam}': 2, '\\theta_{root}': 2, '\\bar{A}_{NACA0008}': 2,
+                         # '\\theta_{max}': 2, 'Re**1.00_{low-bound}': 2, 'N_{max}': 2, '\\bar{J/t}': 2,
+                         # '\\rho_{CFRP}': 2, 'Re**1.00_{up-bound}': 2, '\\rho_{solar}': 2, '(E/S)_{var}': 4,
+                         # '\\rho_{skin}': 2,  '(1-k/2)': 2, 't_{min}': 2, '\\bar{c}_{ave}': 10, '\\rho_{ref}': 2,
+                         # 'V**-1.00V_{gust}**1.001-cos(\\eta)**1.00_{low-bound}': 12, '\\lambda_h/(\\lambda_h+1)': 4,
+                         # '\\sigma_{CFRP}': 9, '\\tau_{CFRP}': 8, 'C_{m_w}': 13, '\\bar{\\delta}_{root}': 7,
+                         # 'w_{lim}': 10, '(E/S)_{irr}': 2, 't_{night}': 2, '\\mu': 8, '\\bar{c}': 8,
+                         # '\\lambda_v/(\\lambda_v+1)': 8, '(P/S)_{var}': 2, 'V_{gust}': 3, "C_M": 4, "e": 1, 'E': 3,
+                         # "C_{L_{max}}": 3, }  # 'P_{acc}': 0.1,
 
     keys = uncertain_var_dic.keys()
     # print keys
