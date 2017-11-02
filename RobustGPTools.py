@@ -22,26 +22,25 @@ class RobustGPTools:
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps, original_monomial_cs, indirect_uncertain_vars):
-        monomial = Monomial(original_monomial_exps, original_monomial_cs)
-        indirect_monomial_uncertain_vars = [var for var in monomial.varkeys if var in indirect_uncertain_vars]
+        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if var in indirect_uncertain_vars]
+        new_monomial_exps = copy(original_monomial_exps)
         for var in indirect_monomial_uncertain_vars:
-            temp_exps = copy(original_monomial_exps)
-            del temp_exps[var]
-            new_vars_mon = RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.pr)
-            monomial = Monomial(temp_exps, original_monomial_cs)*new_vars_mon**original_monomial_exps.get(var.key)
-        return monomial
+            new_vars_exps = RobustGPTools.\
+                replace_indirect_uncertain_variable_by_equivalent(var.key.pr, original_monomial_exps[var])
+            del new_monomial_exps[var]
+            new_monomial_exps.update(new_vars_exps)
+        return new_monomial_exps
 
     @staticmethod
-    def replace_indirect_uncertain_variable_by_equivalent(monomial):
-        equivalent = Monomial(1)
+    def replace_indirect_uncertain_variable_by_equivalent(monomial, exps):
+        equivalent = {}
 
         for var in monomial.exps[0]:
             if var.key.pr is None or isinstance(var.key.pr, Number):
-                equivalent *= Monomial(var)
+                equivalent.update({var: exps*monomial.exps[0][var]})
             elif isinstance(var.key.pr, Monomial):
-                equivalent *= RobustGPTools.replace_indirect_uncertain_variable_by_equivalent(var.key.pr)
-
+                equivalent.update(RobustGPTools.
+                                  replace_indirect_uncertain_variable_by_equivalent(var.key.pr, monomial.exps[0][var]))
         return equivalent
 
     @staticmethod

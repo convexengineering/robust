@@ -136,17 +136,17 @@ class RobustifyLargePosynomial:
         perturbation_matrix = []
         for i in xrange(len(self.p.exps)):
 
-            only_uncertain_vars_monomial = RobustGPTools.\
+            only_uncertain_vars_monomial_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(self.p.exps[i], self.p.cs[i], p_indirect_uncertain_vars)
 
             perturbation_matrix.append([])
-            mon_uncertain_vars = [var for var in p_uncertain_vars if var in only_uncertain_vars_monomial.exps[0]]
+            mon_uncertain_vars = [var for var in p_uncertain_vars if var in only_uncertain_vars_monomial_exps]
             # print mon_uncertain_vars
             mean = 1
             for j, var in enumerate(p_uncertain_vars):
                 if var.key in mon_uncertain_vars:
-                    mean = mean * center[j] ** (only_uncertain_vars_monomial.exps[0].get(var.key))
-                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial.exps[0].get(var.key) * scale[j]))
+                    mean = mean * center[j] ** (only_uncertain_vars_monomial_exps.get(var.key))
+                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial_exps.get(var.key) * scale[j]))
                 else:
                     perturbation_matrix[i].append(0)
             coeff.append([])

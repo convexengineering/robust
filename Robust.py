@@ -131,17 +131,11 @@ class RobustModel:
 
         start_time = time()
 
-#        if number_of_trials_until_feasibility_is_attained > 10:
-#            if not self.lower_approximation_is_feasible:
-#                raise Exception('Not Feasible')
-#            else:
-#                raise Exception('Not Feasible. The Lower Approximation is Feasible, Try Increasing The Maximum Number of'
-#                                'Linear Sections')
-
         old_solution = self.nominal_solve
         reached_feasibility = 0
 
         for _ in xrange(self.setting.get('iterationLimit')):
+
             constraints_posynomials_tuple = self.\
                 approximate_and_classify_sp_constraints(old_solution, self.number_of_gp_posynomials)
 
@@ -212,6 +206,7 @@ class RobustModel:
                 break
             else:
                 old_solution = new_solution
+
         if reached_feasibility < 1:
             raise Exception("feasibility is not reached after %s iterations. If the solution seems to converge, try "
                             "increasing the iterationLimit. Increasing the allowed number of permutations might also "
@@ -273,9 +268,11 @@ class RobustModel:
         return ready_gp_constraints, tractable_gp_posynomials, to_linearize_gp_posynomials, large_gp_posynomials
 
     def robustify_monomial(self, monomial):
-        new_monomial = RobustGPTools. \
+
+        new_monomial_exps = RobustGPTools. \
             only_uncertain_vars_monomial(monomial.exps[0], monomial.cs[0], self.indirect_uncertain_vars)
-        m_direct_uncertain_vars = [var for var in new_monomial.varkeys if var in self.uncertain_vars]
+
+        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if var in self.uncertain_vars]
         total_center = 0
         norm = 0
         for var in m_direct_uncertain_vars:
@@ -284,7 +281,7 @@ class RobustModel:
             eta_min = np.log(1 - pr / 100.0)
             center = (eta_min + eta_max) / 2.0
             scale = eta_max - center
-            exponent = -new_monomial.exps[0].get(var.key)
+            exponent = -new_monomial_exps.get(var.key)
             pert = exponent * scale
 
             if self.type_of_uncertainty_set == 'box':
@@ -298,6 +295,7 @@ class RobustModel:
             total_center = total_center + exponent * center
         if self.type_of_uncertainty_set == 'elliptical':
             norm = np.sqrt(norm)
+
         return monomial * np.exp(self.setting.get('gamma') * norm) / np.exp(total_center)
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
@@ -394,6 +392,7 @@ class RobustModel:
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints,
                                                 tractable_posynomials, feasible=False):
+
         error = 2 * self.setting.get('linearizationTolerance')
         r = self.setting.get('minNumOfLinearSections')
 

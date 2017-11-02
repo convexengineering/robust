@@ -167,14 +167,14 @@ class TwoTermApproximation:
         inverse_relations = {}
         sizes = {}
         for i in xrange(number_of_monomials):
-            direct_vars_only_monomial_ith = RobustGPTools.\
+            direct_vars_only_monomial_ith_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(p.exps[i], p.cs[i], indirect_uncertain_vars)
-            ith_monomial_exps = direct_vars_only_monomial_ith.exps[0]
+            ith_monomial_exps = direct_vars_only_monomial_ith_exps
             m_uncertain_vars = [var for var in ith_monomial_exps.keys() if var in uncertain_vars]
             for j in range(0, number_of_monomials):
-                direct_vars_only_monomial_jth = RobustGPTools.\
+                direct_vars_only_monomial_jth_exps = RobustGPTools.\
                     only_uncertain_vars_monomial(p.exps[j], p.cs[j], indirect_uncertain_vars)
-                jth_monomial_exps = direct_vars_only_monomial_jth.exps[0]
+                jth_monomial_exps = direct_vars_only_monomial_jth_exps
                 for var in m_uncertain_vars:
                     if ith_monomial_exps.get(var.key, 0) * jth_monomial_exps.get(var.key, 0) < 0:
                         if i in inverse_relations:
