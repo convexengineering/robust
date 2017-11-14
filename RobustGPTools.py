@@ -1,5 +1,7 @@
 from numbers import Number
 from gpkit import Monomial, Model
+from gpkit.nomials import MonomialEquality, PosynomialInequality
+
 import numpy as np
 from copy import copy
 
@@ -130,9 +132,26 @@ class SameModel(Model):
         :param model: the original model
         :return: the new model
         """
+        all_constraints = model.flat(constraintsets=False)
+        # unc = RobustGPTools.uncertain_model_variables(model)
         constraints = []
+
+        for cs in all_constraints:
+            if isinstance(cs, MonomialEquality):
+                constraints += [cs]
+            elif isinstance(cs, PosynomialInequality):
+                # varkeys = cs.as_posyslt1()[0].varkeys
+                # if set(model.variable_byname('\\eta')) & set(varkeys):
+                    # model.variable_byname('\\eta')
+                    # print cs.as_posyslt1()[0]
+                constraints += [cs.as_posyslt1()[0] <= 1]
+        self.cost = model.cost
+        # constraints = []
         # unc = SameModel.uncertain_model_variables(model)
-        for i, p in enumerate(model.as_posyslt1()):
+        # for i, p in enumerate(model.as_posyslt1()):
+        #     varkeys = p.varkeys
+            # if model['\eta_{charge}'] in varkeys or model['\eta_{discharge}'] in varkeys:
+            #     print p
             # p_unc = [var.key.name for var in p.varkeys if var in unc]
             # if 'P_{acc}' in p_unc:
                 # print p
@@ -144,6 +163,6 @@ class SameModel(Model):
                 # print(eq_p.data_constraints)
                 # print("__________________________________")
             # print p_unc
-            constraints.append(p <= 1)
-        self.cost = model.cost
+        #     constraints.append(p <= 1)
+        # self.cost = model.cost
         return constraints
