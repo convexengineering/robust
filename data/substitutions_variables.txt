@@ -1,52 +1,37 @@
-Mission-FlightSegment-WingLoading-WingSkinL-: 
-                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
-                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
-                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
-                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
-                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
-                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
-                                            C_{m_w}: negative wing moment coefficent: 0.121 ---- 0.121 
-                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
-                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
-                                            V_{NE}: never exceed vehicle speed: 45.0 meter / second ---- 45 
-                                            \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
-                                            \tau_{CFRP}: torsional stress limit: 570.0 megapascal ---- 570 
+Mission-FlightSegment-WingLoading-WingSkinL-:
+                                             density of air at sea level: 1.225 --> 1.225: [1.2005, 1.2495]
+                                             torsional stress limit of CFRP: 570 --> 570: [552.9, 587.1]
+                                             negative wing moment coefficient: 0.121 --> 0.121: [0.1089, 0.1331]
 
 Mission-Aircraft-Empennage-TailBoomState-: 
-                                         \rho_{sl}: air density at sea level: 1.225 kilogram / meter ** 3 ---- 1.225 
-                                         V_{NE}: never exceed vehicle speed: 40.0 meter / second ---- 40 
+                                          density of air at sea level: 1.225 --> 1.225: [1.2005, 1.2495]
 
-Mission-Aircraft-Empennage-HorizontalTail-WingSkin-: 
-                                                   t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
-                                                   \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
-                                                   g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
-                                                   \rho_{CFRP}: density of CFRP: 0.049 gram / centimeter ** 3 ---- 1.6 
+Mission-Aircraft-Empennage-HorizontalTail-WingSkin-:
+                                                    torsional moment of inertia: 0.01114 --> 0.01114: [0.010583, 0.011697]
+                                                    density of CFRP: 0.049 --> 0.049: [0.047, 0.052]
 
 Mission-Aircraft-Empennage-HorizontalTail-: 
-                                          m_h: horizontal tail span effectiveness: 0.1 ---- None 
-                                          (C_{L_h})_{min}: max downlift coefficient: 0.75 ---- 0.75 
-                                          m_{fac}: wing weight margin factor: 1.1 ---- 1.2 
-                                          V_h: horizontal tail volume coefficient: 0.45 ---- None 
+                                          horizontal tail span effectiveness: 0.1 --> 0.1: [0.08, 0.12]
+                                          max downlift coefficient: 0.75 --> 0.75: [0.5625, 0.9375]
+                                          wing weight margin factor: 1.2 --> 1: [0.8, 1.2]
+                                          horizontal tail volume coefficient: 0.45 --> 0.45: [0.4, 0.5]
 
 Mission-Aircraft-Empennage-VerticalTail-WingInterior-: 
-                                                     \rho_{foam}: foam density: 0.024 gram / centimeter ** 3 ---- 0.036 
-                                                     \bar{A}_{jh01}: jh01 non dimensional area: 0.0548 ---- 0.0753449 
-                                                     g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                                                      foam density: 0.024 --> 0.024: [0.0216, 0.0264]
+                                                      jh01 non dimensional area: 0.0548 --> 0.0548: [0.04932, 0.06028]
 
 Mission-Aircraft-Battery-: 
-                         h_{batt}: battery specific energy: 350.0 hour * watt / kilogram ---- 350 
-                         \eta_{discharge}: discharging efficiency: 0.98 ---- 0.98 
-                         \eta_{charge}: charging efficiency: 0.98 ---- 0.98 
-                         g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
-                         (E/\mathcal{V}): volume battery energy density: 800.0 hour * watt / liter ---- 800 
+                          battery specific energy: 350.0 --> 350: [300, 400]
+                          discharging efficiency: 0.98 --> 0.97: [0.94, 1]
+                          charging efficiency: 0.98 --> 0.97: [0.94, 1]
+                          volume battery energy density: 800.0 --> 800: [720, 880]
 
 Mission-Aircraft-Empennage-: 
-                           m_{fac}: Tail weight margin factor: 1.0 ---- 1.0 
+                            Tail weight margin factor: 1.0 --> 1.0: [0.9, 1.1]
 
 Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
-                                                       g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
-                                                       \bar{A}_{jh01}: jh01 non dimensional area: 0.0548 ---- 0.0753449 
-                                                       \rho_{foam}: foam density: 0.024 gram / centimeter ** 3 ---- 0.036 
+                                                      foam density: 0.024 --> 0.024: [0.0216, 0.0264]
+                                                      jh01 non dimensional area: 0.0548 --> 0.0548: [0.04932, 0.06028]
 
 Mission-Aircraft-Empennage-VerticalTail-Planform-: 
                                                  \eta: (2y/b): [ 0.   0.5  1. ] ---- None 
@@ -60,106 +45,60 @@ Mission-Aircraft-Empennage-VerticalTail-Planform-:
                                                  \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None 
 
 Mission-Aircraft-Wing-CapSpar-: 
-                              m_{fac}: curvature knockdown factor: 0.97 ---- 0.97 
-                              \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
-                              E: Youngs modulus of CFRP: 20000000.0 pound_force_per_square_inch ---- 20000000.0 
-                              w_{lim}: spar width to chord ratio: 0.15 ---- 0.15 
-                              \rho_{foam}: foam density: 0.036 gram / centimeter ** 3 ---- 0.036 
-                              t_{shear-min}: min shear web thickness: 0.012 inch ---- 0.012 
-                              g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
+                              curvature knockdown factor: 0.97 --> 1: [0.97, 1.03]
+                              density of CFRP: 1.6 --> 1.5: [1.4, 1.6]
+                              Youngs modulus of CFRP: 20000000.0 --> 20000000.0: [2e7-4e5, 2e7+4e5]
+                              spar width to chord ratio: 0.15 --> 0.15: [0.1425, 0.1625]
+                              foam density: 0.036 --> 0.036: [0.0324, 0.0396]
+                              min shear web thickness: 0.012 --> 0.012: [0.114, 0.126]
 
 Mission-FlightSegment-WingLoading-ChordSparL-Beam-: 
-                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                                  \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
-                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
-                                                  \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                                  \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                                  \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
+                                                   Base angle: 1e-10 --> 1e-10:[1e-10 - 5e-8, 1e-10 + 5e-8]
+                                                   Base deflection: 1e-10 --> 1e-10:[1e-10 - 5e-8, 1e-10 + 5e-8]
+                                                   Tip moment: 1e-10 --> 1e-10:[1e-10 - 5e-8, 1e-10 + 5e-8]
+                                                   Tip loading: 1e-10 --> 1e-10:[1e-10 - 5e-8, 1e-10 + 5e-8]
 
 Mission-Aircraft-SolarCells-: 
-                            \rho_{solar}: solar cell area density: 0.27 kilogram / meter ** 2 ---- 0.27 
-                            g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
-                            \eta: solar cell efficiency: 0.22 ---- 0.22 
+                            solar cell area density: 0.27 --> 0.27: [0.243, 0.297]
+                            solar cell efficiency: 0.22 --> 0.22: [0.2, 0.24]
 
 Mission-FlightSegment-AircraftPerf-WingAero-: 
-                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
-                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
-                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
-                                            e: span efficiency: 0.9 ---- 0.9 
-                                            e: span efficiency: 0.9 ---- 0.9 
-                                            C_{L_{stall}}: stall CL: 1.3 ---- 1.3 
-                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
-                                            e: span efficiency: 0.9 ---- 0.9 
-                                            m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                             fit factor: 1.0 --> 1.0: [1, 1]
+                                             stall CL: 1.3 --> 1.3: [1.17, 1.43]
+                                             span efficiency: 0.9 --> 0.9: [0.87, 0.93]
 
 Mission-Aircraft-Empennage-VerticalBoomTorsion-: 
-                                               \tau_{CFRP}: torsional stress limit: 210.0 megapascal ---- 210 
+                                                torsional stress limit: 210.0 --> 210: [189, 231]
 
 Mission-FlightSegment-AircraftPerf-TailAero-: 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
-                                            m_{fac--fit}: RMS error of fit: 1.04070184606 ---- 1.04070184606 
+                                             RMS error of fit: 1.04070184606 --> 1.04070184606: [1.04070184606, 1.04070184606]
+
 
 Mission-FlightSegment-AircraftPerf-: 
-                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
-                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
-                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
-                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
-                                   P_{avn}: Accessory power draw: 0.0 watt ---- 0.0 
-                                   m_{fac}: drag margin factor: 1.2 ---- 1.2 
+                                    Accessory power draw: 0.0 watt --> 0.0: [0, 0]
+                                    drag margin factor: 1.2 --> 1: [0.8, 1.2]
 
 Mission-FlightSegment-FlightState-: 
-                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
-                                  t_{night}: night duration: 12.0577598641 hour ---- 12.0577598641 
-                                  (E/S)_{irr}: solar energy: 9501.80786691 hour * watt / meter ** 2 ---- 9501.80786691 
-                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
-                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
-                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
-                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
-                                  t_{night}: night duration: 12.1155582412 hour ---- 12.1155582412 
-                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
-                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
-                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
-                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
-                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
-                                  t_{night}: night duration: 12.6439724382 hour ---- 12.6439724382 
-                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
-                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
-                                  (E/S)_{irr}: solar energy: 9621.02577508 hour * watt / meter ** 2 ---- 9621.02577508 
-                                  \mu: viscosity: 1.42e-05 newton * second / meter ** 2 ---- 1.42e-05 
-                                  (P/S)_{ref}: power units variable: 1.0 watt / meter ** 2 ---- 1 
-                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
-                                  (E/S)_{ref}: energy units variable: 1.0 hour * watt / meter ** 2 ---- 1 
-                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
-                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
-                                  p_{wind}: percentile wind speeds: 0.9 ---- 0.9 
-                                  m_{fac}: wind speed margin factor: 1.0 ---- 1.0 
-                                  (E/S)_{irr}: solar energy: 8328.57282753 hour * watt / meter ** 2 ---- 8328.57282753 
-                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
-                                  V_{wind-ref}: reference wind speed: 100.0 meter / second ---- 100.0 
-                                  \rho_{ref}: reference air density: 1.0 kilogram / meter ** 3 ---- 1.0 
-                                  m_{fac--fit}: fit factor: 1.0 ---- 1.0 
+                                   viscosity: 1.42e-05 --> 1.42e-05: [1.42e-05-2.84e-7, 1.42e-05+2.84e-7]
+                                   night duration: 12.0577598641 --> 12.0577598641: [12.0577598641 +- 1%]
+                                   solar energy: 9501.80786691 --> 9501.80786691 +- 2%
+                                   reference air density: 1.0 --> 1.0: [0.98, 1.02]
+                                   reference wind speed: 100.0 --> 100.0: [95, 105]
+                                   percentile wind speeds: 0.9 --> 0.9: [0.88, 0.92]
+                                   fit factor: 1.0 --> 1.0: [1, 1]
+                                   energy units variable: 1.0 -> 1: [0.98, 1.02]
+                                   wind speed margin factor: 1.0 --> 1.0: [0.9, 1.1]
+                                   power units variable: 1.0 --> 1: [0.98, 1.02]
 
 Mission-FlightSegment-SteadyLevelFlight-: 
-                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
-                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
-                                        \eta_{prop}: propeller efficiency: 0.8 ---- 0.8 
+                                         propeller efficiency: 0.8 --> 0.8: [0.75, 0.85]
 
 Mission-Aircraft-Empennage-VerticalTail-: 
-                                        V_v: vertical tail volume coefficient: 0.04 ---- None 
-                                        m_{fac}: wing weight margin factor: 1.1 ---- 1.2 
+                                         vertical tail volume coefficient: 0.04 --> 0.04: [0.036, 0.044]
+                                         wing weight margin factor: 1.2 --> 1: [0.8, 1.2]
 
 Mission-Aircraft-Wing-: 
-                      m_{fac}: wing weight margin factor: 1.2 ---- 1.2 
+                      m_{fac}: wing weight margin factor: 1.2 --> 1 :[0.8, 1.2]
 
 Mission-FlightSegment-WingLoading-GustL-: 
                                         \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
@@ -205,30 +144,22 @@ Mission-FlightSegment-WingLoading-ChordSparL-:
                                              N_{max}: max loading: 5 ---- 5 
                                              \bar{q}: normalized loading: [ 1.33333337  1.16666663  1.          0.83333331  0.66666669] ---- None 
                                              \sigma_{CFRP}: CFRP max stress: 1700000000.0 pascal ---- 1700000000.0 
-                                             \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0 
-
-Mission-Aircraft-Wing-WingSkin-: 
-                               t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
-                               g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
-                               \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
-                               \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
+                                             \tau_{CFRP}: CFRP fabric stress: 450000000.0 pascal ---- 450000000.0
 
 Mission-Aircraft-Empennage-VerticalBoomBending-: 
                                                \theta_{max}: max tail boom deflection angle: 0.1 ---- 0.1 
 
 Mission-Aircraft-Empennage-TailBoom-: 
-                                    \rho_{CFRP}: density of CFRP: 1.6 gram / centimeter ** 3 ---- 1.6 
-                                    m_{fac}: tail boom margin factor: 1.0 ---- 1.0 
-                                    E: young's modulus carbon fiber: 1.5e+11 newton / meter ** 2 ---- 1.5e+11 
-                                    g: Gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
-                                    (1-k/2): (1-k/2): 0.6 ---- 0.6 
-                                    k: tail boom inertia value: 0.8 ---- 0.8 
-                                    t_{min}: minimum tail boom thickness: 0.25 millimeter ---- 0.25 
+                                     density of CFRP: 1.6 --> 1.5: [1.4, 1.6]
+                                     tail boom margin factor: 1.0 --> 1.0: [0.95, 1.05]
+                                     young's modulus carbon fiber: 1.5e+11 newton / meter ** 2 --> 1.58e+11 :[1.5e11, 1.64e11]
+                                     (1-k/2): 2.2*k**0.4345
+                                     k: tail boom inertia value: 0.8 --> 0.85: [0.8, 0.9]
+                                     t_{min}: minimum tail boom thickness: 0.25 --> 0.25: [0.225, 0.275]
 
-Mission-Aircraft-Motor-: 
-                       g: gravitational constant: 9.81 meter / second ** 2 ---- 9.81 
-                       B_{PM}: power mass ratio: 4140.8 watt / kilogram ---- 4140.8 
-                       \eta: motor efficiency: 0.95 ---- 0.95 
+Mission-Aircraft-Motor-:
+                        power mass ratio: 4140.8 --> 4140.8: [3971, 4398]
+                        motor efficiency: 0.95 --> 0.92: [0.89, 0.95]
 
 Mission-Aircraft-Empennage-HorizontalTail-Planform-: 
                                                    \bar{c}_{ave}: normalized mid section chord: [ 1.05555556  0.94444444] ---- None 
@@ -251,27 +182,13 @@ Mission-Aircraft-Wing-Planform-:
                                \bar{c}_{MAC}: non-dim MAC: 0.777777777778 ---- <function <lambda> at 0x7f8d1a897ed8> 
                                C_M: wing moment coefficient: 0.14 ---- 0.14 
                                d\eta: \Delta (2y/b): [ 0.25  0.25  0.25  0.25] ---- None 
-                               \lambda: wing taper ratio: 0.5 ---- 0.5 
+                               \lambda: wing taper ratio: 0.5 ---- 0.5
 
-Mission-FlightSegment-WingLoading-GustL-Beam-: 
-                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
-                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
-                                             \bar{M}_{tip}: Tip moment: 1e-10 ---- 1e-10 
-                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-                                             \bar{S}_{tip}: Tip loading: 1e-10 ---- 1e-10 
-                                             \bar{\delta}_{root}: Base deflection: 1e-10 ---- 1e-10 
-                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-                                             \theta_{root}: Base angle: 1e-10 ---- 1e-10 
-
-Mission-Aircraft-Empennage-VerticalTail-WingSkin-: 
-                                                 \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114 
-                                                 g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81 
-                                                 \rho_{CFRP}: density of CFRP: 0.049 gram / centimeter ** 3 ---- 1.6 
-                                                 t_{min}: wing skin min gauge: 0.012 inch ---- 0.012 
+Mission-Aircraft-Empennage-VerticalTail-WingSkin-:
+                                                 \bar{J/t}: torsional moment of inertia: 0.01114 1 / millimeter ---- 0.01114
+                                                 g: gravitational acceleration: 9.81 meter / second ** 2 ---- 9.81
+                                                 \rho_{CFRP}: density of CFRP: 0.049 gram / centimeter ** 3 ---- 1.6
+                                                 t_{min}: wing skin min gauge: 0.012 inch ---- 0.012
 
 Mission-Aircraft-: 
                  W_{avn}: avionics weight: 8.0 force_pound ---- 8 

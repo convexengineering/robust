@@ -1,3 +1,4 @@
+"""
 from RobustGP import RobustGPModel
 import GPModels
 import numpy as np
@@ -164,3 +165,13 @@ for gamma in [1]:  # gammas:
 
 for statement in printing_list:
     print(statement)
+"""
+from Robust import RobustModel
+import GPModels as models
+from RobustGPTools import RobustGPTools
+
+solar = models.mike_solar_model()
+robustsolar_elliptical = RobustModel(solar, 'elliptical', gamma=1)
+sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=19)#, maxNumOfLinearSections=20)
+print sol_robustsolar_elliptical['cost']
+robustsolar_uncertainvars = RobustGPTools.uncertain_model_variables(solar)
