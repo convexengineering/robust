@@ -23,9 +23,9 @@ def simpleWing():
                           pr=3.6144578)  # [2 - 2.15] -> [0.6931 - 0.7654] -> 2.0736 -> 4.95
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m",
                           "Wing Weight Coefficent 1",
-                          pr=66.666666)  # [4e-5 - 20e-5] ->[-10.1266 - -8.5171 -> 8.9442 -> 8.63
+                         )  # [4e-5 - 20e-5] ->[-10.1266 - -8.5171 -> 8.9442 -> 8.63
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
-                          "Wing Weight Coefficent 2", pr=66.666666)  # [20 - 100] ->[2.9957 - 4.6051] -> 44.7213 -> 21.2
+                          "Wing Weight Coefficent 2",)  # [20 - 100] ->[2.9957 - 4.6051] -> 44.7213 -> 21.2
     CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area",
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
@@ -67,7 +67,10 @@ def simpleWing():
                     D <= ejer]
     # for key in subs.keys():
 
-    return Model(D, constraints)
+    m = Model(D, constraints)
+    m.W1 = W_W_coeff1
+    m.W2 = W_W_coeff2
+    return m
 
 
 def simpleWingSP():
