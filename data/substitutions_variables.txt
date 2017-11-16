@@ -148,7 +148,7 @@ Mission-Aircraft-Empennage-HorizontalTail-Planform-:
                                                    \lambda: wing taper ratio: 0.8 ---- 0.5
                                                    \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None
                                                    AR: aspect ratio: 4 ---- None
-                                                   \tau: airfoil thickness ratio: 0.115 ---- 0.115
+                                                   \tau: airfoil thickness ratio: 0.115 --- 0.115
 
 Mission-Aircraft-Wing-Planform-:
                                 tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
