@@ -1,0 +1,42 @@
+Mission-FlightSegment-WingLoading-WingSkinL-:
+Cmw = Variable("C_{m_w}", 0.121, "-", "negative wing moment coefficent", pr=0)
+
+Mission-Aircraft-Empennage-HorizontalTail-WingSkin-:
+Jtbar = Variable("\\bar{J/t}", 0.01114, "1/mm", "torsional moment of inertia", pr=0)
+
+Mission-Aircraft-Empennage-HorizontalTail-:
+mh = Variable("m_h", "-", "horizontal tail span effectiveness", pr=0)
+CLhmin = Variable("(C_{L_h})_{min}", 0.75, "-", "max downlift coefficient", pr=0)
+Vh = Variable("V_h", "-", "horizontal tail volume coefficient", pr=0)
+
+Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
+Abar = Variable("\\bar{A}_{jh01}", 0.0548, "-", "jh01 non dimensional area", pr=0)
+
+Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
+Abar = Variable("\\bar{A}_{jh01}", 0.0548, "-", "jh01 non dimensional area", pr=0)
+
+Mission-Aircraft-Wing-CapSpar-: 
+wlim = Variable("w_{lim}", 0.15, "-", "spar width to chord ratio", pr=0)
+tshearmin = Variable("t_{shear-min}", 0.012, "in", "min shear web thickness", pr=0)
+
+Mission-FlightSegment-WingLoading-ChordSparL-Beam-:
+Sbartip = Variable("\\bar{S}_{tip}", 1e-10, "-", "Tip loading", pr=0)            
+Mbartip = Variable("\\bar{M}_{tip}", 1e-10, "-", "Tip moment", pr=0)             
+throot = Variable("\\theta_{root}", 1e-10, "-", "Base angle", pr=0)              
+dbarroot = Variable("\\bar{\\delta}_{root}", 1e-10, "-", "Base deflection", pr=0)
+
+Mission-Aircraft-Empennage-HorizontalBoomBending-:
+thmax = Variable("\\theta_{max}", 0.1, "-", "max tail boom deflection angle", pr=0)
+
+Mission-Aircraft-Empennage-VerticalBoomBending-:
+thmax = Variable("\\theta_{max}", 0.1, "-", "max tail boom deflection angle", pr=0)
+
+Mission-FlightSegment-WingLoading-GustL-:
+kappa = Variable("\\kappa", 0.2, "-", "max tip deflection ratio", pr=0)
+vgust = Variable("V_{gust}", 10, "m/s", "gust velocity", pr=0)
+
+Planform:
+tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
+CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+lam = Variable("\\lambda", 0.5, "-", "wing taper ratio", pr=0)
