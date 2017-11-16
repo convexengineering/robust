@@ -18,7 +18,7 @@ class RobustGPTools:
         :return: the uncertain variables
         """
         subs_vars = list(model.substitutions.keys())
-        uncertain_vars = [var for var in subs_vars if isinstance(var.key.pr, Number)]
+        uncertain_vars = [var for var in subs_vars if isinstance(var.key.pr, Number) and var.key.pr > 0]
         indirect_uncertain_vars = [var for var in subs_vars if isinstance(var.key.pr, Monomial)]
         return uncertain_vars, indirect_uncertain_vars
 
