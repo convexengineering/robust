@@ -62,7 +62,7 @@ class RobustModel:
                                         'slopes': slopes_intercepts[0],
                                         'intercepts': slopes_intercepts[1]
                                         }
-        self.nominal_solve = RobustModel.nominalsolve(model, verbosity=0)
+        self.nominal_solve = RobustModel.internalsolve(model, verbosity=0)
         self.nominal_solution = self.nominal_solve.get('variables')
         self.nominal_cost = self.nominal_solve['cost']
 
@@ -174,7 +174,7 @@ class RobustModel:
                         linearize_and_return_upper_lower_models(two_term_data_posynomials,
                                                                 self.robust_solve_properties['numoflinearsections'],
                                                                 ready_constraints)
-                    new_solution = RobustModel.nominalsolve(self._robust_model, verbosity=0)
+                    new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
                 reached_feasibility += 1
                 # rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             except:
@@ -187,7 +187,7 @@ class RobustModel:
                         linearize_and_return_upper_lower_models(two_term_data_posynomials,
                                                                 self.robust_solve_properties['numoflinearsections'],
                                                                 ready_constraints, feasible=True)
-                    new_solution = RobustModel.nominalsolve(self._robust_model, verbosity=0)
+                    new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
                 # rel_tol = 2 * self.setting.get('iterationsRelativeTolerance')
             rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             if verbosity > 0:
@@ -394,11 +394,11 @@ class RobustModel:
             upper_model_infeasible = 0
 
             try:
-                sol_upper = RobustModel.nominalsolve(model_upper, verbosity=0)
+                sol_upper = RobustModel.internalsolve(model_upper, verbosity=0)
             except:
                 upper_model_infeasible = 1
             try:
-                sol_lower = RobustModel.nominalsolve(model_lower, verbosity=0)
+                sol_lower = RobustModel.internalsolve(model_lower, verbosity=0)
             except:
                 raise Exception("The model is infeasible")
 
@@ -418,7 +418,7 @@ class RobustModel:
         return permutation_indices
 
     @staticmethod
-    def nominalsolve(model, verbosity=0):
+    def internalsolve(model, verbosity=0):
         try:
             return model.solve(verbosity=verbosity)
         except:
@@ -429,3 +429,6 @@ class RobustModel:
             return self._sequence_of_rgps
         else:
             return self._robust_model
+
+    def nominalsolve(self):
+        return self.nominal_solve
