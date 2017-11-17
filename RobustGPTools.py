@@ -1,5 +1,5 @@
 from numbers import Number
-from gpkit import Monomial, Model
+from gpkit import Monomial, Model, Variable, VarKey, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 
 import numpy as np
@@ -18,9 +18,32 @@ class RobustGPTools:
         :return: the uncertain variables
         """
         subs_vars = list(model.substitutions.keys())
-        uncertain_vars = [var for var in subs_vars if isinstance(var.key.pr, Number) and var.key.pr > 0]
-        indirect_uncertain_vars = [var for var in subs_vars if isinstance(var.key.pr, Monomial)]
+        uncertain_vars = []#[var for var in subs_vars if isinstance(var.key.pr, Number) and var.key.pr > 0]
+        indirect_uncertain_vars = []
+        for var in subs_vars:
+            if isinstance(var.key.pr, Number) and var.key.pr > 0:
+               if var.key.shape:
+                   # print RobustGPTools.from_nomial_array_to_variables([], var)
+                   uncertain_vars += RobustGPTools.from_nomial_array_to_variables(model, [], var)
+               else:
+                   print var
+                   uncertain_vars += [var]
+            elif isinstance(var.key.pr, Monomial):
+               if var.key.shape:
+                   indirect_uncertain_vars += RobustGPTools.from_nomial_array_to_variables(model, [], var)
+               else:
+                   indirect_uncertain_vars += [var]
         return uncertain_vars, indirect_uncertain_vars
+
+    @staticmethod
+    def from_nomial_array_to_variables(model, vars, nomial_array):
+        if isinstance(nomial_array, nomials.variables.Variable):
+            vars.append(nomial_array.key)
+            return
+        print nomial_array.key.descr
+        for i in model[nomial_array.key.name]:
+            RobustGPTools.from_nomial_array_to_variables(model, vars, i)
+        return vars
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps, original_monomial_cs, indirect_uncertain_vars):
