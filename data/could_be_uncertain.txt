@@ -36,7 +36,12 @@ kappa = Variable("\\kappa", 0.2, "-", "max tip deflection ratio", pr=0)
 vgust = Variable("V_{gust}", 10, "m/s", "gust velocity", pr=0)
 
 Planform:
-tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
-CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.05555556  0.94444444] ---- None
 CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
-lam = Variable("\\lambda", 0.5, "-", "wing taper ratio", pr=0)
+cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=0)
+CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.   0.5  1. ] ---- None
+deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.5  0.5] ---- None
+lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.11111111  1.          0.88888889] ---- None
+tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)

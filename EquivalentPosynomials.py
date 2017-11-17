@@ -1,4 +1,5 @@
 import numpy as np
+from numbers import Number
 
 from gpkit import Variable, Monomial, Posynomial
 from RobustGPTools import RobustGPTools
@@ -19,10 +20,9 @@ class EquivalentPosynomials:
     no_data_constraints = []
     data_constraints = []
 
-    def __init__(self, p, uncertain_vars, indirect_uncertain_vars, m, simple_model, dependent_uncertainties):
+    def __init__(self, p, m, simple_model, dependent_uncertainties):
         """
         :param p: the posynomial to be simplified
-        :param uncertain_vars: the model's uncertain variables
         :param m: the index of the posynomial
         :param simple_model: if a simple model is preferred
         :param dependent_uncertainties: if the uncertainty set is dependent or not
@@ -30,15 +30,16 @@ class EquivalentPosynomials:
         self.simple_model = simple_model
         self.m = m
         self.dependent_uncertainties = dependent_uncertainties
-        direct_p_uncertain_vars = [var for var in p.varkeys if var in uncertain_vars]
-        self.p_indirect_uncertain_vars = [var for var in p.varkeys if var in indirect_uncertain_vars]
+        direct_p_uncertain_vars = [var for var in p.varkeys if isinstance(var.key.pr, Number) and var.key.pr > 0]
+        self.p_indirect_uncertain_vars = [var for var in p.varkeys if isinstance(var.key.pr, Monomial)]
 
         new_direct_uncertain_vars = []
         for var in self.p_indirect_uncertain_vars:
             new_direct_uncertain_vars += RobustGPTools.\
                 replace_indirect_uncertain_variable_by_equivalent(var.key.pr, 1).keys()
 
-        new_direct_uncertain_vars = list(set(new_direct_uncertain_vars) & set(uncertain_vars))
+        new_direct_uncertain_vars = [var for var in new_direct_uncertain_vars
+                                     if isinstance(var.key.pr, Number) and var.key.pr > 0]
 
         self.p_uncertain_vars = list(set(direct_p_uncertain_vars) | set(new_direct_uncertain_vars))
         # print self.p_uncertain_vars
@@ -62,10 +63,10 @@ class EquivalentPosynomials:
             m_uncertain_vars_exps = {}
 
             only_uncertain_vars_monomial_exps = RobustGPTools.\
-                only_uncertain_vars_monomial(p.exps[i], p.cs[i], self.p_indirect_uncertain_vars)
+                only_uncertain_vars_monomial(p.exps[i])
 
             for var in only_uncertain_vars_monomial_exps.keys():
-                if var in uncertain_vars:
+                if isinstance(var.key.pr, Number) and var.key.pr > 0:
                     m_uncertain_vars_exps[var] = only_uncertain_vars_monomial_exps[var]
             if m_uncertain_vars_exps in uncertain_vars_exps:
                 index = uncertain_vars_exps.index(m_uncertain_vars_exps)
@@ -232,7 +233,7 @@ class EquivalentPosynomials:
             for j in xrange(number_of_monomials):
 
                 only_uncertain_vars_monomial_exps = RobustGPTools.\
-                    only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j], self.p_indirect_uncertain_vars)
+                    only_uncertain_vars_monomial(self.main_p.exps[j])
 
                 for var in self.p_uncertain_vars:
                     if var.key in only_uncertain_vars_monomial_exps:
@@ -248,8 +249,7 @@ class EquivalentPosynomials:
                 for j in xrange(number_of_monomials):
 
                     only_uncertain_vars_monomial_exps = RobustGPTools.\
-                        only_uncertain_vars_monomial(self.main_p.exps[j], self.main_p.cs[j],
-                                                     self.p_indirect_uncertain_vars)
+                        only_uncertain_vars_monomial(self.main_p.exps[j])
 
                     if var in only_uncertain_vars_monomial_exps:
 

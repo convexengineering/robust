@@ -69,7 +69,7 @@ class RobustModel:
         self._sequence_of_rgps = []
         self._robust_model = None
 
-        self.uncertain_vars, self.indirect_uncertain_vars = RobustGPTools.uncertain_model_variables(model)
+        # self.uncertain_vars, self.indirect_uncertain_vars = RobustGPTools.uncertain_model_variables(model)
         self.lower_approximation_is_feasible = False
 
         if self.type_of_uncertainty_set == 'box':
@@ -236,8 +236,7 @@ class RobustModel:
         data_gp_posynomials = []
         ready_gp_constraints = []
         for i, p in enumerate(gp_posynomials):
-            equivalent_p = EquivalentPosynomials(p, self.uncertain_vars, self.indirect_uncertain_vars,
-                                                 i + offset, self.setting.get('simpleModel'),
+            equivalent_p = EquivalentPosynomials(p, i + offset, self.setting.get('simpleModel'),
                                                  self.dependent_uncertainty_set)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
             data_gp_posynomials += [posy.as_posyslt1()[0] for posy in data]
@@ -253,21 +252,19 @@ class RobustModel:
                 to_linearize_gp_posynomials += [p]
             else:
                 if self.setting.get('twoTerm'):
-                    two_term_approximation = TwoTermApproximation(p, self.uncertain_vars, self.indirect_uncertain_vars,
-                                                                  self.setting)
+                    two_term_approximation = TwoTermApproximation(p, self.setting)
                     large_gp_posynomials.append(two_term_approximation)
                 else:
                     robust_large_p = RobustifyLargePosynomial(p)
                     ready_gp_constraints += robust_large_p. \
-                        robustify_large_posynomial(self.type_of_uncertainty_set, self.uncertain_vars,
-                                                   self.indirect_uncertain_vars, i + offset, self.setting)
+                        robustify_large_posynomial(self.type_of_uncertainty_set, i + offset, self.setting)
 
         return ready_gp_constraints, to_linearize_gp_posynomials, large_gp_posynomials
 
     def robustify_monomial(self, monomial):
         new_monomial_exps = RobustGPTools. \
-            only_uncertain_vars_monomial(monomial.exps[0], monomial.cs[0], self.indirect_uncertain_vars)
-        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if var.key.pr is not None]  # in self.uncertain_vars]
+            only_uncertain_vars_monomial(monomial.exps[0])
+        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if var.key.pr is not None]
 
         total_center = 0
         norm = 0

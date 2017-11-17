@@ -136,38 +136,39 @@ Mission-FlightSegment-WingLoading-ChordSparL-:
                                              sigmacfrp = Variable("\\sigma_{CFRP}", 1700e6, "Pa", "CFRP max stress", pr=2)
                                              kappa = Variable("\\kappa", 0.2, "-", "max tip deflection ratio", pr=0)
                                              taucfrp = Variable("\\tau_{CFRP}", 450e6, "Pa", "CFRP fabric stress", pr=2)
-                                             \bar{q}: normalized loading: [ 1.33333337  1.16666663  1.          0.83333331  0.66666669]
+                                             qbar = Variable("\\bar{q}", "-", "normalized loading",pr=5)  # [ 1.33333337  1.16666663  1.          0.83333331  0.66666669]
 
 Mission-Aircraft-Empennage-HorizontalTail-Planform-:
-                                                   \bar{c}_{ave}: normalized mid section chord: [ 1.05555556  0.94444444] ---- None
-                                                   C_M: wing moment coefficient: 0.14 ---- 0.14
-                                                   \bar{c}_{MAC}: non-dim MAC: 0.903703703704 ---- <function <lambda> at 0x7f8cfe883410>
-                                                   C_{L_{max}}: maximum CL of JHO1: 1.39 ---- 1.39
-                                                   \eta: (2y/b): [ 0.   0.5  1. ] ---- None
-                                                   d\eta: \Delta (2y/b): [ 0.5  0.5] ---- None
-                                                   \lambda: wing taper ratio: 0.8 ---- 0.5
-                                                   \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None
-                                                   AR: aspect ratio: 4 ---- None
-                                                   \tau: airfoil thickness ratio: 0.115 --- 0.115
+                                                   cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.05555556  0.94444444] ---- None
+                                                   CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+                                                   cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                                   CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+                                                   eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.   0.5  1. ] ---- None
+                                                   deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.5  0.5] ---- None
+                                                   lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+                                                   cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.11111111  1.          0.88888889] ---- None
+                                                   AR = Variable("AR", 4, "-", "aspect ratio", pr=2)
+                                                   tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
 
 Mission-Aircraft-Wing-Planform-:
                                 tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
                                 CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
                                 CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
-                               \bar{c}: normalized chord at mid element: [ 1.33333333  1.16666667  1.          0.83333333  0.66666667] -> None
-                               \eta: (2y/b): [ 0.    0.25  0.5   0.75  1.  ] -> None
-                               \bar{c}_{ave}: normalized mid section chord: [ 1.25        1.08333333  0.91666667  0.75      ] -> None
-                               \bar{c}_{MAC}: non-dim MAC: 0.777777777778 -> <function <lambda> at 0x7f8d1a897ed8>
-                               d\eta: \Delta (2y/b): [ 0.25  0.25  0.25  0.25] -> None
-                               lam = Variable("\\lambda", 0.5, "-", "wing taper ratio", pr=0)
+                                cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.33333333  1.16666667  1.          0.83333333  0.66666667] -> None
+                                eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.    0.25  0.5   0.75  1.  ] -> None
+                                cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.25        1.08333333  0.91666667  0.75      ] -> None
+                                cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.25  0.25  0.25  0.25] -> None
+                                lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
 
 Mission-Aircraft-Empennage-VerticalTail-Planform-:
-                                                 \eta: (2y/b): [ 0.   0.5  1. ] ---- None
-                                                 \bar{c}_{MAC}: non-dim MAC: 0.903703703704 ---- <function <lambda> at 0x7f8d05ba70c8>
-                                                 C_M: wing moment coefficient: 0.14 ---- 0.14
-                                                 d\eta: \Delta (2y/b): [ 0.5  0.5] ---- None
-                                                 C_{L_{max}}: maximum CL of JHO1: 1.39 ---- 1.39
-                                                 \lambda: wing taper ratio: 0.8 ---- 0.5
-                                                 \tau: airfoil thickness ratio: 0.115 ---- 0.115
-                                                 \bar{c}_{ave}: normalized mid section chord: [ 1.05555556  0.94444444] ---- None
-                                                 \bar{c}: normalized chord at mid element: [ 1.11111111  1.          0.88888889] ---- None
+                                                  cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.05555556  0.94444444] ---- None
+                                                  CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+                                                  cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                                  CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+                                                  eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.   0.5  1. ] ---- None
+                                                  deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.5  0.5] ---- None
+                                                  lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+                                                  cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.11111111  1.          0.88888889] ---- None
+                                                  AR = Variable("AR", 4, "-", "aspect ratio", pr=2)
+                                                  tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)

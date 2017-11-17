@@ -44,8 +44,8 @@ class RobustGPTools:
         return vars
 
     @staticmethod
-    def only_uncertain_vars_monomial(original_monomial_exps, original_monomial_cs, indirect_uncertain_vars):
-        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if var in indirect_uncertain_vars]
+    def only_uncertain_vars_monomial(original_monomial_exps):
+        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if isinstance(var.key.pr, Monomial)]
         new_monomial_exps = copy(original_monomial_exps)
         for var in indirect_monomial_uncertain_vars:
             new_vars_exps = RobustGPTools.\

@@ -109,7 +109,6 @@ class LinearizeTwoTermPosynomials:
         """
         Finds the appropriate r, slopes, and intercepts for a given tolerance
         :param r: the number of PWL functions
-        :param tol: tolerance
         :return: the slope, intercept, and new x
         """
         if r < 2:
@@ -140,7 +139,6 @@ class LinearizeTwoTermPosynomials:
         Approximates a two term posynomial constraint by upper and lower piece-wise linear constraints
         :param m: the index of the constraint
         :param r: the number of linear functions used for approximation
-        :param tol: the tolerance allowed on the position of the intersection points
         :return: the deprived of data upper and lower constraints and the common data containing constraints
         """
         if r < 2:
