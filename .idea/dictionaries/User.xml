@@ -2,6 +2,7 @@
   <dictionary name="User">
     <words>
       <w>slackvar</w>
+      <w>stds</w>
     </words>
   </dictionary>
 </component>

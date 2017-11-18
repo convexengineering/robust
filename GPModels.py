@@ -5,7 +5,7 @@ from RobustGPTools import SameModel
 
 
 def simpleWing():
-    k = Variable("k", 1.17, "-", "form factor", pr=11.111111)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
+    k = Variable("k", 1.17, "-", "form factor", pr=11.111111, sigma=0.035)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
     e = Variable("e", 0.92, "-", "Oswald efficiency factor",
                  pr=7.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",

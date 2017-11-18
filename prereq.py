@@ -171,7 +171,7 @@ import GPModels as models
 from RobustGPTools import RobustGPTools
 
 solar = models.mike_solar_model()
-robustsolar_elliptical = RobustModel(solar, 'elliptical', gamma=1)
+robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=True)
 sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=19, maxNumOfLinearSections=20)
 print sol_robustsolar_elliptical['cost']
 # robustsolar_uncertainvars = RobustGPTools.uncertain_model_variables(solar)

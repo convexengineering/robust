@@ -3,6 +3,7 @@ from gpkit.nomials import SignomialInequality, MonomialEquality
 import numpy as np
 from time import time
 import warnings
+from scipy.stats import norm
 
 from RobustGPTools import RobustGPTools
 from EquivalentPosynomials import EquivalentPosynomials
@@ -29,7 +30,9 @@ class RobustnessSetting:
             'minNumOfLinearSections': 12,
             'maxNumOfLinearSections': 20,
             'iterationsRelativeTolerance': 1e-4,
-            'iterationLimit': 10
+            'iterationLimit': 10,
+            'probabilityOfSuccess': 0.9,
+            'lognormal': True
         }
         for key, value in options.iteritems():
             self._options[key] = value
@@ -62,6 +65,9 @@ class RobustModel:
                                         'slopes': slopes_intercepts[0],
                                         'intercepts': slopes_intercepts[1]
                                         }
+
+        self.number_of_stds = norm.ppf(self.setting.get("probabilityOfSuccess")/2.0 + 0.5)
+
         self.nominal_solve = RobustModel.internalsolve(model, verbosity=0)
         self.nominal_solution = self.nominal_solve.get('variables')
         self.nominal_cost = self.nominal_solve['cost']
@@ -267,29 +273,40 @@ class RobustModel:
         m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if var.key.pr is not None]
 
         total_center = 0
-        norm = 0
+        l_norm = 0
         for var in m_direct_uncertain_vars:
-            pr = var.key.pr * self.setting.get('gamma')
-            eta_max = np.log(1 + pr / 100.0)
-            eta_min = np.log(1 - pr / 100.0)
+            eta_min, eta_max = 0, 0
+            if self.setting.get("lognormal") and var.key.sigma is not None:
+                    eta_max = var.key.sigma*self.number_of_stds
+                    eta_min = -var.key.sigma*self.number_of_stds
+            else:
+                if self.type_of_uncertainty_set == 'box' or 'one norm':
+                    pr = var.key.pr * self.setting.get("gamma")
+                    eta_max = np.log(1 + pr / 100.0)
+                    eta_min = np.log(1 - pr / 100.0)
+                elif self.type_of_uncertainty_set == 'elliptical':
+                    r = var.key.r * self.setting.get("gamma")
+                    eta_max = np.log(r)
+                    eta_min = - np.log(r)
+
             center = (eta_min + eta_max) / 2.0
             scale = eta_max - center
             exponent = -new_monomial_exps.get(var.key)
             pert = exponent * scale
 
             if self.type_of_uncertainty_set == 'box':
-                norm += np.abs(pert)
+                l_norm += np.abs(pert)
             elif self.type_of_uncertainty_set == 'elliptical':
-                norm += pert ** 2
+                l_norm += pert ** 2
             elif self.type_of_uncertainty_set == 'one norm':
-                norm = max(norm, np.abs(pert))
+                l_norm = max(l_norm, np.abs(pert))
             else:
                 raise Exception('This type of set is not supported')
             total_center = total_center + exponent * center
         if self.type_of_uncertainty_set == 'elliptical':
-            norm = np.sqrt(norm)
+            l_norm = np.sqrt(l_norm)
 
-        return monomial * np.exp(self.setting.get('gamma') * norm) / np.exp(total_center)
+        return monomial * np.exp(self.setting.get('gamma') * l_norm) / np.exp(total_center)
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
         robust_set_of_monomial_constraints = []
