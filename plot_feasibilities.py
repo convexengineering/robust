@@ -32,6 +32,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
 
     # plot original feasibility set
     # plot boundary of uncertainty set
+    sol = None
     if rm:
         fc = FeasCircle(m, rm.solution)
         del fc.substitutions[x]
@@ -49,6 +50,8 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     def plot_uncertainty_set(ax):
         xo, yo = map(mag, map(m.solution, [x, y]))
         ax.plot(xo, yo, "k.")
+        x_center = None
+        y_center = None
         if rm:
             eta_max_x = np.log(1 + x.key.pr / 100.0)
             eta_min_x = np.log(1 - x.key.pr / 100.0)
@@ -71,6 +74,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
             ax.add_patch(p)
 
     orig_a, orig_b = map(mag, map(origfeas, [x, y]))
+    a_i, b_i, a, b = [None]*4
     if rm:
         a_i, b_i, a, b = map(mag, map(sol, ["x_i", "y_i", x, y]))
         for i in range(len(a)):
@@ -79,7 +83,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
         axes[0].loglog([orig_a[0]], [orig_b[0]], "k-")
 
     from matplotlib.patches import Polygon
-    from matplotlib.collections import PatchCollection
+    # from matplotlib.collections import PatchCollection
 
     perimeter = np.array([orig_a, orig_b]).T
     p = Polygon(perimeter, True, color=GPBLU, linewidth=0)

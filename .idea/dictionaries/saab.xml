@@ -3,6 +3,8 @@
     <words>
       <w>cfrp</w>
       <w>coeff</w>
+      <w>feas</w>
+      <w>feasibilities</w>
       <w>freevariables</w>
       <w>linearizations</w>
       <w>linearize</w>
@@ -10,6 +12,7 @@
       <w>numoflinearsections</w>
       <w>posynomial</w>
       <w>purturbations</w>
+      <w>rmtype</w>
       <w>robustify</w>
       <w>robustsolve</w>
       <w>setuptime</w>
