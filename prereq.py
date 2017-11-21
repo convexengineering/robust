@@ -167,10 +167,10 @@ for statement in printing_list:
     print(statement)
 """
 from Robust import RobustModel
-import GPModels as models
-from RobustGPTools import RobustGPTools
+import GPModels as Models
+# from RobustGPTools import RobustGPTools
 
-solar = models.mike_solar_model()
+solar = Models.mike_solar_model()
 robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=True)
 sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=19, maxNumOfLinearSections=20)
 print sol_robustsolar_elliptical['cost']

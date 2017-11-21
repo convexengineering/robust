@@ -14,9 +14,9 @@ Mission-Aircraft-Empennage-HorizontalTail-WingSkin-:
 Mission-Aircraft-Empennage-HorizontalTail-: 
                                            mh = Variable("m_h", "-", "horizontal tail span effectiveness", pr=0)
                                            CLhmin = Variable("(C_{L_h})_{min}", 0.75, "-", "max downlift coefficient", pr=0)
-                                           mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 10)
-	                                       mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 10)
-	                                       mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 10)  # replaced m_{fac} = 1.1
+                                           mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                                       mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                                       mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)  # replaced m_{fac} = 1.1
                                            Vh = Variable("V_h", 0.45, "-", "horizontal tail volume coefficient", pr=0) # substituted (was None)
 
 Mission-Aircraft-Empennage-VerticalTail-WingInterior-: 
@@ -30,16 +30,16 @@ Mission-Aircraft-Battery-:
                           vbatt = Variable("(E/\\mathcal{V})", 800, "W*hr/l", "volume battery energy density", pr=5)
 
 Mission-Aircraft-Empennage-: 
-                            mfachtopvar = Variable("m_{fachtopvar}", 1.0, "-", "Tail weight margin factor", pr=10)
-                            mfacvtopvar = Variable("m_{facvtopvar}", 1.0, "-", "Tail weight margin factor", pr=10)
-                            mfactailboom = Variable("m_{factailboom}", 1.0, "-", "Tail weight margin factor", pr=10)  # replaced m_{fac} = 1
+                            mfachtopvar = Variable("m_{fachtopvar}", 1.0, "-", "Tail weight margin factor", pr=0)
+                            mfacvtopvar = Variable("m_{facvtopvar}", 1.0, "-", "Tail weight margin factor", pr=0)
+                            mfactailboom = Variable("m_{factailboom}", 1.0, "-", "Tail weight margin factor", pr=0)  # replaced m_{fac} = 1
 
 Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
                                                         rhofoam = Variable("\\rho_{foam}", 0.024, "g/cm^3", "foam density", pr=10)  # substituted (0.036)
                                                         Abar = Variable("\\bar{A}_{jh01}", 0.0548, "-", "jh01 non dimensional area", pr=0)  # substituted (0.036)
 
 Mission-Aircraft-Wing-CapSpar-: 
-                               mfac = Variable("m_{fac}", 1, "-", "curvature knockdown factor", pr=3)
+                               mfac = Variable("m_{fac}", 1, "-", "curvature knockdown factor", pr=0)
                                rhocfrp = Variable("\\rho_{CFRP}", 1.5, "g/cm^3", "density of CFRP", pr=6.5)
                                E = Variable("E", 2e7, "psi", "Youngs modulus of CFRP", pr=2)
                                wlim = Variable("w_{lim}", 0.15, "-", "spar width to chord ratio", pr=0)
@@ -70,8 +70,8 @@ Mission-FlightSegment-AircraftPerf-TailAero-:
 
 Mission-FlightSegment-AircraftPerf-: 
                                     Pavn = Variable("P_{avn}", 0.0, "W", "Accessory power draw")
-                                    mfaccda = Variable("m_{faccda}", 1, "-", "cda drag margin factor", pr=5)
-                                    mfacwingcd = Variable("m_{facwingcd}", 1, "-", "wing cd drag margin factor", pr=5) #replaced m_{fac} = 1.2
+                                    mfaccda = Variable("m_{faccda}", 1, "-", "cda drag margin factor", pr=0)
+                                    mfacwingcd = Variable("m_{facwingcd}", 1, "-", "wing cd drag margin factor", pr=0) #replaced m_{fac} = 1.2
 
 Mission-FlightSegment-FlightState-: 
                                    mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity", pr=5)
@@ -86,14 +86,14 @@ Mission-FlightSegment-SteadyLevelFlight-:
 
 Mission-Aircraft-Empennage-VerticalTail-: 
                                          Vv = Variable("V_v", "-", "vertical tail volume coefficient", pr=5)
-                                         mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 10)
-	                                     mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 10)
-	                                     mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 10)
+                                         mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                                     mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                                     mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)
 
 Mission-Aircraft-Wing-: 
-                       mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 5)
-	                   mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 5)
-	                   mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 5)
+                       mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                   mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                   mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)
 
 Mission-Aircraft-Empennage-HorizontalBoomBending-: 
                                                   thmax = Variable("\\theta_{max}", 0.1, "-", "max tail boom deflection angle", pr=0)

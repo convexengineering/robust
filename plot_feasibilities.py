@@ -14,7 +14,8 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
             s_x = Variable("s_x", "-", "slack in x")
             s_y = Variable("s_y", "-", "slack in y")
 
-            self.cost = s_x**2 + s_y**2
+            Dref = Variable('D_{ref}', 1, "N")
+            self.cost = s_x + s_y  # s_x**2 + s_y**2
             feas_slack = ConstraintSet(
                 [s_x >= 1, s_y >= 1,
                  m[x]/s_x <= x_i, x_i <= m[x]*s_x,
@@ -27,9 +28,11 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     # plot boundary of uncertainty set
     if rm:
         fc = FeasCircle(m, rm.solution)
+        # print fc
         del fc.substitutions[x]
         del fc.substitutions[y]
         sol = fc.solve()
+        # print sol['freevariables']
     ofc = FeasCircle(m, m.solution)
     del ofc.substitutions[x]
     del ofc.substitutions[y]
@@ -48,17 +51,17 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
             eta_max_y = np.log(1 + y.key.pr / 100.0)
             eta_min_y = np.log(1 - y.key.pr / 100.0)
             center_y = (eta_min_y + eta_max_y) / 2.0
-            x_center = xo*np.exp(center_x)
-            y_center = yo*np.exp(center_y)
-            ax.plot(x_center, y_center, "kx")
+            x_center = np.log(xo) + center_x
+            y_center = np.log(yo) + center_y
+            ax.plot(np.exp(x_center), np.exp(y_center), "kx")
         if rmtype == "elliptical":
             th = np.linspace(0, 2*np.pi, 50)
-            ax.plot(xo*np.exp(center_x)*np.exp(np.cos(th))**np.log((1 + x.key.pr/100.0)),
-                    yo*np.exp(center_y)*np.exp(np.sin(th))**np.log((1 + y.key.pr/100.0)), "k--",
+            ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + np.log((1 + x.key.pr/100.0)) - x_center),
+                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + np.log((1 + y.key.pr/100.0)) - y_center), "k--",
                     linewidth=1)
         elif rmtype:
-            p = Polygon(np.array([[xo*np.exp(center_x)/(1 + x.key.pr/100.0)]+[xo*np.exp(center_x)*(1 + x.key.pr/100.0)]*2+[xo*np.exp(center_x)/(1 + x.key.pr/100.0)],
-                                  [yo*np.exp(center_y)/(1 + y.key.pr/100.0)]*2 + [yo*np.exp(center_y)*(1 + y.key.pr/100.0)]*2]).T,
+            p = Polygon(np.array([[xo/(1 + x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo/(1 + x.key.pr/100.0)],
+                                  [yo/(1 + y.key.pr/100.0)]*2 + [yo*(1 + y.key.pr/100.0)]*2]).T,
                         True, edgecolor="black", facecolor="none", linestyle="dashed")
             ax.add_patch(p)
 

@@ -277,10 +277,10 @@ class RobustModel:
         for var in m_direct_uncertain_vars:
             eta_min, eta_max = 0, 0
             if self.setting.get("lognormal") and var.key.sigma is not None:
-                    eta_max = var.key.sigma*self.number_of_stds
-                    eta_min = -var.key.sigma*self.number_of_stds
+                eta_max = var.key.sigma*self.number_of_stds
+                eta_min = -var.key.sigma*self.number_of_stds
             else:
-                if self.type_of_uncertainty_set == 'box' or 'one norm':
+                if self.type_of_uncertainty_set == 'box' or self.type_of_uncertainty_set == 'one norm' or self.type_of_uncertainty_set == 'elliptical':
                     pr = var.key.pr * self.setting.get("gamma")
                     eta_max = np.log(1 + pr / 100.0)
                     eta_min = np.log(1 - pr / 100.0)

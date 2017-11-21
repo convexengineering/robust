@@ -58,11 +58,12 @@ constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
 m = Model(D, constraints)
 m.solve()
 plot_feasibilities(W_W_coeff1, W_W_coeff2, m)
+# plot_feasibilities(k, W_W_coeff2, m)
 W_W_coeff1.key.descr["pr"] = 60
 # k.key.descr["pr"] = 10
 W_W_coeff2.key.descr["pr"] = 66
-RM = RobustModel(m, 'elliptical', two_term=True, linearizationTolerance=1e-5)
-RMsol = RM.robustsolve(verbosity=1, minNumOfLinearSections=40, maxNumOfLinearSections=99)
+RM = RobustModel(m, 'elliptical', two_term=True, linearizationTolerance=1e-4)
+RMsol = RM.robustsolve(verbosity=1, minNumOfLinearSections=20, maxNumOfLinearSections=40)
 rm = RM.get_robust_model()
 plot_feasibilities(W_W_coeff1, W_W_coeff2, m, rm, "elliptical")
 # plot_feasibilities(k, W_W_coeff2, m, rm, "elliptical")
