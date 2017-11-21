@@ -14,13 +14,19 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
             s_x = Variable("s_x", "-", "slack in x")
             s_y = Variable("s_y", "-", "slack in y")
 
-            Dref = Variable('D_{ref}', 1, "N")
-            self.cost = s_x + s_y  # s_x**2 + s_y**2
+            self.cost = s_x**2 + s_y**2  # s_x**2 + s_y**2
             feas_slack = ConstraintSet(
                 [s_x >= 1, s_y >= 1,
                  m[x]/s_x <= x_i, x_i <= m[x]*s_x,
                  m[y]/s_y <= y_i, y_i <= m[y]*s_y])
-
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[0]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[1]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[2]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[3]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[4]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[5]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[6]]
+            # print sol["freevariables"][m.variables_byname('c_{ave}')[7]]
             return [m, feas_slack], {k: v for k, v in sol["freevariables"].items()
                                      if k in m.varkeys}
 
@@ -28,7 +34,6 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     # plot boundary of uncertainty set
     if rm:
         fc = FeasCircle(m, rm.solution)
-        # print fc
         del fc.substitutions[x]
         del fc.substitutions[y]
         sol = fc.solve()
@@ -57,7 +62,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
         if rmtype == "elliptical":
             th = np.linspace(0, 2*np.pi, 50)
             ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + np.log((1 + x.key.pr/100.0)) - x_center),
-                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + np.log((1 + y.key.pr/100.0)) - y_center), "k--",
+                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + np.log((1 + y.key.pr/100.0)) - y_center), "k",
                     linewidth=1)
         elif rmtype:
             p = Polygon(np.array([[xo/(1 + x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo/(1 + x.key.pr/100.0)],

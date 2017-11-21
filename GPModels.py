@@ -5,13 +5,13 @@ from RobustGPTools import SameModel
 
 
 def simpleWing():
-    k = Variable("k", 1.17, "-", "form factor", pr=11.111111, sigma=0.035)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
+    k = Variable("k", 1.17, "-", "form factor", pr=31.111111, sigma=0.035)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
     e = Variable("e", 0.92, "-", "Oswald efficiency factor",
-                 pr=7.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
+                 pr=27.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",
                   pr=4.225352)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
     # pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
-    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air")  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
+    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio",
                    pr=33.333333)  # [0.08 - 0.16] -> [-2.5257 - -1.8325] -> 0.1131 -> 16
     N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor",
@@ -23,14 +23,14 @@ def simpleWing():
                           pr=3.6144578)  # [2 - 2.15] -> [0.6931 - 0.7654] -> 2.0736 -> 4.95
     W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m",
                           "Wing Weight Coefficent 1",
-                         )  # [4e-5 - 20e-5] ->[-10.1266 - -8.5171 -> 8.9442 -> 8.63
+                         pr=60)  # [4e-5 - 20e-5] ->[-10.1266 - -8.5171 -> 8.9442 -> 8.63
     W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa",
-                          "Wing Weight Coefficent 2",)  # [20 - 100] ->[2.9957 - 4.6051] -> 44.7213 -> 21.2
+                          "Wing Weight Coefficent 2", pr=66)  # [20 - 100] ->[2.9957 - 4.6051] -> 44.7213 -> 21.2
     CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area",
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
-    toz = Variable("toz", 1, "-", pr=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
+    toz = Variable("toz", 1, "-", pr=15)#k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
     ejer = Variable("ejer", 10000, "N")
     # Free Variables
     D = Variable("D", "N", "total drag force")
