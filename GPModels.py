@@ -14,8 +14,8 @@ def simpleWing():
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio",)
                    # pr=33.333333)  # [0.08 - 0.16] -> [-2.5257 - -1.8325] -> 0.1131 -> 16
-    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor",)
-                     # pr=33.333333)  # [2.2 - 4.4] -> [0.7884 - 1.4816] -> 3.1112 -> 30.5
+    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor",
+                     pr=33.333333)  # [2.2 - 4.4] -> [0.7884 - 1.4816] -> 3.1112 -> 30.5
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)  # [20 - 30] -> [2.9957 - 3.4011] -> 24.4948 -> 6.33
     C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down",
                       pr=25)  # [1.2 - 2] -> [0.1823, 0.6931] -> 1.5491 -> 58.4

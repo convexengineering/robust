@@ -6,12 +6,12 @@ from gpkit.small_scripts import mag
 def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     posynomials = m.as_posyslt1()
     interesting_vars = [x, y]
-    old = []
-    while set(old) != set(interesting_vars):
-        old = interesting_vars
-        for p in posynomials:
-            if set(interesting_vars) & set(p.varkeys.keys()):
-                interesting_vars = list(set(interesting_vars) | set(p.varkeys.keys()))
+    # old = []
+    # while set(old) != set(interesting_vars):
+    #     old = interesting_vars
+    #     for p in posynomials:
+    #         if set([var.key.name for var in interesting_vars]) & set([var.key.name for var in p.varkeys.keys()]):
+    #             interesting_vars = list(set(interesting_vars) | set([m[var.key.name] for var in p.varkeys.keys() if var.key.pr is not None]))
 
     class FeasCircle(Model):
         "SKIP VERIFICATION"
@@ -24,12 +24,14 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
                 th = Variable("\\theta_%s" % count, np.linspace(0, 2*np.pi, 120), "-")
                 thetas += [th]
             for i_set in xrange(len(interesting_vars)):
-                x_i = Monomial(1)*Variable("x_%s" % i_set, 4, interesting_vars[i_set].unitstr())
-                for j in xrange(i_set):
-                    x_i *= Variable("x_%s^%s" % (i_set, j), lambda c, i_set=i_set: sol(interesting_vars[i_set])*np.exp(np.cos(c[thetas[j]])), '-')
-                if i_set != len(interesting_vars) - 1:
-                    x_i *= Variable("x_%s^%s" % (i_set, i_set), lambda c, i_set=i_set: sol(interesting_vars[i_set])*np.exp(np.sin(c[thetas[i_set]])), '-')
-                print x_i
+                def f(c, index=i_set):
+                    product = 1
+                    for j in xrange(index):
+                        product *= np.cos(c[thetas[j]])
+                    if index != len(interesting_vars) - 1:
+                        product *= np.sin(c[thetas[index]])
+                    return sol(interesting_vars[index])*np.exp(r*product)
+                x_i = Variable('x_%s' % i_set, f, interesting_vars[i_set].unitstr())
                 s_i = Variable("s_%s" % i_set)
                 slacks += [s_i]
                 additional_constraints += [s_i >= 1, m[interesting_vars[i_set]]/s_i <= x_i, x_i <= m[interesting_vars[i_set]]*s_i]
@@ -51,8 +53,6 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     ofc = FeasCircle(m, m.solution)
     for interesting_var in interesting_vars:
         del ofc.substitutions[interesting_var]
-    for p in m.as_posyslt1():
-        print p.unitstr()
     origfeas = ofc.solve()
 
     from matplotlib import pyplot as plt
@@ -87,7 +87,11 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     orig_a, orig_b = map(mag, map(origfeas, [x, y]))
     a_i, b_i, a, b = [None]*4
     if rm:
-        a_i, b_i, a, b = map(mag, map(sol, ["x_0^0", "x_1^0", x, y]))
+        x_index = interesting_vars.index(x)
+        y_index = interesting_vars.index(y)
+        print sol("\\theta_%s" % x_index)
+        a_i, b_i, a, b = map(mag, map(sol, ["x_%s" % x_index, "x_%s" % y_index, x, y]))
+
         for i in range(len(a)):
             axes[0].loglog([a_i[i], a[i]], [b_i[i], b[i]], color=GPCOLORS[1], linewidth=0.2)
     else:
