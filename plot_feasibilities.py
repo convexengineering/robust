@@ -1,32 +1,42 @@
 import numpy as np
-from gpkit import Model, Variable, ConstraintSet, GPCOLORS, GPBLU
+from gpkit import Model, Variable, ConstraintSet, GPCOLORS, GPBLU, Vectorize, Monomial
 from gpkit.small_scripts import mag
 
 
 def plot_feasibilities(x, y, m, rm=None, rmtype=None):
+    posynomials = m.as_posyslt1()
+    interesting_vars = [x, y]
+    old = []
+    while set(old) != set(interesting_vars):
+        old = interesting_vars
+        for p in posynomials:
+            if set(interesting_vars) & set(p.varkeys.keys()):
+                interesting_vars = list(set(interesting_vars) | set(p.varkeys.keys()))
+
     class FeasCircle(Model):
         "SKIP VERIFICATION"
         def setup(self, m, sol):
             r = 4
-            th = Variable("\\theta", np.linspace(0, 2*np.pi, 120), "-")
-            x_i = Variable("x_i", lambda c: sol(x)*np.exp(r*np.cos(c[th])), x.unitstr(), "starting point in x")
-            y_i = Variable("y_i", lambda c: sol(y)*np.exp(r*np.sin(c[th])), y.unitstr(), "starting point in y")
-            s_x = Variable("s_x", "-", "slack in x")
-            s_y = Variable("s_y", "-", "slack in y")
+            additional_constraints = []
+            slacks = []
+            thetas = []
+            for count in xrange((len(interesting_vars)-1)):
+                th = Variable("\\theta_%s" % count, np.linspace(0, 2*np.pi, 120), "-")
+                thetas += [th]
+            for i_set in xrange(len(interesting_vars)):
+                x_i = Monomial(1)*Variable("x_%s" % i_set, 4, interesting_vars[i_set].unitstr())
+                for j in xrange(i_set):
+                    x_i *= Variable("x_%s^%s" % (i_set, j), lambda c, i_set=i_set: sol(interesting_vars[i_set])*np.exp(np.cos(c[thetas[j]])), '-')
+                if i_set != len(interesting_vars) - 1:
+                    x_i *= Variable("x_%s^%s" % (i_set, i_set), lambda c, i_set=i_set: sol(interesting_vars[i_set])*np.exp(np.sin(c[thetas[i_set]])), '-')
+                print x_i
+                s_i = Variable("s_%s" % i_set)
+                slacks += [s_i]
+                additional_constraints += [s_i >= 1, m[interesting_vars[i_set]]/s_i <= x_i, x_i <= m[interesting_vars[i_set]]*s_i]
 
-            self.cost = s_x**2 + s_y**2  # s_x**2 + s_y**2
-            feas_slack = ConstraintSet(
-                [s_x >= 1, s_y >= 1,
-                 m[x]/s_x <= x_i, x_i <= m[x]*s_x,
-                 m[y]/s_y <= y_i, y_i <= m[y]*s_y])
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[0]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[1]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[2]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[3]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[4]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[5]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[6]]
-            # print sol["freevariables"][m.variables_byname('c_{ave}')[7]]
+            self.cost = sum([sl**2 for sl in slacks])
+            feas_slack = ConstraintSet(additional_constraints)
+
             return [m, feas_slack], {k: v for k, v in sol["freevariables"].items()
                                      if k in m.varkeys}
 
@@ -35,13 +45,14 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     sol = None
     if rm:
         fc = FeasCircle(m, rm.solution)
-        del fc.substitutions[x]
-        del fc.substitutions[y]
+        for interesting_var in interesting_vars:
+            del fc.substitutions[interesting_var]
         sol = fc.solve()
-        # print sol['freevariables']
     ofc = FeasCircle(m, m.solution)
-    del ofc.substitutions[x]
-    del ofc.substitutions[y]
+    for interesting_var in interesting_vars:
+        del ofc.substitutions[interesting_var]
+    for p in m.as_posyslt1():
+        print p.unitstr()
     origfeas = ofc.solve()
 
     from matplotlib import pyplot as plt
@@ -68,15 +79,15 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
                     np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + np.log((1 + y.key.pr/100.0)) - y_center), "k",
                     linewidth=1)
         elif rmtype:
-            p = Polygon(np.array([[xo/(1 + x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo/(1 + x.key.pr/100.0)],
-                                  [yo/(1 + y.key.pr/100.0)]*2 + [yo*(1 + y.key.pr/100.0)]*2]).T,
+            p = Polygon(np.array([[xo*(1 - x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo*(1 - x.key.pr/100.0)],
+                                  [yo*(1 - y.key.pr/100.0)]*2 + [yo*(1 + y.key.pr/100.0)]*2]).T,
                         True, edgecolor="black", facecolor="none", linestyle="dashed")
             ax.add_patch(p)
 
     orig_a, orig_b = map(mag, map(origfeas, [x, y]))
     a_i, b_i, a, b = [None]*4
     if rm:
-        a_i, b_i, a, b = map(mag, map(sol, ["x_i", "y_i", x, y]))
+        a_i, b_i, a, b = map(mag, map(sol, ["x_0^0", "x_1^0", x, y]))
         for i in range(len(a)):
             axes[0].loglog([a_i[i], a[i]], [b_i[i], b[i]], color=GPCOLORS[1], linewidth=0.2)
     else:
