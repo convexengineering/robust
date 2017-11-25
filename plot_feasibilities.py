@@ -89,7 +89,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     if rm:
         x_index = interesting_vars.index(x)
         y_index = interesting_vars.index(y)
-        print sol("\\theta_%s" % x_index)
+
         a_i, b_i, a, b = map(mag, map(sol, ["x_%s" % x_index, "x_%s" % y_index, x, y]))
 
         for i in range(len(a)):
