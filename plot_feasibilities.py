@@ -2,10 +2,14 @@ import numpy as np
 from gpkit import Model, Variable, ConstraintSet, GPCOLORS, GPBLU, Vectorize, Monomial
 from gpkit.small_scripts import mag
 
+from RobustGPTools import RobustGPTools
 
-def plot_feasibilities(x, y, m, rm=None, rmtype=None):
+
+def plot_feasibilities(x, y, m, rm=None):
     posynomials = m.as_posyslt1()
     interesting_vars = [x, y]
+    if rm:
+        rmtype = rm.type_of_uncertainty_set
     # old = []
     # while set(old) != set(interesting_vars):
     #     old = interesting_vars
@@ -46,7 +50,7 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
     # plot boundary of uncertainty set
     sol = None
     if rm:
-        fc = FeasCircle(m, rm.solution)
+        fc = FeasCircle(m, rm.get_robust_model().solution)
         for interesting_var in interesting_vars:
             del fc.substitutions[interesting_var]
         sol = fc.solve()
@@ -64,51 +68,23 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
         x_center = None
         y_center = None
         if rm:
-            try:
-                if rmtype == 'box' or rmtype == 'one norm':
-                    pr_x = x.key.pr
-                    eta_max_x = np.log(1 + pr_x / 100.0)
-                    eta_min_x = np.log(1 - pr_x / 100.0)
-                    pr_y = y.key.pr
-                    eta_max_y = np.log(1 + pr_y / 100.0)
-                    eta_min_y = np.log(1 - pr_y / 100.0)
-                elif rmtype == 'elliptical':
-                    r_x = x.key.r
-                    eta_max_x = np.log(r_x)
-                    eta_min_x = - np.log(r_x)
-                    r_y = y.key.r
-                    eta_max_y = np.log(r_y)
-                    eta_min_y = - np.log(r_y)
-            except:
-                if rmtype == 'box' or rmtype == 'one norm':
-                    r_x = x.key.r
-                    eta_max_x = np.log(r_x)
-                    eta_min_x = - np.log(r_x)
-                    r_y = y.key.r
-                    eta_max_y = np.log(r_y)
-                    eta_min_y = - np.log(r_y)
-                elif rmtype == 'elliptical':
-                    pr_x = x.key.pr
-                    eta_max_x = np.log(1 + pr_x / 100.0)
-                    eta_min_x = np.log(1 - pr_x / 100.0)
-                    pr_y = y.key.pr
-                    eta_max_y = np.log(1 + pr_y / 100.0)
-                    eta_min_y = np.log(1 - pr_y / 100.0)
+            eta_min_x, eta_max_x = RobustGPTools.generate_etas(x, rmtype, rm.number_of_stds, rm.setting)
+            eta_min_y, eta_max_y = RobustGPTools.generate_etas(y, rmtype, rm.number_of_stds, rm.setting)
             center_x = (eta_min_x + eta_max_x) / 2.0
             center_y = (eta_min_y + eta_max_y) / 2.0
             x_center = np.log(xo) + center_x
             y_center = np.log(yo) + center_y
             ax.plot(np.exp(x_center), np.exp(y_center), "kx")
-        if rmtype == "elliptical":
-            th = np.linspace(0, 2*np.pi, 50)
-            ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + eta_max_x - x_center),
-                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + eta_max_y - y_center), "k",
-                    linewidth=1)
-        elif rmtype:
-            p = Polygon(np.array([[xo*np.exp(eta_min_x)]+[xo*np.exp(eta_max_x)]*2+[xo*np.exp(eta_min_x)],
-                                  [yo*np.exp(eta_min_y)]*2 + [yo*np.exp(eta_max_y)]*2]).T,
-                        True, edgecolor="black", facecolor="none", linestyle="dashed")
-            ax.add_patch(p)
+            if rmtype == "elliptical":
+                th = np.linspace(0, 2*np.pi, 50)
+                ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + eta_max_x - x_center),
+                        np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + eta_max_y - y_center), "k",
+                        linewidth=1)
+            elif rmtype:
+                p = Polygon(np.array([[xo*np.exp(eta_min_x)]+[xo*np.exp(eta_max_x)]*2+[xo*np.exp(eta_min_x)],
+                                      [yo*np.exp(eta_min_y)]*2 + [yo*np.exp(eta_max_y)]*2]).T,
+                            True, edgecolor="black", facecolor="none", linestyle="dashed")
+                ax.add_patch(p)
 
     orig_a, orig_b = map(mag, map(origfeas, [x, y]))
     a_i, b_i, a, b = [None]*4

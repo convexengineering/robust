@@ -64,7 +64,6 @@ W_W_coeff1.key.descr["r"] = 1.5
 W_W_coeff2.key.descr["r"] = 1.7
 RM = RobustModel(m, 'elliptical', two_term=True, linearizationTolerance=1e-4)
 RMsol = RM.robustsolve(verbosity=1, minNumOfLinearSections=20, maxNumOfLinearSections=40)
-print RMsol['cost'], RM.nominal_cost
 rm = RM.get_robust_model()
-plot_feasibilities(W_W_coeff1, W_W_coeff2, m, rm, "elliptical")
+plot_feasibilities(W_W_coeff1, W_W_coeff2, m, RM)
 # plot_feasibilities(k, W_W_coeff2, m, rm, "elliptical")
