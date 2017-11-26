@@ -75,7 +75,6 @@ class RobustModel:
         self._sequence_of_rgps = []
         self._robust_model = None
 
-        # self.uncertain_vars, self.indirect_uncertain_vars = RobustGPTools.uncertain_model_variables(model)
         self.lower_approximation_is_feasible = False
 
         if self.type_of_uncertainty_set == 'box':
