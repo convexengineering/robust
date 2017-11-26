@@ -261,7 +261,8 @@ class RobustModel:
                     two_term_approximation = TwoTermApproximation(p, self.setting)
                     large_gp_posynomials.append(two_term_approximation)
                 else:
-                    robust_large_p = RobustifyLargePosynomial(p)
+                    robust_large_p = RobustifyLargePosynomial(p, self.type_of_uncertainty_set,
+                                                              self.number_of_stds, self.setting)
                     ready_gp_constraints += robust_large_p. \
                         robustify_large_posynomial(self.type_of_uncertainty_set, i + offset, self.setting)
 
@@ -270,25 +271,13 @@ class RobustModel:
     def robustify_monomial(self, monomial):
         new_monomial_exps = RobustGPTools. \
             only_uncertain_vars_monomial(monomial.exps[0])
-        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if var.key.pr is not None]
+        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if RobustGPTools.is_uncertain(var)]
 
         total_center = 0
         l_norm = 0
         for var in m_direct_uncertain_vars:
-            eta_min, eta_max = 0, 0
-            if self.setting.get("lognormal") and var.key.sigma is not None:
-                eta_max = var.key.sigma*self.number_of_stds
-                eta_min = -var.key.sigma*self.number_of_stds
-            else:
-                if self.type_of_uncertainty_set == 'box' or self.type_of_uncertainty_set == 'one norm' or self.type_of_uncertainty_set == 'elliptical':
-                    pr = var.key.pr * self.setting.get("gamma")
-                    eta_max = np.log(1 + pr / 100.0)
-                    eta_min = np.log(1 - pr / 100.0)
-                elif self.type_of_uncertainty_set == 'elliptical':
-                    r = var.key.r * self.setting.get("gamma")
-                    eta_max = np.log(r)
-                    eta_min = - np.log(r)
-
+            eta_min, eta_max = RobustGPTools.generate_etas(var, self.type_of_uncertainty_set,
+                                                           self.number_of_stds, self.setting)
             center = (eta_min + eta_max) / 2.0
             scale = eta_max - center
             exponent = -new_monomial_exps.get(var.key)

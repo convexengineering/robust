@@ -6,10 +6,12 @@ from RobustGPTools import RobustGPTools
 
 
 class RobustifyLargePosynomial:
-    p = Posynomial()
 
-    def __init__(self, p):
+    def __init__(self, p, type_of_uncertainty_set, number_of_stds, setting):
         self.p = p
+        self.type_of_uncertainty_set = type_of_uncertainty_set
+        self.number_of_stds = number_of_stds
+        self.setting = setting
 
     @staticmethod
     def merge_mesh_grid(array, n):
@@ -129,9 +131,10 @@ class RobustifyLargePosynomial:
         coeff, intercept = [], []
 
         for i in xrange(len(p_uncertain_vars)):
-            pr = p_uncertain_vars[i].key.pr
-            center.append(np.sqrt(1 - pr ** 2 / 10000.0))
-            scale.append(0.5 * np.log((1 + pr / 100.0) / (1 - pr / 100.0)))
+            eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i], self.type_of_uncertainty_set,
+                                                           self.number_of_stds, self.setting)
+            center.append((eta_min + eta_max) / 2.0)
+            scale.append(eta_max - center)
 
         perturbation_matrix = []
         for i in xrange(len(self.p.exps)):
@@ -265,16 +268,16 @@ class RobustifyLargePosynomial:
         :param setting: robustness setting
         :return: set of robust constraints
         """
-        p_direct_uncertain_vars = [var for var in self.p.varkeys if isinstance(var.key.pr, Number) and var.key.pr > 0]
-        p_indirect_uncertain_vars = [var for var in self.p.varkeys if isinstance(var.key.pr, Monomial)]
+        p_direct_uncertain_vars = [var for var in self.p.varkeys if RobustGPTools.is_directly_uncertain(var)]
+        p_indirect_uncertain_vars = [var for var in self.p.varkeys if RobustGPTools.is_indirectly_uncertain(var)]
 
         new_direct_uncertain_vars = []
         for var in p_indirect_uncertain_vars:
             new_direct_uncertain_vars += RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.pr, 1).varkeys
+                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).varkeys
 
         new_direct_uncertain_vars = [var for var in new_direct_uncertain_vars
-                                     if isinstance(var.key.pr, Number) and var.key.pr > 0]
+                                     if RobustGPTools.is_directly_uncertain(var)]
 
         p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))
 

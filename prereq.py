@@ -173,11 +173,11 @@ from plot_feasibilities import plot_feasibilities
 solar = Models.simpleWing()  #mike_solar_model()  #
 robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=False)
 sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=0, minNumOfLinearSections=40, maxNumOfLinearSections=41)
-# print sol_robustsolar_elliptical['cost']
+print sol_robustsolar_elliptical['cost']
 # print robustsolar_elliptical.nominal_cost
 # plot_feasibilities(solar['\\rho'], solar['C_{L,max}'], solar)
-plot_feasibilities(solar['W_{W_{coeff2}}'], solar['W_{W_{coeff1}}'], solar)
-rm = robustsolar_elliptical.get_robust_model()
+# plot_feasibilities(solar['W_{W_{coeff2}}'], solar['W_{W_{coeff1}}'], solar)
+# rm = robustsolar_elliptical.get_robust_model()
 # plot_feasibilities(rm['\\rho'], rm['C_{L,max}'], solar, rm, "box")
-plot_feasibilities(rm['W_{W_{coeff2}}'], rm['W_{W_{coeff1}}'], solar, rm, "elliptical")
+# plot_feasibilities(rm['W_{W_{coeff2}}'], rm['W_{W_{coeff1}}'], solar, rm, "elliptical")
 # robustsolar_uncertainvars = RobustGPTools.uncertain_model_variables(solar)

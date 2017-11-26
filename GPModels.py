@@ -9,7 +9,7 @@ def simpleWing():
     e = Variable("e", 0.92, "-", "Oswald efficiency factor",
                  pr=27.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",
-                  pr=4.225352)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
+                  pr=4.225352, r=2)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
     # pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio",
@@ -30,7 +30,7 @@ def simpleWing():
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
-    toz = Variable("toz", 1, "-", pr=15)#k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
+    toz = Variable("toz", 1, "-", pr=15, rel=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
     ejer = Variable("ejer", 10000, "N")
     # Free Variables
     D = Variable("D", "N", "total drag force")

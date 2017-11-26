@@ -12,26 +12,46 @@ class RobustGPTools:
         pass
 
     @staticmethod
-    def uncertain_model_variables(model):
-        """
-        Finds the uncertain variables of a model
-        :return: the uncertain variables
-        """
-        subs_vars = list(model.substitutions.keys())
-        uncertain_vars = []
-        indirect_uncertain_vars = []
-        for var in subs_vars:
-            if isinstance(var.key.pr, Number) and var.key.pr > 0:
-               if var.key.shape:
-                   uncertain_vars += RobustGPTools.from_nomial_array_to_variables(model, [], var)
-               else:
-                   uncertain_vars += [var]
-            elif isinstance(var.key.pr, Monomial):
-               if var.key.shape:
-                   indirect_uncertain_vars += RobustGPTools.from_nomial_array_to_variables(model, [], var)
-               else:
-                   indirect_uncertain_vars += [var]
-        return uncertain_vars, indirect_uncertain_vars
+    def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
+        eta_max, eta_min = 0, 0
+        if setting.get("lognormal") and var.key.sigma is not None:
+            eta_max = var.key.sigma*number_of_stds
+            eta_min = -var.key.sigma*number_of_stds
+        else:
+            try:
+                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
+                    pr = var.key.pr * setting.get("gamma")
+                    eta_max = np.log(1 + pr / 100.0)
+                    eta_min = np.log(1 - pr / 100.0)
+                elif type_of_uncertainty_set == 'elliptical':
+                    r = var.key.r * setting.get("gamma")
+                    eta_max = np.log(r)
+                    eta_min = - np.log(r)
+            except:
+                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
+                    r = var.key.r * setting.get("gamma")
+                    eta_max = np.log(r)
+                    eta_min = - np.log(r)
+                elif type_of_uncertainty_set == 'elliptical':
+                    pr = var.key.pr * setting.get("gamma")
+                    eta_max = np.log(1 + pr / 100.0)
+                    eta_min = np.log(1 - pr / 100.0)
+        return eta_min, eta_max
+
+    @staticmethod
+    def is_directly_uncertain(variable):
+        return ((variable.key.pr is not None and variable.key.pr > 0)
+                or (variable.key.r is not None and variable.key.r > 1)
+                or variable.key.sigma is not None)\
+               and variable.key.rel is None
+
+    @staticmethod
+    def is_indirectly_uncertain(variable):
+        return variable.key.rel is not None
+
+    @staticmethod
+    def is_uncertain(variable):
+        return RobustGPTools.is_indirectly_uncertain(variable) or RobustGPTools.is_directly_uncertain(variable)
 
     @staticmethod
     def from_nomial_array_to_variables(model, vars, nomial_array):
@@ -45,11 +65,11 @@ class RobustGPTools:
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps):
-        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if isinstance(var.key.pr, Monomial)]
+        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if RobustGPTools.is_indirectly_uncertain(var)]
         new_monomial_exps = copy(original_monomial_exps)
         for var in indirect_monomial_uncertain_vars:
             new_vars_exps = RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.pr, original_monomial_exps[var])
+                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, original_monomial_exps[var])
             del new_monomial_exps[var]
             new_monomial_exps.update(new_vars_exps)
         return new_monomial_exps
@@ -59,11 +79,11 @@ class RobustGPTools:
         equivalent = {}
 
         for var in monomial.exps[0]:
-            if var.key.pr is None or isinstance(var.key.pr, Number):
-                equivalent.update({var: exps*monomial.exps[0][var]})
-            elif isinstance(var.key.pr, Monomial):
+            if RobustGPTools.is_indirectly_uncertain(var):
                 equivalent.update(RobustGPTools.
-                                  replace_indirect_uncertain_variable_by_equivalent(var.key.pr, monomial.exps[0][var]))
+                                  replace_indirect_uncertain_variable_by_equivalent(var.key.rel, monomial.exps[0][var]))
+            else:
+                equivalent.update({var: exps*monomial.exps[0][var]})
         return equivalent
 
     @staticmethod

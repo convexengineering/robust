@@ -64,23 +64,49 @@ def plot_feasibilities(x, y, m, rm=None, rmtype=None):
         x_center = None
         y_center = None
         if rm:
-            eta_max_x = np.log(1 + x.key.pr / 100.0)
-            eta_min_x = np.log(1 - x.key.pr / 100.0)
+            try:
+                if rmtype == 'box' or rmtype == 'one norm':
+                    pr_x = x.key.pr
+                    eta_max_x = np.log(1 + pr_x / 100.0)
+                    eta_min_x = np.log(1 - pr_x / 100.0)
+                    pr_y = y.key.pr
+                    eta_max_y = np.log(1 + pr_y / 100.0)
+                    eta_min_y = np.log(1 - pr_y / 100.0)
+                elif rmtype == 'elliptical':
+                    r_x = x.key.r
+                    eta_max_x = np.log(r_x)
+                    eta_min_x = - np.log(r_x)
+                    r_y = y.key.r
+                    eta_max_y = np.log(r_y)
+                    eta_min_y = - np.log(r_y)
+            except:
+                if rmtype == 'box' or rmtype == 'one norm':
+                    r_x = x.key.r
+                    eta_max_x = np.log(r_x)
+                    eta_min_x = - np.log(r_x)
+                    r_y = y.key.r
+                    eta_max_y = np.log(r_y)
+                    eta_min_y = - np.log(r_y)
+                elif rmtype == 'elliptical':
+                    pr_x = x.key.pr
+                    eta_max_x = np.log(1 + pr_x / 100.0)
+                    eta_min_x = np.log(1 - pr_x / 100.0)
+                    pr_y = y.key.pr
+                    eta_max_y = np.log(1 + pr_y / 100.0)
+                    eta_min_y = np.log(1 - pr_y / 100.0)
             center_x = (eta_min_x + eta_max_x) / 2.0
-            eta_max_y = np.log(1 + y.key.pr / 100.0)
-            eta_min_y = np.log(1 - y.key.pr / 100.0)
             center_y = (eta_min_y + eta_max_y) / 2.0
             x_center = np.log(xo) + center_x
             y_center = np.log(yo) + center_y
             ax.plot(np.exp(x_center), np.exp(y_center), "kx")
         if rmtype == "elliptical":
             th = np.linspace(0, 2*np.pi, 50)
-            ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + np.log((1 + x.key.pr/100.0)) - x_center),
-                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + np.log((1 + y.key.pr/100.0)) - y_center), "k",
+            ax.plot(np.exp(x_center)*np.exp(np.cos(th))**(np.log(xo) + eta_max_x - x_center),
+                    np.exp(y_center)*np.exp(np.sin(th))**(np.log(yo) + eta_max_y - y_center), "k",
                     linewidth=1)
         elif rmtype:
-            p = Polygon(np.array([[xo*(1 - x.key.pr/100.0)]+[xo*(1 + x.key.pr/100.0)]*2+[xo*(1 - x.key.pr/100.0)],
-                                  [yo*(1 - y.key.pr/100.0)]*2 + [yo*(1 + y.key.pr/100.0)]*2]).T,
+            p = Polygon(np.array([[xo*np.exp(eta_min_x)]+[xo*np.exp(eta_max_x)]*2+[xo*np.exp(eta_min_x)],
+                                  [yo*np.exp(eta_min_y)]*2 + [yo*np.exp(eta_max_y)]*2]).T,
                         True, edgecolor="black", facecolor="none", linestyle="dashed")
             ax.add_patch(p)
 

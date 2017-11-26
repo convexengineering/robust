@@ -170,7 +170,7 @@ class TwoTermApproximation:
                 only_uncertain_vars_monomial(p.exps[i])
             ith_monomial_exps = direct_vars_only_monomial_ith_exps
             m_uncertain_vars = [var for var in ith_monomial_exps.keys()
-                                if isinstance(var.key.pr, Number) and var.key.pr > 0]
+                                if RobustGPTools.is_directly_uncertain(var)]
             for j in range(0, number_of_monomials):
                 direct_vars_only_monomial_jth_exps = RobustGPTools.\
                     only_uncertain_vars_monomial(p.exps[j])
