@@ -39,7 +39,7 @@ constraints = []
 C_D_fuse = CDA0 / S
 C_D_wpar = k * C_f * S_wetratio
 C_D_ind = C_L ** 2 / (np.pi * A * e)
-constraints += [C_D >= C_D_fuse / toz + C_D_wpar / toz + C_D_ind / toz]
+constraints += [C_D >= C_D_fuse * toz + C_D_wpar / toz + C_D_ind / toz]
 
 # Wing weight model
 # W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
@@ -57,13 +57,12 @@ constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
 
 m = Model(D, constraints)
 m.solve()
-plot_feasibilities(W_W_coeff1, W_W_coeff2, m)
-# plot_feasibilities(k, W_W_coeff2, m)
-W_W_coeff1.key.descr["r"] = 1.5
-# k.key.descr["pr"] = 10
-W_W_coeff2.key.descr["r"] = 1.7
-RM = RobustModel(m, 'elliptical', two_term=True, linearizationTolerance=1e-4)
-RMsol = RM.robustsolve(verbosity=1, minNumOfLinearSections=20, maxNumOfLinearSections=40)
-rm = RM.get_robust_model()
-plot_feasibilities(W_W_coeff1, W_W_coeff2, m, RM)
-# plot_feasibilities(k, W_W_coeff2, m, rm, "elliptical")
+def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2, val2):
+    plot_feasibilities(x, y, m)
+    x.key.descr[str1] = val1
+    y.key.descr[str2] = val2
+    RM = RobustModel(m, type_of_uncertainty_set, linearizationTolerance=1e-4)
+    _ = RM.robustsolve(verbosity=1, minNumOfLinearSections=20, maxNumOfLinearSections=40)
+    plot_feasibilities(x, y, m, RM)
+
+plot_feasibility_simple_Wing('elliptical', k, e, 'r', 1.6, 'r', 1.66)
