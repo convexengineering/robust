@@ -28,7 +28,7 @@ def plot_feasibilities(x, y, m, rm=None):
             slacks = []
             thetas = []
             for count in xrange((len(interesting_vars) - 1)):
-                th = Variable("\\theta_%s" % count, np.linspace(0, 2 * np.pi, 360), "-")
+                th = Variable("\\theta_%s" % count, np.linspace(0, 2 * np.pi, 60), "-")
                 thetas += [th]
             for i_set in xrange(len(interesting_vars)):
                 if rob:
@@ -81,6 +81,7 @@ def plot_feasibilities(x, y, m, rm=None):
             cost_ref = Variable('cost_ref', 1, m.cost.unitstr(), "reference cost")
             self.cost = sum([sl ** 2 for sl in slacks]) * m.cost / cost_ref
             feas_slack = ConstraintSet(additional_constraints)
+
             return [m, feas_slack], {k: v for k, v in sol["freevariables"].items()
                                      if k in m.varkeys and k.key.fix is True}
 
@@ -95,7 +96,7 @@ def plot_feasibilities(x, y, m, rm=None):
     ofc = FeasCircle(m, m.solution)
     for interesting_var in interesting_vars:
         del ofc.substitutions[interesting_var]
-    origfeas = ofc.solve()
+    origfeas = ofc.solve(skipsweepfailures=True)
     from matplotlib import pyplot as plt
     fig, axes = plt.subplots(2)
 
