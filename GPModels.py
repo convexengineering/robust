@@ -1,13 +1,14 @@
 # coding=utf-8
-from gpkit import Variable, Model, SignomialsEnabled, VarKey, units
+from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
 import numpy as np
 from RobustGPTools import SameModel
 
 
 def simpleWing():
+
     k = Variable("k", 1.17, "-", "form factor", pr=31.111111, sigma=0.035)  # [1.04 - 1.3] -> [0.039 - 0.262] -> 1.1624 -> 74
     e = Variable("e", 0.92, "-", "Oswald efficiency factor",
-                 pr=27.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
+                 pr=7.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",
                   pr=4.225352, r=2)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
     # pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
@@ -66,7 +67,6 @@ def simpleWing():
                     W >= W_0 + W_w,
                     D <= ejer]
     # for key in subs.keys():
-
     m = Model(D, constraints)
     m.W1 = W_W_coeff1
     m.W2 = W_W_coeff2

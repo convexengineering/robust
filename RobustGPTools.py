@@ -12,6 +12,19 @@ class RobustGPTools:
         pass
 
     @staticmethod
+    def variables_bynameandmodels(model, name, models=None):
+        all_vars = model.variables_byname(name)
+        if models is None:
+            return all_vars
+        else:
+            models_set = set(models)
+            new_all_vars = []
+            for var in all_vars:
+                if models_set <= set(var.key.models):
+                    new_all_vars.append(var)
+            return new_all_vars
+
+    @staticmethod
     def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
         eta_max, eta_min = 0, 0
         if setting.get("lognormal") and var.key.sigma is not None:
