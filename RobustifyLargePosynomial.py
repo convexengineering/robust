@@ -134,7 +134,7 @@ class RobustifyLargePosynomial:
             eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i], self.type_of_uncertainty_set,
                                                            self.number_of_stds, self.setting)
             center.append((eta_min + eta_max) / 2.0)
-            scale.append(eta_max - center)
+            scale.append(eta_max - center[i])
 
         perturbation_matrix = []
         for i in xrange(len(self.p.exps)):
