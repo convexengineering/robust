@@ -8,7 +8,7 @@ class trial(Model):
         subs = {k: v for k, v in solution['freevariables'].items() if not hasattr(v, "__call__")}
         slack = Variable
         ConstraintSet([slack <= 10, slack <= 10])
-        return [model, ConstraintSet([slack <= 10, slack <= 10])], subs
+        return [model, ConstraintSet([slack <= 10, slack >= 1])], subs
 
 solar = models.mike_solar_model()
 solution = solar.solve()
