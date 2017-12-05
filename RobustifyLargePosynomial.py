@@ -41,7 +41,6 @@ class RobustifyLargePosynomial:
         per dimension
         :return: the regression coefficients and intercept
         """
-        print perturbation_vector
         dim = len(perturbation_vector)
         # print(dim, number_of_regression_points)
         if dim != 1:
@@ -133,14 +132,11 @@ class RobustifyLargePosynomial:
 
         perturbation_matrix = []
         for i in xrange(len(self.p.exps)):
-            # print self.p.exps[i]
             only_uncertain_vars_monomial_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(self.p.exps[i])
-            # print only_uncertain_vars_monomial_exps
             perturbation_matrix.append([])
             mon_uncertain_vars = [var for var in only_uncertain_vars_monomial_exps
                                   if RobustGPTools.is_directly_uncertain(var)]
-            # print mon_uncertain_vars
             mean = 1
             for j, var in enumerate(p_uncertain_vars):
                 if var.key in mon_uncertain_vars:
@@ -231,11 +227,19 @@ class RobustifyLargePosynomial:
                                             sum([a * b for a, b in
                                                  zip(positive_pert, positive_monomials)]) <= s]
                     elif type_of_uncertainty_set == 'elliptical':
-
-                        constraints += [(sum([a * b for a, b in
-                                              zip(positive_pert, positive_monomials)])
-                                         - sum([a * b for a, b in
-                                                zip(negative_pert, negative_monomials)])) ** 2 <= s]
+                        if negative_pert and not positive_pert:
+                            constraints += [(sum([a * b for a, b in
+                                                 zip(negative_pert, negative_monomials)]))**2 <= s]
+                        elif positive_pert and not negative_pert:
+                            constraints += [(sum([a * b for a, b in
+                                                 zip(positive_pert, positive_monomials)]))**2 <= s]
+                        else:
+                            dummiest = Variable()
+                            constraints += [dummiest**2 <= s]
+                            constraints += [(sum([a * b for a, b in zip(positive_pert, positive_monomials)]) -
+                                             (sum([a * b for a, b in zip(negative_pert, negative_monomials)]))) <= dummiest]
+                            constraints += [(sum([a * b for a, b in zip(negative_pert, negative_monomials)]) -
+                                             (sum([a * b for a, b in zip(positive_pert, positive_monomials)]))) <= dummiest]
             else:
                 if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
                     if positive_pert:
@@ -245,7 +249,6 @@ class RobustifyLargePosynomial:
                         constraints += [sum([a * b for a, b in
                                              zip(negative_pert, negative_monomials)]) <= s]
                 elif type_of_uncertainty_set == 'elliptical':
-
                     constraints += [sum([a * b for a, b in
                                          zip(positive_pert, positive_monomials)]) ** 2
                                     + sum([a * b for a, b in
@@ -268,20 +271,11 @@ class RobustifyLargePosynomial:
 
         new_direct_uncertain_vars = []
         for var in p_indirect_uncertain_vars:
-            print 'eker', RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1)
-            print 'eker', RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys()
-            print 'eker', [i.key for i in RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys()]
             new_direct_uncertain_vars += RobustGPTools.\
                 replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys()
-        print new_direct_uncertain_vars
         new_direct_uncertain_vars = [var for var in new_direct_uncertain_vars
                                      if RobustGPTools.is_directly_uncertain(var)]
-        print new_direct_uncertain_vars
         p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))
-        print p_uncertain_vars
         if (not p_uncertain_vars and not p_indirect_uncertain_vars) or setting.get('gamma') == 0:
             return [self.p <= 1]
 
