@@ -169,15 +169,21 @@ for statement in printing_list:
 from Robust import RobustModel
 import GPModels as Models
 from plot_feasibilities import plot_feasibilities
+from RobustGPTools import RobustGPTools
 
-solar = Models.simpleWing()  #mike_solar_model()  #
-robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=False)
-sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=0, minNumOfLinearSections=40, maxNumOfLinearSections=41)
+solar = Models.mike_solar_model()
+_ = solar.solve()
+robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=False, twoTerm=True)
+sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=20,
+                                                                maxNumOfLinearSections=21)
 print sol_robustsolar_elliptical['cost']
-# print robustsolar_elliptical.nominal_cost
-# plot_feasibilities(solar['\\rho'], solar['C_{L,max}'], solar)
-# plot_feasibilities(solar['W_{W_{coeff2}}'], solar['W_{W_{coeff1}}'], solar)
-# rm = robustsolar_elliptical.get_robust_model()
-# plot_feasibilities(rm['\\rho'], rm['C_{L,max}'], solar, rm, "box")
-# plot_feasibilities(rm['W_{W_{coeff2}}'], rm['W_{W_{coeff1}}'], solar, rm, "elliptical")
-# robustsolar_uncertainvars = RobustGPTools.uncertain_model_variables(solar)
+
+def plot_feasibility_solar(x, y):
+    # plot_feasibilities(x, y, solar)
+    plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False)
+
+hbatt = RobustGPTools.variables_bynameandmodels(solar, 'h_{batt}', ['Battery'])[0]
+etacharge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{charge}", ['Battery'])[0]
+etadischarge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{discharge}", ['Battery'])[0]
+
+plot_feasibility_solar(etadischarge, etacharge)
