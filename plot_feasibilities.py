@@ -5,7 +5,7 @@ from gpkit.small_scripts import mag
 from RobustGPTools import RobustGPTools
 
 
-def plot_feasibilities(x, y, m, rm=None, design_feasibility=True):
+def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=False, numberofsweeps=150):
     interesting_vars = [x, y]
     rmtype = None
     if rm:
@@ -28,7 +28,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True):
             slacks = []
             thetas = []
             for count in xrange((len(interesting_vars) - 1)):
-                th = Variable("\\theta_%s" % count, np.linspace(0, 2 * np.pi, 50), "-")
+                th = Variable("\\theta_%s" % count, np.linspace(0, 2 * np.pi, numberofsweeps), "-")
                 thetas += [th]
             for i_set in xrange(len(interesting_vars)):
                 if rob:
@@ -93,11 +93,11 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True):
         fc = FeasCircle(m, rm.get_robust_model().solution, rob=True)
         for interesting_var in interesting_vars:
             del fc.substitutions[interesting_var]
-        sol = fc.solve()
+        sol = fc.solve(skipsweepfailures=skipfailures)
     ofc = FeasCircle(m, m.solution)
     for interesting_var in interesting_vars:
         del ofc.substitutions[interesting_var]
-    origfeas = ofc.solve()
+    origfeas = ofc.solve(skipsweepfailures=skipfailures)
     from matplotlib import pyplot as plt
     fig, axes = plt.subplots(2)
 
