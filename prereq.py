@@ -182,8 +182,8 @@ def plot_feasibility_solar(x, y):
     # plot_feasibilities(x, y, solar)
     plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False)
 
-hbatt = RobustGPTools.variables_bynameandmodels(solar, 'h_{batt}', ['Battery'])[0]
-etacharge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{charge}", ['Battery'])[0]
-etadischarge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{discharge}", ['Battery'])[0]
+hbatt = RobustGPTools.variables_bynameandmodels(solar, 'h_{batt}', models=['Battery'])[0]
+etacharge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{charge}", models=['Battery'])[0]
+etadischarge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{discharge}", models=['Battery'])[0]
 
 plot_feasibility_solar(etadischarge, etacharge)

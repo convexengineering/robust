@@ -68,8 +68,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True):
                 slacks += [s_i]
 
                 uncertaintyset = Variable('uncertaintyset_%s' % i_set, g)
-                var = RobustGPTools.variables_bynameandmodels(m, interesting_vars[i_set].key.name,
-                                                              interesting_vars[i_set].key.models)
+                var = RobustGPTools.variables_bynameandmodels(m, **interesting_vars[i_set].key.descr)
 
                 if len(var) > 1:
                     raise Exception("vector uncertain variables are not supported yet")

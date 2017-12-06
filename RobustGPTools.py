@@ -12,17 +12,22 @@ class RobustGPTools:
         pass
 
     @staticmethod
-    def variables_bynameandmodels(model, name, models=None):
+    def variables_bynameandmodels(model, name, **descr):
         all_vars = model.variables_byname(name)
-        if models is None:
-            return all_vars
-        else:
-            models_set = set(models)
-            new_all_vars = []
+        if 'models' in descr:
+            temp_vars = []
             for var in all_vars:
-                if models_set <= set(var.key.models):
-                    new_all_vars.append(var)
-            return new_all_vars
+                if set(descr['models']) <= set(var.key.models):
+                    temp_vars.append(var)
+            all_vars = temp_vars
+            if 'modelnums' in descr:
+                temp_vars = []
+                for var in all_vars:
+                    if all(var.key.modelnums[var.key.models.index(model)] == descr['modelnums'][i]
+                               for i, model in enumerate(descr['models'])):
+                        temp_vars.append(var)
+                all_vars = temp_vars
+        return all_vars
 
     @staticmethod
     def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
