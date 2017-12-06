@@ -75,7 +75,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                 else:
                     var = var[0]
 
-                additional_constraints += [s_i >= 1, s_i <= uncertaintyset, var / s_i <= x_i, x_i <= var * s_i]
+                additional_constraints += [s_i >= 1, s_i <= uncertaintyset*1.000001, var / s_i <= x_i, x_i <= var * s_i]
 
             cost_ref = Variable('cost_ref', 1, m.cost.unitstr(), "reference cost")
             self.cost = sum([sl ** 2 for sl in slacks]) * m.cost / cost_ref

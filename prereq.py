@@ -179,11 +179,13 @@ sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, min
 print sol_robustsolar_elliptical['cost']
 
 def plot_feasibility_solar(x, y):
-    # plot_feasibilities(x, y, solar)
-    plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False)
+    # plot_feasibilities(x, y, solar, skipfailures=False, numberofsweeps=150)
+    plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False, skipfailures=False, numberofsweeps=150)
 
 hbatt = RobustGPTools.variables_bynameandmodels(solar, 'h_{batt}', models=['Battery'])[0]
 etacharge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{charge}", models=['Battery'])[0]
 etadischarge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{discharge}", models=['Battery'])[0]
+pwind = RobustGPTools.variables_bynameandmodels(solar, "p_{wind}", models=['FlightState'], modelnums=[10])[0]
+rhoref = RobustGPTools.variables_bynameandmodels(solar, "\\rho_{ref}", models=['FlightState'], modelnums=[10])[0]
 
-plot_feasibility_solar(etadischarge, etacharge)
+plot_feasibility_solar(pwind, rhoref)
