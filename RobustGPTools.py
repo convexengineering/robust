@@ -1,5 +1,4 @@
-from numbers import Number
-from gpkit import Monomial, Model, nomials
+from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 
 import numpy as np
@@ -24,13 +23,14 @@ class RobustGPTools:
                 temp_vars = []
                 for var in all_vars:
                     if all(var.key.modelnums[var.key.models.index(model)] == descr['modelnums'][i]
-                               for i, model in enumerate(descr['models'])):
+                           for i, model in enumerate(descr['models'])):
                         temp_vars.append(var)
                 all_vars = temp_vars
         return all_vars
 
     @staticmethod
     def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
+
         eta_max, eta_min = 0, 0
         if setting.get("lognormal") and var.key.sigma is not None:
             eta_max = var.key.sigma*number_of_stds
@@ -72,14 +72,14 @@ class RobustGPTools:
         return RobustGPTools.is_indirectly_uncertain(variable) or RobustGPTools.is_directly_uncertain(variable)
 
     @staticmethod
-    def from_nomial_array_to_variables(model, vars, nomial_array):
+    def from_nomial_array_to_variables(model, the_vars, nomial_array):
         if isinstance(nomial_array, nomials.variables.Variable):
-            vars.append(nomial_array.key)
+            the_vars.append(nomial_array.key)
             return
 
         for i in model[nomial_array.key.name]:
-            RobustGPTools.from_nomial_array_to_variables(model, vars, i)
-        return vars
+            RobustGPTools.from_nomial_array_to_variables(model, the_vars, i)
+        return the_vars
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps):
@@ -192,36 +192,11 @@ class SameModel(Model):
         :return: the new model
         """
         all_constraints = model.flat(constraintsets=False)
-        # unc = RobustGPTools.uncertain_model_variables(model)
         constraints = []
-
         for cs in all_constraints:
             if isinstance(cs, MonomialEquality):
                 constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
-                # varkeys = cs.as_posyslt1()[0].varkeys
-                # if set(model.variable_byname('\\eta')) & set(varkeys):
-                    # model.variable_byname('\\eta')
-                    # print cs.as_posyslt1()[0]
                 constraints += [cs.as_posyslt1()[0] <= 1]
         self.cost = model.cost
-        # constraints = []
-        # unc = SameModel.uncertain_model_variables(model)
-        # for i, p in enumerate(model.as_posyslt1()):
-        #     varkeys = p.varkeys
-            # if model['\eta_{charge}'] in varkeys or model['\eta_{discharge}'] in varkeys:
-            #     print p
-            # p_unc = [var.key.name for var in p.varkeys if var in unc]
-            # if 'P_{acc}' in p_unc:
-                # print p
-                # print p_unc
-                # print len(p.exps)
-                # eq_p = EquivalentPosynomials(p, unc, 0, False, False)
-                # print("------------------------------------")
-                # print(eq_p.no_data_constraints)
-                # print(eq_p.data_constraints)
-                # print("__________________________________")
-            # print p_unc
-        #     constraints.append(p <= 1)
-        # self.cost = model.cost
         return constraints
