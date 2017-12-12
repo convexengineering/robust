@@ -171,13 +171,17 @@ import GPModels as Models
 from plot_feasibilities import plot_feasibilities
 from RobustGPTools import RobustGPTools
 
-solar = Models.mike_solar_model()
-_ = solar.solve()
-robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95, lognormal=False, twoTerm=True)
-sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=20,
+solar = Models.mike_solar_model(20)
+nominal_solution = solar.solve()
+# nominal_fixed_variables = {k: v for k, v in nominal_solution["freevariables"].items() if k.key.fix is True}
+robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95,
+                                     lognormal=False, twoTerm=True, gamma=1)
+sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=21,
                                                                 maxNumOfLinearSections=21)
-print sol_robustsolar_elliptical['cost']
-
+robust_fixed_variables = {k: v for k, v in sol_robustsolar_elliptical["freevariables"].items() if k.key.fix is True}
+robust_fixed_variables
+# print sol_robustsolar_elliptical['cost']
+"""
 def plot_feasibility_solar(x, y):
     # plot_feasibilities(x, y, solar, skipfailures=False, numberofsweeps=150)
     plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False, skipfailures=False, numberofsweeps=150)
@@ -189,3 +193,4 @@ pwind = RobustGPTools.variables_bynameandmodels(solar, "p_{wind}", models=['Flig
 rhoref = RobustGPTools.variables_bynameandmodels(solar, "\\rho_{ref}", models=['FlightState'], modelnums=[10])[0]
 
 plot_feasibility_solar(pwind, rhoref)
+"""
