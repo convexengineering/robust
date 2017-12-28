@@ -174,12 +174,12 @@ from RobustGPTools import RobustGPTools
 solar = Models.mike_solar_model(20)
 nominal_solution = solar.solve()
 # nominal_fixed_variables = {k: v for k, v in nominal_solution["freevariables"].items() if k.key.fix is True}
-robustsolar_elliptical = RobustModel(solar, 'elliptical', probabilityOfSuccess=0.95,
-                                     lognormal=False, twoTerm=True, gamma=1)
-sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=21,
-                                                                maxNumOfLinearSections=21)
+robustsolar_elliptical = RobustModel(solar, 'box', probabilityOfSuccess=0.95,
+                                     lognormal=False, twoTerm=True, gamma=0.96, boyd=True, simpleModel=True)
+sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=30,
+                                                                maxNumOfLinearSections=30, linearizationTolerance=0.001)
 robust_fixed_variables = {k: v for k, v in sol_robustsolar_elliptical["freevariables"].items() if k.key.fix is True}
-robust_fixed_variables
+# RobustGPTools.probability_of_failure(solar, sol_robustsolar_elliptical, 3)
 # print sol_robustsolar_elliptical['cost']
 """
 def plot_feasibility_solar(x, y):

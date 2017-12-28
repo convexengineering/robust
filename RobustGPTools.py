@@ -6,7 +6,6 @@ from copy import copy
 
 
 class RobustGPTools:
-
     def __init__(self):
         pass
 
@@ -33,8 +32,8 @@ class RobustGPTools:
 
         eta_max, eta_min = 0, 0
         if setting.get("lognormal") and var.key.sigma is not None:
-            eta_max = var.key.sigma*number_of_stds
-            eta_min = -var.key.sigma*number_of_stds
+            eta_max = var.key.sigma * number_of_stds
+            eta_min = -var.key.sigma * number_of_stds
         else:
             try:
                 if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
@@ -60,7 +59,7 @@ class RobustGPTools:
     def is_directly_uncertain(variable):
         return ((variable.key.pr is not None and variable.key.pr > 0)
                 or (variable.key.r is not None and variable.key.r > 1)
-                or variable.key.sigma is not None)\
+                or variable.key.sigma is not None) \
                and variable.key.rel is None
 
     @staticmethod
@@ -83,10 +82,11 @@ class RobustGPTools:
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps):
-        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if RobustGPTools.is_indirectly_uncertain(var)]
+        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if
+                                            RobustGPTools.is_indirectly_uncertain(var)]
         new_monomial_exps = copy(original_monomial_exps)
         for var in indirect_monomial_uncertain_vars:
-            new_vars_exps = RobustGPTools.\
+            new_vars_exps = RobustGPTools. \
                 replace_indirect_uncertain_variable_by_equivalent(var.key.rel, original_monomial_exps[var])
             del new_monomial_exps[var]
             new_monomial_exps.update(new_vars_exps)
@@ -101,7 +101,7 @@ class RobustGPTools:
                 equivalent.update(RobustGPTools.
                                   replace_indirect_uncertain_variable_by_equivalent(var.key.rel, monomial.exps[0][var]))
             else:
-                equivalent.update({var: exps*monomial.exps[0][var]})
+                equivalent.update({var: exps * monomial.exps[0][var]})
         return equivalent
 
     @staticmethod
@@ -119,17 +119,15 @@ class RobustGPTools:
             return False
 
     @staticmethod
-    def probability_of_failure(rob_model, number_of_iterations, design_variables):
+    def probability_of_failure(model, solution, number_of_iterations):
 
         failure = 0
         success = 0
 
-        solution = rob_model.solve()
-        variable_solution = solution['variables']
         sum_cost = 0
         for i in xrange(number_of_iterations):
             print('iteration: %s' % i)
-            new_model = RobustGPTools.evaluate_random_model(rob_model.model, variable_solution, design_variables)
+            new_model = RobustGPTools.DesignedModel(model, solution)
             fail_success, cost = RobustGPTools.fail_or_success(new_model)
             print cost
             sum_cost = sum_cost + cost
@@ -144,29 +142,18 @@ class RobustGPTools:
         prob = failure / (failure + success + 0.0)
         return prob, cost_average
 
-    @staticmethod
-    def evaluate_random_model(old_model, solution, design_variables):
-        model = SameModel(old_model)
-        model.substitutions.update(old_model.substitutions)
-        free_vars = [var for var in model.varkeys.keys()
-                     if var not in model.substitutions.keys()]
-        uncertain_vars = [var for var in model.substitutions.keys()
-                          if "pr" in var.key.descr]
-        for key in free_vars:
-            if key.descr['name'] in design_variables:
-                try:
-                    model.substitutions[key] = solution.get(key).m
-                except:
-                    model.substitutions[key] = solution.get(key)
-        for key in uncertain_vars:
-            val = model[key].key.descr["value"]
-            pr = model[key].key.descr["pr"]
-            if pr != 0:
-                # sigma = pr * val / 300.0
-                # new_val = np.random.normal(val,sigma)
-                new_val = np.random.uniform(val - pr * val / 100.0, val + pr * val / 100.0)
-                model.substitutions[key] = new_val
-        return model
+    class DesignedModel(Model):
+        def setup(self, model, solution):
+            subs = {k: v for k, v in solution["freevariables"].items()
+                    if k in model.varkeys and k.key.fix is True}
+            directly_uncertain_vars_subs = {k: np.random.uniform(v - 0.01*k.key.pr * v / 100.0, v + 0.01*k.key.pr * v / 100.0)
+                                            for k, v in model.substitutions.items()
+                                            if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
+            # print subs
+            # print directly_uncertain_vars_subs
+            subs.update(directly_uncertain_vars_subs)
+            self.cost = model.cost
+            return model, subs
 
     @staticmethod
     def fail_or_success(model):
@@ -195,6 +182,12 @@ class SameModel(Model):
         constraints = []
         for cs in all_constraints:
             if isinstance(cs, MonomialEquality):
+                # air = [i for i in cs.varkeys if i.key.fix is True]
+                # kiss = [i for i in cs.varkeys if RobustGPTools.is_directly_uncertain(i)]
+                # if kiss:
+                    # print air
+                    # print kiss
+                    # print cs
                 constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
                 constraints += [cs.as_posyslt1()[0] <= 1]
