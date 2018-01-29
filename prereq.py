@@ -1,196 +1,274 @@
-"""
-from RobustGP import RobustGPModel
-import GPModels
-import numpy as np
-model = GPModels.simpleWing()
-# model = GPModels.mike_solar_model()
-gammas = list(np.linspace(0.9, 1.5, 10))
-printing_list = []
-for gamma in [1]:  # gammas:
-    printing_list.append("________________________________________________________________________")
-
-    print "box boyd:"
-    model_box_boyd = RobustGPModel.construct(model, 'box', boyd=True)
-    try:
-        sol_model_box_boyd = model_box_boyd.solve(verbosity=1)
-        st = ''
-        if model_box_boyd.lower_approximation_used:
-            st = 'box boyd infeasible, lower approximation used:'
-        printing_list.append(st + "box boyd %s, gamma = %s, setup time = %s, solve time = %s" %
-                             (sol_model_box_boyd['cost'], gamma, model_box_boyd.setup_time,
-                              sol_model_box_boyd['soltime']))
-    except:
-        printing_list.append('box boyd infeasible')
-
-    print "ell boyd:"
-    model_ell_boyd = RobustGPModel.construct(model, 'elliptical', boyd=True)
-    try:
-        sol_model_ell_boyd = model_ell_boyd.solve(verbosity=1)
-        st = ''
-        if model_ell_boyd.lower_approximation_used:
-            st = 'ell boyd infeasible, lower approximation used:'
-        printing_list.append(st+"elliptical boyd %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_ell_boyd['cost'], gamma, model_ell_boyd.setup_time,
-                                sol_model_ell_boyd['soltime']))
-    except:
-        printing_list.append('elliptical boyd infeasible')
-
-    print "one norm boyd:"
-    model_one_boyd = RobustGPModel.construct(model, 'one norm', boyd=True)
-    try:
-        sol_model_one_boyd = model_one_boyd.solve(verbosity=1)
-        if model_one_boyd.lower_approximation_used:
-            printing_list.append('one norm boyd infeasible, lower approximation used:')
-        printing_list.append("one norm boyd %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_one_boyd['cost'], gamma, model_one_boyd.setup_time,
-                                sol_model_one_boyd['soltime']))
-    except:
-        printing_list.append('one norm boyd infeasible')
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-    print "box cons:"
-    model_box_cons = RobustGPModel.construct(model, 'box', simpleModel=True)
-    try:
-        sol_model_box_cons = model_box_cons.solve(verbosity=1)
-        if model_box_cons.lower_approximation_used:
-            printing_list.append('box cons infeasible, lower approximation used:')
-        printing_list.append("box cons %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_box_cons['cost'], gamma, model_box_cons.setup_time,
-                                sol_model_box_cons['soltime']))
-    except:
-        printing_list.append('box cons infeasible')
-
-    print "ell cons:"
-    model_ell_cons = RobustGPModel.construct(model, 'elliptical', simpleModel=True)
-    try:
-        sol_model_ell_cons = model_ell_cons.solve(verbosity=1)
-        if model_ell_cons.lower_approximation_used:
-            printing_list.append('ell cons infeasible, lower approximation used:')
-        printing_list.append("elliptical cons %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_ell_cons['cost'], gamma, model_ell_cons.setup_time,
-                                sol_model_ell_cons['soltime']))
-    except:
-        printing_list.append('elliptical cons infeasible')
-
-    print "one norm cons:"
-    model_one_cons = RobustGPModel.construct(model, 'one norm', simpleModel=True)
-    try:
-        sol_model_one_cons = model_one_cons.solve(verbosity=1)
-        if model_one_cons.lower_approximation_used:
-            printing_list.append('one norm cons infeasible, lower approximation used:')
-        printing_list.append("one norm cons %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_one_cons['cost'], gamma, model_one_cons.setup_time,
-                                sol_model_one_cons['soltime']))
-    except:
-        printing_list.append('one norm cons infeasible')
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-    print "box :"
-    model_box = RobustGPModel.construct(model, 'box', twoTerm=False)
-    try:
-        sol_model_box = model_box.solve(verbosity=1)
-        if model_box.lower_approximation_used:
-            printing_list.append('box infeasible, lower approximation used:')
-        printing_list.append("box %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_box['cost'], gamma, model_box.setup_time,
-                                sol_model_box['soltime']))
-    except:
-        printing_list.append('box infeasible')
-
-    print "ell:"
-    model_ell = RobustGPModel.construct(model, 'elliptical', twoTerm=False)
-    try:
-        sol_model_ell = model_ell.solve(verbosity=1)
-        if model_ell.lower_approximation_used:
-            printing_list.append('ell infeasible, lower approximation used:')
-        printing_list.append("elliptical %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_ell['cost'], gamma, model_ell.setup_time,
-                                sol_model_ell['soltime']))
-    except:
-        printing_list.append('elliptical infeasible')
-        
-    print "one norm:"
-    model_one = RobustGPModel.construct(model, 'one norm', twoTerm=False)
-    try:
-        sol_model_one = model_one.solve(verbosity=1)
-        if model_one.lower_approximation_used:
-            printing_list.append('one norm infeasible, lower approximation used:')
-        printing_list.append("one norm %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_one['cost'], gamma, model_one.setup_time,
-                                sol_model_one['soltime']))
-    except:
-        printing_list.append('one norm infeasible')
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-    print "box two term:"
-    model_box_two_term = RobustGPModel.construct(model, 'box')
-    try:
-        sol_model_box_two_term = model_box_two_term.solve(verbosity=1)
-        if model_box_two_term.lower_approximation_used:
-            printing_list.append('box two term infeasible, lower approximation used:')
-        printing_list.append("box two term %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_box_two_term['cost'], gamma, model_box_two_term.setup_time,
-                                sol_model_box_two_term['soltime']))
-    except:
-        printing_list.append('box two term infeasible')
-
-    print "ell two term:"
-    model_ell_two_term = RobustGPModel.construct(model, 'elliptical')
-    try:
-        sol_model_ell_two_term = model_ell_two_term.solve(verbosity=1)
-        if model_ell_two_term.lower_approximation_used:
-            printing_list.append('ell two term infeasible, lower approximation used:')
-        printing_list.append("elliptical two term %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_ell_two_term['cost'], 1, model_ell_two_term.setup_time,
-                                sol_model_ell_two_term['soltime']))
-    except:
-        printing_list.append('elliptical two term infeasible')
-
-    print "one norm two term:"
-    model_one_two_term = RobustGPModel.construct(model, 'one norm')
-    try:
-        sol_model_one_two_term = model_one_two_term.solve(verbosity=1)
-        if model_one_two_term.lower_approximation_used:
-            printing_list.append('one norm two term infeasible, lower approximation used:')
-        printing_list.append("one norm two term %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model_one_two_term['cost'], gamma, model_one_two_term.setup_time,
-                                sol_model_one_two_term['soltime']))
-    except:
-        printing_list.append('one norm two term infeasible')
-# -------------------------------------------------------------------------------------------------------------------------------------------------
-    print "deterministic:"
-    try:
-        sol_model = model.solve(verbosity=1)
-        printing_list.append("deterministic %s, gamma = %s, setup time = %s, solve time = %s"
-                             % (sol_model['cost'], gamma, 0, sol_model['soltime']))
-    except:
-        printing_list.append('deterministic infeasible')
-
-for statement in printing_list:
-    print(statement)
-"""
 from Robust import RobustModel
 import GPModels as Models
-from plot_feasibilities import plot_feasibilities
+import numpy as np
+
 from RobustGPTools import RobustGPTools
+from gpkit.small_scripts import mag
+import matplotlib.pyplot as plt
+import gc
 
-solar = Models.mike_solar_model(20)
-nominal_solution = solar.solve()
-# nominal_fixed_variables = {k: v for k, v in nominal_solution["freevariables"].items() if k.key.fix is True}
-robustsolar_elliptical = RobustModel(solar, 'box', probabilityOfSuccess=0.95,
-                                     lognormal=False, twoTerm=True, gamma=0.96, boyd=True, simpleModel=True)
-sol_robustsolar_elliptical = robustsolar_elliptical.robustsolve(verbosity=1, minNumOfLinearSections=30,
-                                                                maxNumOfLinearSections=30, linearizationTolerance=0.001)
-robust_fixed_variables = {k: v for k, v in sol_robustsolar_elliptical["freevariables"].items() if k.key.fix is True}
-# RobustGPTools.probability_of_failure(solar, sol_robustsolar_elliptical, 3)
-# print sol_robustsolar_elliptical['cost']
-"""
-def plot_feasibility_solar(x, y):
-    # plot_feasibilities(x, y, solar, skipfailures=False, numberofsweeps=150)
-    plot_feasibilities(x, y, solar, robustsolar_elliptical, design_feasibility=False, skipfailures=False, numberofsweeps=150)
+the_model = Models.mike_solar_model(20)
+# the_model = Models.simpleWing()
+the_gamma = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.05]  # [0, 0.5, 0.9]
+the_number_of_iterations = 200
+the_min_num_of_linear_sections = 29
+the_max_num_of_linear_sections = 30
+the_verbosity = 0
+the_directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
+                                     for k, v in the_model.substitutions.items()
+                                     if k in the_model.varkeys and RobustGPTools.is_directly_uncertain(k)}
+                                    for _ in xrange(the_number_of_iterations)]
 
-hbatt = RobustGPTools.variables_bynameandmodels(solar, 'h_{batt}', models=['Battery'])[0]
-etacharge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{charge}", models=['Battery'])[0]
-etadischarge = RobustGPTools.variables_bynameandmodels(solar, "\\eta_{discharge}", models=['Battery'])[0]
-pwind = RobustGPTools.variables_bynameandmodels(solar, "p_{wind}", models=['FlightState'], modelnums=[10])[0]
-rhoref = RobustGPTools.variables_bynameandmodels(solar, "\\rho_{ref}", models=['FlightState'], modelnums=[10])[0]
 
-plot_feasibility_solar(pwind, rhoref)
-"""
+def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_iterations,
+                               min_num_of_linear_sections, max_num_of_linear_sections, verbosity):
+
+    print ("iter box gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'box', gamma=gamma)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    iter_box = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("coef box gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'box', gamma=gamma, twoTerm=False)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    coef_box = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("simple box gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'box', gamma=gamma, simpleModel=True)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    simple_box = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("boyd box gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'box', gamma=gamma, boyd=True)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    boyd_box = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("iter ell gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'elliptical', gamma=gamma)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    iter_ell = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("coef ell gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'elliptical', gamma=gamma, twoTerm=True)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    coef_ell = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("simple ell gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'elliptical', gamma=gamma, simpleModel=True)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    simple_ell = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    print ("boyd ell gamma = %s" % gamma)
+    model = Models.mike_solar_model(20)
+    # model = Models.simpleWing()
+    robust_model = RobustModel(model, 'elliptical', gamma=gamma, boyd=True)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations)
+    boyd_ell = (
+        simulation[0], simulation[1], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del model, robust_model, robust_model_solution, simulation
+    gc.collect(2)
+    return iter_box, coef_box, simple_box, boyd_box, iter_ell, coef_ell, simple_ell, boyd_ell
+
+iter_box_prob_of_failure = []
+iter_box_obj = []
+coef_box_prob_of_failure = []
+coef_box_obj = []
+simple_box_prob_of_failure = []
+simple_box_obj = []
+boyd_box_prob_of_failure = []
+boyd_box_obj = []
+iter_ell_prob_of_failure = []
+iter_ell_obj = []
+coef_ell_prob_of_failure = []
+coef_ell_obj = []
+simple_ell_prob_of_failure = []
+simple_ell_obj = []
+boyd_ell_prob_of_failure = []
+boyd_ell_obj = []
+
+aeys = []
+bs = []
+cs = []
+ds = []
+es = []
+fs = []
+gs = []
+hs = []
+
+for a_gamma in the_gamma:
+    a, b, g, c, d, e, h, f = different_uncertainty_sets(0.85*a_gamma, the_directly_uncertain_vars_subs,
+                                                        the_number_of_iterations, the_min_num_of_linear_sections,
+                                                        the_max_num_of_linear_sections, the_verbosity)
+    iter_box_prob_of_failure.append(a[0])
+    iter_box_obj.append(mag(a[1]))
+    coef_box_prob_of_failure.append(b[0])
+    coef_box_obj.append(mag(b[1]))
+    simple_box_prob_of_failure.append(g[0])
+    simple_box_obj.append(mag(g[1]))
+    boyd_box_prob_of_failure.append(c[0])
+    boyd_box_obj.append(mag(c[1]))
+    iter_ell_prob_of_failure.append(d[0])
+    iter_ell_obj.append(mag(d[1]))
+    coef_ell_prob_of_failure.append(e[0])
+    coef_ell_obj.append(mag(e[1]))
+    simple_ell_prob_of_failure.append(h[0])
+    simple_ell_obj.append(mag(h[1]))
+    boyd_ell_prob_of_failure.append(f[0])
+    boyd_ell_obj.append(mag(f[1]))
+
+    aeys.append(a)
+    bs.append(b)
+    cs.append(c)
+    ds.append(d)
+    es.append(e)
+    fs.append(f)
+    gs.append(g)
+    hs.append(h)
+
+    gc.collect(2)
+
+for i in xrange(len(aeys)):
+    print aeys[i]
+    print bs[i]
+    print gs[i]
+    print cs[i]
+    print ds[i]
+    print es[i]
+    print hs[i]
+    print fs[i]
+
+plt.figure()
+plt.plot(the_gamma, iter_box_obj, label='uncertain exponents')
+plt.plot(the_gamma, coef_box_obj, label='uncertain coefficients')
+plt.plot(the_gamma, simple_box_obj, label='simple')
+plt.plot(the_gamma, boyd_box_obj, label='boyd')
+plt.xlabel("gamma")
+plt.ylabel("objective function")
+plt.title("box uncertainty set: %d simulations" % the_number_of_iterations)
+plt.legend()
+plt.show()
+
+plt.figure()
+plt.plot(the_gamma, iter_box_prob_of_failure, label='uncertain exponents')
+plt.plot(the_gamma, coef_box_prob_of_failure, label='uncertain coefficients')
+plt.plot(the_gamma, simple_box_prob_of_failure, label='simple')
+plt.plot(the_gamma, boyd_box_prob_of_failure, label='boyd')
+plt.xlabel("gamma")
+plt.ylabel("probability of failure")
+plt.title("box uncertainty set: %d simulations" % the_number_of_iterations)
+plt.legend()
+plt.show()
+
+plt.figure()
+plt.plot(the_gamma, iter_ell_obj, label='uncertain exponents')
+plt.plot(the_gamma, coef_ell_obj, label='uncertain coefficients')
+plt.plot(the_gamma, simple_ell_obj, label='simple')
+plt.plot(the_gamma, boyd_ell_obj, label='boyd')
+plt.xlabel("gamma")
+plt.ylabel("objective function")
+plt.title("elliptical uncertainty set: %d simulations" % the_number_of_iterations)
+plt.legend()
+plt.show()
+
+plt.figure()
+plt.plot(the_gamma, iter_ell_prob_of_failure, label='uncertain exponents')
+plt.plot(the_gamma, coef_ell_prob_of_failure, label='uncertain coefficients')
+plt.plot(the_gamma, simple_ell_prob_of_failure, label='simple')
+plt.plot(the_gamma, boyd_ell_prob_of_failure, label='boyd')
+plt.xlabel("gamma")
+plt.ylabel("probability of failure")
+plt.title("elliptical uncertainty set: %d simulations" % the_number_of_iterations)
+plt.legend()
+plt.show()

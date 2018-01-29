@@ -123,7 +123,7 @@ def test_linearize_two_term_posynomial():
             x = Variable('x_%s' % i)
             m_1 *= x**(np.random.rand()*10 - 5)
             m_2 *= x**(np.random.rand()*10 - 5)
-            subs[x.key.name] = np.random.rand()*1
+            subs[x.key.name] = np.random.rand()*100
 
         p = m_1 + m_2
 

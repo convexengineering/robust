@@ -4,6 +4,7 @@ import numpy as np
 from time import time
 import warnings
 from scipy.stats import norm
+import gc
 
 from RobustGPTools import RobustGPTools
 from EquivalentPosynomials import EquivalentPosynomials
@@ -96,7 +97,7 @@ class RobustModel:
             except:
                 raise Exception("boyd's formulation is not supported for sp models")
             safe_model_constraints = safe_model.flat(constraintsets=False)
-
+            del safe_model
             for cs in safe_model_constraints:
                 if isinstance(cs, MonomialEquality):
                     self.ready_gp_constraints += [cs]
@@ -108,6 +109,8 @@ class RobustModel:
                         self.ready_gp_constraints += [robust_monomial <= 1]
                     else:
                         self.to_linearize_gp_posynomials += [p]
+            del safe_model_constraints
+            gc.collect(2)
             if equality_constraints:
                 warnings.warn('equality constraints will not be robustified')
             self.number_of_gp_posynomials = 0
@@ -368,7 +371,7 @@ class RobustModel:
             no_data_upper_constraints += no_data_upper
             no_data_lower_constraints += no_data_lower
             data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
-
+            del linearize_p, no_data_lower, no_data_upper
         data_constraints, slackvar = self.robustify_set_of_monomials(data_posynomials, feasible)
 
         upper_cons, lower_cons = [no_data_upper_constraints, ready_constraints, data_constraints], \
@@ -381,7 +384,8 @@ class RobustModel:
         model_upper.unique_varkeys, model_lower.unique_varkeys = [self.nominal_model.varkeys] * 2
         model_upper.reset_varkeys()
         model_lower.reset_varkeys()
-
+        del upper_cons, lower_cons, no_data_lower_constraints, no_data_upper_constraints, data_posynomials
+        gc.collect(2)
         return model_upper, model_lower
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints, feasible=False):
@@ -414,6 +418,8 @@ class RobustModel:
                 raise Exception("The model is infeasible. The lower approximation of the model is feasible, try "
                                 "increasing the maximum number of linear sections")
             r += 1
+            del model_lower, sol_lower
+            gc.collect(2)
         return r - 1, sol_upper, model_upper
 
     def new_permutation_indices(self, solution, large_posynomials):

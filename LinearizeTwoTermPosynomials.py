@@ -130,6 +130,7 @@ class LinearizeTwoTermPosynomials:
             x_intersection = [float(item) for item in x_intersection]
             eps = float(data[4])
             linearization_data_file.close()
+            del linearization_data_file, line
             return slopes, intercepts, x_tangent, x_intersection, eps
         else:
             return LinearizeTwoTermPosynomials.compute_two_term_posynomial_linearization_coeff(r, 2*np.finfo(float).eps)
@@ -167,5 +168,5 @@ class LinearizeTwoTermPosynomials:
                                  second_monomial ** a[i] * np.exp(b[i]) <= w]
 
         data_constraints += [second_monomial <= w]
-
+        del a, b, eps
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints

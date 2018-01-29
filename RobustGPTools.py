@@ -119,7 +119,7 @@ class RobustGPTools:
             return False
 
     @staticmethod
-    def probability_of_failure(model, solution, number_of_iterations):
+    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations):
 
         failure = 0
         success = 0
@@ -127,9 +127,9 @@ class RobustGPTools:
         sum_cost = 0
         for i in xrange(number_of_iterations):
             print('iteration: %s' % i)
-            new_model = RobustGPTools.DesignedModel(model, solution)
+            new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
             fail_success, cost = RobustGPTools.fail_or_success(new_model)
-            print cost
+            # print cost
             sum_cost = sum_cost + cost
             if fail_success:
                 success = success + 1
@@ -143,12 +143,12 @@ class RobustGPTools:
         return prob, cost_average
 
     class DesignedModel(Model):
-        def setup(self, model, solution):
+        def setup(self, model, solution, directly_uncertain_vars_subs):
             subs = {k: v for k, v in solution["freevariables"].items()
                     if k in model.varkeys and k.key.fix is True}
-            directly_uncertain_vars_subs = {k: np.random.uniform(v - 0.01*k.key.pr * v / 100.0, v + 0.01*k.key.pr * v / 100.0)
-                                            for k, v in model.substitutions.items()
-                                            if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
+            # directly_uncertain_vars_subs = {k: np.random.uniform(v - 0.01*k.key.pr * v / 100.0, v + 0.01*k.key.pr * v / 100.0)
+            #                                 for k, v in model.substitutions.items()
+            #                                 if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
             # print subs
             # print directly_uncertain_vars_subs
             subs.update(directly_uncertain_vars_subs)
@@ -182,12 +182,6 @@ class SameModel(Model):
         constraints = []
         for cs in all_constraints:
             if isinstance(cs, MonomialEquality):
-                # air = [i for i in cs.varkeys if i.key.fix is True]
-                # kiss = [i for i in cs.varkeys if RobustGPTools.is_directly_uncertain(i)]
-                # if kiss:
-                    # print air
-                    # print kiss
-                    # print cs
                 constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
                 constraints += [cs.as_posyslt1()[0] <= 1]

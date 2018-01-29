@@ -2,6 +2,7 @@ from gpkit import Model
 from EquivalentPosynomials import EquivalentPosynomials
 from TwoTermApproximation import TwoTermApproximation
 from gpkit.nomials import MonomialEquality, PosynomialInequality
+import gc
 
 
 class EquivalentModel(Model):
@@ -57,9 +58,10 @@ class TwoTermBoydModel(Model):
                 _, data = TwoTermApproximation. \
                     two_term_equivalent_posynomial(cs.as_posyslt1()[0], i, [], True)
                 data_constraints += data
+                del data
             else:
                 raise Exception("Two Term Boyd Model supports geometric programs only")
-
+        gc.collect(2)
         self.cost = model.cost
 
         return data_constraints

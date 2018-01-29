@@ -10,7 +10,7 @@ def simpleWing():
     e = Variable("e", 0.92, "-", "Oswald efficiency factor",
                  pr=7.6086956)  # [0.85 - 0.99] -> [-0.1625 - −0.01] -> 0.9173 -> 88
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air",
-                  pr=4.225352, r=2)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
+                  pr=4.225352)#, r=2)  # [1.7e-5 - 1.85e-5] -> [-10.982297 - -10.897739] -> 1.773414 -> 0.3865
     # pi = Variable("\\pi", np.pi, "-", "half of the circle constant", pr= 0)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)  # [1.2 - 1.3] -> [0.1823 - 0.2623] -> 1.2489 -> 18
     tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio",
@@ -31,12 +31,12 @@ def simpleWing():
                     pr=42.857142)  # [0.02 - 0.05] -> [-3.9120 - -2.9957] -> 0.0316 -> 13.3
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing",
                    pr=60)  # [2500 - 10000] -> [7.8240 - 9.2103] -> 5000 -> 8.14
-    toz = Variable("toz", 1, "-", pr=15, rel=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
-    ejer = Variable("ejer", 10000, "N")
+    # toz = Variable("toz", 1, "-", pr=15)#, rel=k*e/tau/N_ult)  # [0.85 - 1.15] -> [-0.1625 - 0.1397] -> 0.9886 -> 1328
+    # ejer = Variable("ejer", 10000, "N")
     # Free Variables
     D = Variable("D", "N", "total drag force")
-    A = Variable("A", "-", "aspect ratio")
-    S = Variable("S", "m^2", "total wing area")
+    A = Variable("A", "-", "aspect ratio", fix=True)
+    S = Variable("S", "m^2", "total wing area", fix=True)
     V = Variable("V", "m/s", "cruising speed")
     W = Variable("W", "N", "total aircraft weight")
     Re = Variable("Re", "-", "Reynold's number")
@@ -44,14 +44,13 @@ def simpleWing():
     C_L = Variable("C_L", "-", "Lift coefficient of wing")
     C_f = Variable("C_f", "-", "skin friction coefficient")
     W_w = Variable("W_w", "N", "wing weight")
-
     constraints = []
 
     # Drag model
     C_D_fuse = CDA0 / S
     C_D_wpar = k * C_f * S_wetratio
     C_D_ind = C_L ** 2 / (np.pi * A * e)
-    constraints += [C_D >= C_D_ind * toz + C_D_fuse * toz + C_D_wpar / toz]
+    constraints += [C_D >= C_D_ind + C_D_fuse + C_D_wpar]
 
     # Wing weight model
     W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
@@ -64,12 +63,11 @@ def simpleWing():
                     C_f >= 0.074 / Re ** 0.2,
                     W <= 0.5 * rho * S * C_L * V ** 2,
                     W <= 0.5 * rho * S * C_Lmax * V_min ** 2,
-                    W >= W_0 + W_w,
-                    D <= ejer]
+                    W >= W_0 + W_w]
     # for key in subs.keys():
     m = Model(D, constraints)
-    m.W1 = W_W_coeff1
-    m.W2 = W_W_coeff2
+    # m.W1 = W_W_coeff1
+    # m.W2 = W_W_coeff2
     return m
 
 
