@@ -2,6 +2,7 @@
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
 import numpy as np
 from RobustGPTools import SameModel
+from gassolar.solar.solar import Mission as solar_mike
 
 
 def simpleWing():
@@ -244,10 +245,9 @@ def example_sp():
 
 
 def mike_solar_model(lat):
-    import gassolar.solar.solar as solar_mike
-    model = solar_mike.Mission(latitude=lat)
+    model = solar_mike(latitude=lat)
     model.cost = model["W_{total}"]
-
+    # new_model = model
     new_model = SameModel(model)
     new_model.substitutions.update(model.substitutions)
     new_model.unique_varkeys = model.varkeys
