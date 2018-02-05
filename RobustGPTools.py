@@ -119,14 +119,15 @@ class RobustGPTools:
             return False
 
     @staticmethod
-    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations):
+    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
 
         failure = 0
         success = 0
 
         sum_cost = 0
         for i in xrange(number_of_iterations):
-            print('iteration: %s' % i)
+            if verbosity > 0:
+                print('iteration: %s' % i)
             new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
             fail_success, cost = RobustGPTools.fail_or_success(new_model)
             # print cost
@@ -151,6 +152,7 @@ class RobustGPTools:
             #                                 if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
             # print subs
             # print directly_uncertain_vars_subs
+            subs.update(model.substitutions)
             subs.update(directly_uncertain_vars_subs)
             self.cost = model.cost
             return model, subs
