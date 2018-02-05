@@ -4,7 +4,6 @@ import numpy as np
 from time import time
 import warnings
 from scipy.stats import norm
-import gc
 
 from RobustGPTools import RobustGPTools
 from EquivalentPosynomials import EquivalentPosynomials
@@ -110,7 +109,7 @@ class RobustModel:
                     else:
                         self.to_linearize_gp_posynomials += [p]
             del safe_model_constraints
-            gc.collect(2)
+
             if equality_constraints:
                 warnings.warn('equality constraints will not be robustified')
             self.number_of_gp_posynomials = 0
@@ -385,7 +384,6 @@ class RobustModel:
         model_upper.reset_varkeys()
         model_lower.reset_varkeys()
         del upper_cons, lower_cons, no_data_lower_constraints, no_data_upper_constraints, data_posynomials
-        gc.collect(2)
         return model_upper, model_lower
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints, feasible=False):
@@ -419,7 +417,6 @@ class RobustModel:
                                 "increasing the maximum number of linear sections")
             r += 1
             del model_lower, sol_lower
-            gc.collect(2)
         return r - 1, sol_upper, model_upper
 
     def new_permutation_indices(self, solution, large_posynomials):
