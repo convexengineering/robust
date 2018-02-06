@@ -32,7 +32,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     iter_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -49,7 +49,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     coef_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -66,7 +66,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     simple_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -83,7 +83,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     boyd_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -100,7 +100,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     iter_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -117,7 +117,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     coef_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -134,7 +134,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     simple_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -151,7 +151,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=0)
     boyd_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -257,10 +257,10 @@ plt.plot(the_gamma, iter_box_obj, 'r--', label='Uncertain Exponents')
 plt.plot(the_gamma, coef_box_obj, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_box_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_box_obj, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("objective function")
-plt.title("the average performance of the size "
-          "of the box uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Objective Function")
+plt.title("The Average Performance as a Function of the Size "
+          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -269,10 +269,10 @@ plt.plot(the_gamma, iter_box_worst_obj, 'r--', label='Uncertain Exponents')
 plt.plot(the_gamma, coef_box_worst_obj, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_box_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_box_worst_obj, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("objective function")
-plt.title("the worst case performance of the size "
-          "of the box uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Objective Function")
+plt.title("The Worst-Case Performance as a Function of the Size "
+          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -281,10 +281,10 @@ plt.plot(the_gamma, iter_box_prob_of_failure, 'r--', label='Uncertain Exponents'
 plt.plot(the_gamma, coef_box_prob_of_failure, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_box_prob_of_failure, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_box_prob_of_failure, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("probability of failure")
-plt.title("the probability as a function of the size "
-          "of the box uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Probability of Failure")
+plt.title("The Probability of Failure as a Function of the Size "
+          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -293,10 +293,10 @@ plt.plot(the_gamma, iter_ell_obj, 'r--', label='Uncertain Exponents')
 plt.plot(the_gamma, coef_ell_obj, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_ell_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_ell_obj, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("objective function")
-plt.title("the average performance as a function of the size "
-          "of the elliptical uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Objective Function")
+plt.title("The Average Performance as a Function of the Size "
+          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -305,10 +305,10 @@ plt.plot(the_gamma, iter_ell_worst_obj, 'r--', label='Uncertain Exponents')
 plt.plot(the_gamma, coef_ell_worst_obj, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_ell_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_ell_worst_obj, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("objective function")
-plt.title("the worst case performance as a function of the size "
-          "of the elliptical uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Objective Function")
+plt.title("The Worst-Case Performance as a Function of the Size "
+          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -317,10 +317,10 @@ plt.plot(the_gamma, iter_ell_prob_of_failure, 'r--', label='Uncertain Exponents'
 plt.plot(the_gamma, coef_ell_prob_of_failure, 'bs', label='Uncertain Coefficients')
 plt.plot(the_gamma, simple_ell_prob_of_failure, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_ell_prob_of_failure, 'ro', label='State of Art')
-plt.xlabel("uncertainty set scaling factor Gamma")
-plt.ylabel("probability of failure")
-plt.title("the probability as a function of the size "
-          "of the elliptical uncertainty set: %d simulations" % the_number_of_iterations)
+plt.xlabel("Uncertainty Set Scaling Factor Gamma")
+plt.ylabel("Probability of Failure")
+plt.title("The Probability of Failure as a Function of the Size "
+          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 

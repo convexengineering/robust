@@ -31,7 +31,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     iter_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -48,7 +48,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     coef_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -65,7 +65,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     simple_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -82,7 +82,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     boyd_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -99,7 +99,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     iter_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -116,7 +116,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     coef_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -133,7 +133,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     simple_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
@@ -150,7 +150,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
     simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations)
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     boyd_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
         robust_model_solution['soltime'],
