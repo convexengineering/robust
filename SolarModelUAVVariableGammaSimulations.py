@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 the_model = Models.mike_solar_model(20)
 the_nominal_solve = the_model.solve(verbosity=0)
 the_gamma = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.45, 0.6, 0.87, 1.05]
-the_number_of_iterations = 3
-the_min_num_of_linear_sections = 25
-the_max_num_of_linear_sections = 25
+the_number_of_iterations = 300
+the_min_num_of_linear_sections = 20
+the_max_num_of_linear_sections = 30
 the_verbosity = 0
 factor = 0.79
 
@@ -88,7 +88,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
+    print ("elliptical, uncertain exponents, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,

@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 the_model = Models.mike_solar_model(20)
 the_nominal_solve = the_model.solve(verbosity=0)
 the_gamma = 1.05
-the_number_of_iterations = 3
+the_number_of_iterations = 300
 the_num_of_linear_sections = [16, 22, 28, 34, 40, 46, 52, 58, 64, 70, 76]
 the_verbosity = 0
 factor = 0.79
