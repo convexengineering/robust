@@ -68,7 +68,10 @@ class RobustModel:
 
         self.number_of_stds = norm.ppf(self.setting.get("probabilityOfSuccess")/2.0 + 0.5)
 
-        self.nominal_solve = RobustModel.internalsolve(model, verbosity=0)
+        if 'nominalsolve' in options:
+            self.nominal_solve = options['nominalsolve']
+        else:
+            self.nominal_solve = RobustModel.internalsolve(model, verbosity=0)
         self.nominal_solution = self.nominal_solve.get('variables')
         self.nominal_cost = self.nominal_solve['cost']
 
