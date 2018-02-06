@@ -7,159 +7,18 @@ from gpkit.small_scripts import mag
 import matplotlib.pyplot as plt
 
 the_model = Models.mike_solar_model(20)
-the_gamma = [0, 1]
-the_number_of_iterations = 5
-the_min_num_of_linear_sections = 16
-the_max_num_of_linear_sections = 16
-the_verbosity = 0
+the_nominal_solve = the_model.solve()
+the_gamma = [0.5, 1]
+number_of_iterations = 5
+min_num_of_linear_sections = 16
+max_num_of_linear_sections = 16
+verbosity = 0
 factor = 0.79
 
-the_directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
-                                     for k, v in the_model.substitutions.items()
-                                     if k in the_model.varkeys and RobustGPTools.is_directly_uncertain(k)}
-                                    for _ in xrange(the_number_of_iterations)]
-
-
-def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_iterations,
-                               min_num_of_linear_sections, max_num_of_linear_sections, verbosity):
-
-    print ("box, uncertain exponents, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'box', gamma=gamma)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    iter_box = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-    print iter_box
-    print ("box, uncertain coeffients, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'box', gamma=gamma, twoTerm=False)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    coef_box = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("box, simple conservative, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'box', gamma=gamma, simpleModel=True)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    simple_box = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("box, state of art, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'box', gamma=gamma, boyd=True)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    boyd_box = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    iter_ell = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, twoTerm=True)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    coef_ell = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("elliptical, simple conservative, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, simpleModel=True)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    simple_ell = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    print ("elliptical, state of art, gamma = %s, max PWL = %s, "
-           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = EqualModel(the_model)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, boyd=True)
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                     minNumOfLinearSections=min_num_of_linear_sections,
-                                                     maxNumOfLinearSections=max_num_of_linear_sections,
-                                                     linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
-                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
-    boyd_ell = (
-        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
-        robust_model_solution['soltime'],
-        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
-        robust_model_solution['numoflinearsections'])
-    del robust_model, robust_model_solution, simulation
-
-    return iter_box, coef_box, simple_box, boyd_box, iter_ell, coef_ell, simple_ell, boyd_ell
+directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
+                                 for k, v in the_model.substitutions.items()
+                                 if k in the_model.varkeys and RobustGPTools.is_directly_uncertain(k)}
+                                for _ in xrange(number_of_iterations)]
 
 iter_box_prob_of_failure = []
 iter_box_obj = []
@@ -201,45 +60,176 @@ es = []
 fs = []
 gs = []
 hs = []
-
+the_model = Models.mike_solar_model(20)
 for a_gamma in the_gamma:
-    a, b, g, c, d, e, h, f = different_uncertainty_sets(factor*a_gamma, the_directly_uncertain_vars_subs,
-                                                        the_number_of_iterations, the_min_num_of_linear_sections,
-                                                        the_max_num_of_linear_sections, the_verbosity)
+    gamma = factor*a_gamma
+    print ("box, uncertain exponents, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    iter_box = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+    print iter_box
 
-    iter_box_prob_of_failure.append(a[0])
-    iter_box_obj.append(mag(a[1]))
-    iter_box_worst_obj.append(mag(a[2]))
-    coef_box_prob_of_failure.append(b[0])
-    coef_box_obj.append(mag(b[1]))
-    coef_box_worst_obj.append(mag(b[2]))
-    simple_box_prob_of_failure.append(g[0])
-    simple_box_obj.append(mag(g[1]))
-    simple_box_worst_obj.append(mag(g[2]))
-    boyd_box_prob_of_failure.append(c[0])
-    boyd_box_obj.append(mag(c[1]))
-    boyd_box_worst_obj.append(mag(c[2]))
-    iter_ell_prob_of_failure.append(d[0])
-    iter_ell_obj.append(mag(d[1]))
-    iter_ell_worst_obj.append(mag(d[2]))
-    coef_ell_prob_of_failure.append(e[0])
-    coef_ell_obj.append(mag(e[1]))
-    coef_ell_worst_obj.append(mag(e[2]))
-    simple_ell_prob_of_failure.append(h[0])
-    simple_ell_obj.append(mag(h[1]))
-    simple_ell_worst_obj.append(mag(h[2]))
-    boyd_ell_prob_of_failure.append(f[0])
-    boyd_ell_obj.append(mag(f[1]))
-    boyd_ell_worst_obj.append(mag(f[2]))
+    print ("box, uncertain coeffients, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, twoTerm=False, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    coef_box = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+    print coef_box
 
-    aeys.append(a)
-    bs.append(b)
-    cees.append(c)
-    ds.append(d)
-    es.append(e)
-    fs.append(f)
-    gs.append(g)
-    hs.append(h)
+    print ("box, simple conservative, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, simpleModel=True, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    simple_box = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    print ("box, state of art, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    boyd_box = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    # model = EqualModel(the_model)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001, )
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    iter_ell = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    # model = EqualModel(the_model)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, twoTerm=True, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    coef_ell = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    print ("elliptical, simple conservative, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    # model = EqualModel(the_model)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, simpleModel=True, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    simple_ell = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    print ("elliptical, state of art, gamma = %s, max PWL = %s, "
+           "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
+    # model = EqualModel(the_model)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                     minNumOfLinearSections=min_num_of_linear_sections,
+                                                     maxNumOfLinearSections=max_num_of_linear_sections,
+                                                     linearizationTolerance=0.001)
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
+                                                      directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
+    boyd_ell = (
+        simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
+        robust_model_solution['soltime'],
+        len([cs for cs in robust_model.get_robust_model().flat(constraintsets=False)]),
+        robust_model_solution['numoflinearsections'])
+    del robust_model, robust_model_solution, simulation
+
+    iter_box_prob_of_failure.append(iter_box[0])
+    iter_box_obj.append(mag(iter_box[1]))
+    iter_box_worst_obj.append(mag(iter_box[2]))
+    coef_box_prob_of_failure.append(coef_box[0])
+    coef_box_obj.append(mag(coef_box[1]))
+    coef_box_worst_obj.append(mag(coef_box[2]))
+    simple_box_prob_of_failure.append(simple_box[0])
+    simple_box_obj.append(mag(simple_box[1]))
+    simple_box_worst_obj.append(mag(simple_box[2]))
+    boyd_box_prob_of_failure.append(boyd_box[0])
+    boyd_box_obj.append(mag(boyd_box[1]))
+    boyd_box_worst_obj.append(mag(boyd_box[2]))
+    iter_ell_prob_of_failure.append(iter_ell[0])
+    iter_ell_obj.append(mag(iter_ell[1]))
+    iter_ell_worst_obj.append(mag(iter_ell[2]))
+    coef_ell_prob_of_failure.append(coef_ell[0])
+    coef_ell_obj.append(mag(coef_ell[1]))
+    coef_ell_worst_obj.append(mag(coef_ell[2]))
+    simple_ell_prob_of_failure.append(simple_ell[0])
+    simple_ell_obj.append(mag(simple_ell[1]))
+    simple_ell_worst_obj.append(mag(simple_ell[2]))
+    boyd_ell_prob_of_failure.append(boyd_ell[0])
+    boyd_ell_obj.append(mag(boyd_ell[1]))
+    boyd_ell_worst_obj.append(mag(boyd_ell[2]))
+
+    aeys.append(iter_box)
+    bs.append(coef_box)
+    cees.append(boyd_box)
+    ds.append(iter_ell)
+    es.append(coef_ell)
+    fs.append(boyd_ell)
+    gs.append(simple_box)
+    hs.append(simple_ell)
 
 for i in xrange(len(aeys)):
     print "gamma =", the_gamma[i]
@@ -260,7 +250,7 @@ plt.plot(the_gamma, boyd_box_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
 plt.title("The Average Performance as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Box Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -272,7 +262,7 @@ plt.plot(the_gamma, boyd_box_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Box Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -284,7 +274,7 @@ plt.plot(the_gamma, boyd_box_prob_of_failure, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Probability of Failure")
 plt.title("The Probability of Failure as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Box Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -296,7 +286,7 @@ plt.plot(the_gamma, boyd_ell_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
 plt.title("The Average Performance as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Elliptical Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -308,7 +298,7 @@ plt.plot(the_gamma, boyd_ell_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Elliptical Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
 
@@ -320,6 +310,6 @@ plt.plot(the_gamma, boyd_ell_prob_of_failure, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Probability of Failure")
 plt.title("The Probability of Failure as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+          "of the Elliptical Uncertainty Set: %d Simulations" % number_of_iterations)
 plt.legend(loc=0)
 plt.show()
