@@ -189,3 +189,10 @@ class SameModel(Model):
                 constraints += [cs.as_posyslt1()[0] <= 1]
         self.cost = model.cost
         return constraints
+
+
+class EqualModel(Model):
+    def setup(self, model):
+        subs = model.substitutions
+        self.cost = model.cost
+        return model, subs
