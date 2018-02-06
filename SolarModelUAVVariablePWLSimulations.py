@@ -7,8 +7,9 @@ from gpkit.small_scripts import mag
 import matplotlib.pyplot as plt
 
 the_model = Models.mike_solar_model(20)
+the_nominal_solve = the_model.solve(verbosity=0)
 the_gamma = 1.05
-the_number_of_iterations = 200
+the_number_of_iterations = 3
 the_num_of_linear_sections = [16, 22, 28, 34, 40, 46, 52, 58, 64, 70, 76]
 the_verbosity = 0
 factor = 0.79
@@ -24,13 +25,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("box, uncertain exponents, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'box', gamma=gamma)
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     iter_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -41,13 +41,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("box, uncertain coeffients, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'box', gamma=gamma, twoTerm=False)
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, twoTerm=False, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     coef_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -58,13 +57,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("box, simple conservative, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'box', gamma=gamma, simpleModel=True)
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, simpleModel=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     simple_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -75,13 +73,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("box, state of art, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'box', gamma=gamma, boyd=True)
+    robust_model = RobustModel(the_model, 'box', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     boyd_box = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -90,15 +87,14 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
+    print ("elliptical, uncertain exponents, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     iter_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -109,13 +105,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, twoTerm=True)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, twoTerm=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     coef_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -126,13 +121,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("elliptical, simple conservative, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, simpleModel=True)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, simpleModel=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     simple_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -143,13 +137,12 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
 
     print ("elliptical, state of art, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
-    model = Models.mike_solar_model(20)
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, boyd=True)
+    robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
                                                      linearizationTolerance=0.001)
-    simulation = RobustGPTools.probability_of_failure(model, robust_model_solution,
+    simulation = RobustGPTools.probability_of_failure(the_model, robust_model_solution,
                                                       directly_uncertain_vars_subs, number_of_iterations, verbosity=1)
     boyd_ell = (
         simulation[0], simulation[1], robust_model_solution['cost'], robust_model_solution['setuptime'],
@@ -200,7 +193,7 @@ es = []
 fs = []
 gs = []
 hs = []
-
+the_model = Models.mike_solar_model(20)
 for num_of_linear_sections in the_num_of_linear_sections:
     a, b, g, c, d, e, h, f = different_uncertainty_sets(factor*the_gamma, the_directly_uncertain_vars_subs,
                                                         the_number_of_iterations, num_of_linear_sections,
@@ -269,7 +262,7 @@ plt.plot(the_num_of_linear_sections, coef_box_worst_obj, 'bs', label='Uncertain 
 plt.plot(the_num_of_linear_sections, simple_box_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_box_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
@@ -293,7 +286,7 @@ plt.plot(the_num_of_linear_sections, coef_ell_obj, 'bs', label='Uncertain Coeffi
 plt.plot(the_num_of_linear_sections, simple_ell_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_ell_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Average Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
@@ -305,7 +298,7 @@ plt.plot(the_num_of_linear_sections, coef_ell_worst_obj, 'bs', label='Uncertain 
 plt.plot(the_num_of_linear_sections, simple_ell_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_ell_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)

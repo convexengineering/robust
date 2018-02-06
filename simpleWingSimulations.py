@@ -12,7 +12,7 @@ the_number_of_iterations = 1000
 the_min_num_of_linear_sections = 20
 the_max_num_of_linear_sections = 99
 the_verbosity = 0
-the_num_of_linear_sections = [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 80]
+the_num_of_linear_sections = [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 60, 70, 80]
 
 the_directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
                                      for k, v in the_model.substitutions.items()
@@ -91,7 +91,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
+    print ("elliptical, uncertain exponents, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     model = Models.simpleWing()
     robust_model = RobustModel(model, 'elliptical', gamma=gamma)
@@ -434,7 +434,7 @@ plt.plot(the_num_of_linear_sections, coef_box_worst_obj, 'bs', label='Uncertain 
 plt.plot(the_num_of_linear_sections, simple_box_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_box_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
@@ -458,7 +458,7 @@ plt.plot(the_num_of_linear_sections, coef_ell_obj, 'bs', label='Uncertain Coeffi
 plt.plot(the_num_of_linear_sections, simple_ell_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_ell_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Average Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
@@ -470,7 +470,7 @@ plt.plot(the_num_of_linear_sections, coef_ell_worst_obj, 'bs', label='Uncertain 
 plt.plot(the_num_of_linear_sections, simple_ell_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_num_of_linear_sections, boyd_ell_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("objective function")
+plt.ylabel("Objective Function")
 plt.title("The Worst-Case Performance as a Function of the Number of Piece-wise Linear Sections for "
           "Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
 plt.legend(loc=0)
