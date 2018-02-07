@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 the_model = Models.mike_solar_model(20)
 the_nominal_solve = the_model.solve(verbosity=0)
-the_gamma = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.45, 0.6, 0.87, 1.05]
+the_gamma = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.29, 0.33, 0.39, 0.45, 0.6, 0.87, 1.05]
 the_number_of_iterations = 300
 the_min_num_of_linear_sections = 20
 the_max_num_of_linear_sections = 30
@@ -253,8 +253,7 @@ plt.plot(the_gamma, simple_box_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_box_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
-plt.title("The Average Performance as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Average Performance: Box Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
 
@@ -265,8 +264,7 @@ plt.plot(the_gamma, simple_box_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_box_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
-plt.title("The Worst-Case Performance as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Worst-Case Performance: Box Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
 
@@ -277,8 +275,7 @@ plt.plot(the_gamma, simple_box_prob_of_failure, 'g^', label='Simple Conservative
 plt.plot(the_gamma, boyd_box_prob_of_failure, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Probability of Failure")
-plt.title("The Probability of Failure as a Function of the Size "
-          "of the Box Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Probability of Failure: Box Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
 
@@ -289,8 +286,7 @@ plt.plot(the_gamma, simple_ell_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_ell_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
-plt.title("The Average Performance as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Average Performance: Elliptical Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
 
@@ -301,8 +297,7 @@ plt.plot(the_gamma, simple_ell_worst_obj, 'g^', label='Simple Conservative')
 plt.plot(the_gamma, boyd_ell_worst_obj, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Objective Function")
-plt.title("The Worst-Case Performance as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Worst-Case Performance: Elliptical Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
 
@@ -313,7 +308,6 @@ plt.plot(the_gamma, simple_ell_prob_of_failure, 'g^', label='Simple Conservative
 plt.plot(the_gamma, boyd_ell_prob_of_failure, 'ro', label='State of Art')
 plt.xlabel("Uncertainty Set Scaling Factor Gamma")
 plt.ylabel("Probability of Failure")
-plt.title("The Probability of Failure as a Function of the Size "
-          "of the Elliptical Uncertainty Set: %d Simulations" % the_number_of_iterations)
+plt.title("The Probability of Failure: Elliptical Uncertainty Set")
 plt.legend(loc=0)
 plt.show()
