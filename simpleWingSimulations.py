@@ -111,7 +111,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
     print ("elliptical, uncertain coeffients, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     model = Models.simpleWing()
-    robust_model = RobustModel(model, 'elliptical', gamma=gamma, twoTerm=True)
+    robust_model = RobustModel(model, 'elliptical', gamma=gamma, twoTerm=False)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                      minNumOfLinearSections=min_num_of_linear_sections,
                                                      maxNumOfLinearSections=max_num_of_linear_sections,
