@@ -1,6 +1,5 @@
 import numpy as np
-from gpkit import Variable, Monomial, SignomialsEnabled, Posynomial
-from numbers import Number
+from gpkit import Variable, Monomial, SignomialsEnabled
 
 from RobustGPTools import RobustGPTools
 
@@ -32,7 +31,7 @@ class RobustifyLargePosynomial:
             return output
 
     @staticmethod
-    def perturbation_function(perturbation_vector, number_of_regression_points):
+    def perturbation_function(perturbation_vector, type_of_uncertainty_set, number_of_regression_points):
         """
         A method used to do the linear regression
         :param perturbation_vector: A list representing the perturbation associated
@@ -42,28 +41,50 @@ class RobustifyLargePosynomial:
         :return: the regression coefficients and intercept
         """
         dim = len(perturbation_vector)
-        # print(dim, number_of_regression_points)
-        if dim != 1:
-            x = np.meshgrid(*[np.linspace(-1, 1, number_of_regression_points)] * dim)
-        else:
-            x = [np.linspace(-1, 1, number_of_regression_points)]
-
         result, input_list = [], []
-        for _ in xrange(number_of_regression_points ** dim):
-            input_list.append([])
 
-        for i in xrange(dim):
-            temp = RobustifyLargePosynomial.merge_mesh_grid(x[i], number_of_regression_points ** dim)
-            for j in xrange(number_of_regression_points ** dim):
-                input_list[j].append(temp[j])
+        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm' or dim == 1:
+            if dim == 1:
+                x = [np.linspace(-1, 1, number_of_regression_points)]
+            else:
+                x = np.meshgrid(*[np.linspace(-1, 1, number_of_regression_points)] * dim)
 
-        for i in xrange(number_of_regression_points ** dim):
+            for _ in xrange(number_of_regression_points ** dim):
+                input_list.append([])
+
+            for i in xrange(dim):
+                temp = RobustifyLargePosynomial.merge_mesh_grid(x[i], number_of_regression_points ** dim)
+                for j in xrange(number_of_regression_points ** dim):
+                    input_list[j].append(temp[j])
+
+        else:
+            theta_mesh_grid = np.meshgrid(*[np.linspace(0, 2*np.pi - 2*np.pi/number_of_regression_points,
+                                                        number_of_regression_points)] * (dim - 1))
+            thetas_list = []
+            for _ in xrange(number_of_regression_points ** (dim - 1)):
+                thetas_list.append([])
+            for i in xrange(dim - 1):
+                temp = RobustifyLargePosynomial.merge_mesh_grid(theta_mesh_grid[i], number_of_regression_points ** (dim - 1))
+                for j in xrange(number_of_regression_points ** (dim - 1)):
+                    thetas_list[j].append(temp[j])
+            for i in xrange(number_of_regression_points ** (dim - 1)):
+                an_input_list = []
+                for j in xrange(dim):
+                    product = 1
+                    for k in xrange(j):
+                        product *= np.cos(thetas_list[i][k])
+                    if j != dim - 1:
+                        product *= np.sin(thetas_list[i][j])
+                    an_input_list.append(product)
+                input_list.append(an_input_list)
+
+        num_of_inputs = len(input_list)
+        for i in xrange(num_of_inputs):
             output = 1
             for j in xrange(dim):
                 if perturbation_vector[j] != 0:
                     output = output * perturbation_vector[j] ** input_list[i][j]
             result.append(output)
-
         max_index, max_value, min_index, min_value = None, -np.inf, None, np.inf
         for i, element in enumerate(result):
             if element < min_value:
@@ -72,45 +93,56 @@ class RobustifyLargePosynomial:
             if element >= max_value:
                 max_value = element
                 max_index = i
+        tol = 0
+        the_index = -1
+        while tol <= 1e-4:
+            the_index += 1
+            tol = abs(input_list[min_index][the_index] - input_list[max_index][the_index])
 
-        y = [[(min_value - max_value) / (input_list[min_index][0] - input_list[max_index][0])]]
-
-        for i in range(1, dim):
-            y.append([(input_list[min_index][i] - input_list[max_index][i]) /
-                      (input_list[min_index][0] - input_list[max_index][0])])
-
+        # y = [[(min_value - max_value) / (input_list[min_index][0] - input_list[max_index][0])]]
+        A = []
         b = []
-        for i in xrange(number_of_regression_points ** dim):
-            if i != max_index and i != min_index:
-                b.append([result[i] - max_value - y[0][0] * (input_list[i][0] - input_list[max_index][0])])
+        y_m_i = input_list[min_index][the_index] - input_list[max_index][the_index]
+        back_count = 0
+        for k in xrange(num_of_inputs):
+            if k != max_index and k != min_index:
+                A.append([])
+                y_ratio = (input_list[k][the_index] - input_list[max_index][the_index])/y_m_i
+                b.append(result[k] + max_value*(y_ratio - 1) - min_value*y_ratio)
+                for l in xrange(dim):
+                    if l != the_index:
+                        y_k_l = input_list[k][l] - input_list[max_index][l]
+                        y_m_l = input_list[min_index][l] - input_list[max_index][l]
+                        A[k-back_count].append(y_k_l - y_m_l*y_ratio)
+            else:
+                back_count += 1
 
-        capital_a = []
-        for i in range(0, number_of_regression_points ** dim):
-            if i != max_index and i != min_index:
-                capital_a.append([])
-                for j in range(1, dim):
-                    capital_a[-1].append(input_list[i][j] - input_list[max_index][j] -
-                                         y[j][0] * (input_list[i][0] - input_list[max_index][0]))
+        capital_a_trans = map(list, zip(*A))
 
-        capital_a_trans = map(list, zip(*capital_a))
-
-        capital_b = np.dot(capital_a_trans, capital_a)
+        capital_b = np.dot(capital_a_trans, A)
         r_h_s = np.dot(capital_a_trans, b)
         try:
             solution = list(np.linalg.solve(capital_b, r_h_s))
-            solution = [list(i) for i in solution]
 
-            temp = y[0][0] - list(list(np.dot(map(list, zip(*solution)), y[1:]))[0])
-            temp = [list(temp)]
+            l1 = 0
+            l2 = 0
+            sum = 0
+            while l1 < dim - 1:
+                if l2 != the_index:
+                    y_m_l = input_list[min_index][l2] - input_list[max_index][l2]
+                    sum += solution[l1]*y_m_l
+                    l1 += 1
+                l2 += 1
 
-            coeff = temp + solution
-            intercept = max_value - np.dot(map(list, zip(*coeff)), input_list[max_index])
-            intercept = list(intercept)[0]
-            coeff = [i[0] for i in coeff]
+            a_i = (min_value - max_value - sum)/y_m_i
+            coeff = solution[0:the_index] + [a_i] + solution[the_index:len(solution)]
+            sum = 0
+            for l in xrange(dim):
+                sum += coeff[l]*input_list[max_index][l]
+            intercept = max_value - sum
         except:
-            coeff = [y[0][0]]
-            intercept = max_value - coeff[0]*input_list[max_index][0]
-
+            coeff = [(min_value - max_value)/y_m_i]
+            intercept = max_value - coeff[0]*input_list[max_index][the_index]
         return coeff, intercept
 
     def linearize_perturbations(self, p_uncertain_vars, number_of_regression_points):
@@ -147,7 +179,7 @@ class RobustifyLargePosynomial:
             coeff.append([])
             intercept.append([])
             coeff[i], intercept[i] = RobustifyLargePosynomial. \
-                perturbation_function(perturbation_matrix[i], number_of_regression_points)
+                perturbation_function(perturbation_matrix[i], self.type_of_uncertainty_set, number_of_regression_points)
             mean_vector.append(mean)
 
         return coeff, intercept, mean_vector

@@ -19,6 +19,7 @@ class RobustnessSetting:
             'gamma': 1,
             'simpleModel': False,
             'numberOfRegressionPoints': 2,
+            'numberOfRegressionPointsElliptical': 36,
             'linearizeTwoTerm': True,
             'enableSP': True,
             'boyd': False,
@@ -84,6 +85,8 @@ class RobustModel:
             self.dependent_uncertainty_set = False
         else:
             self.dependent_uncertainty_set = True
+            if self.type_of_uncertainty_set == 'elliptical':
+                self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsElliptical'))
 
         self.ready_gp_constraints = []
         self.to_linearize_gp_posynomials = []
