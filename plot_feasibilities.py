@@ -20,7 +20,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
     #             interesting_vars = list(set(interesting_vars) | set([m[var.key.name] for var in p.varkeys.keys() if var.key.pr is not None]))
 
     class FeasCircle(Model):
-        "SKIP VERIFICATION"
+        """SKIP VERIFICATION"""
 
         def setup(self, m, sol, rob=False):
             r = 4
@@ -167,4 +167,3 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
 
     fig.suptitle("%s vs %s feasibility space" % (x, y))
     plt.show()
-
