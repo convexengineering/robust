@@ -23,7 +23,7 @@ the_directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100
 def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_iterations,
                                min_num_of_linear_sections, max_num_of_linear_sections, verbosity):
 
-    print ("box, uncertain exponents, gamma = %s, max PWL = %s, "
+    print ("box, Best Pairs, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     robust_model = RobustModel(the_model, 'box', gamma=gamma, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
@@ -55,7 +55,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("box, state of art, gamma = %s, max PWL = %s, "
+    print ("box, two term, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     robust_model = RobustModel(the_model, 'box', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
@@ -71,7 +71,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("elliptical, uncertain exponents, gamma = %s, max PWL = %s, "
+    print ("elliptical, Best Pairs, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
@@ -103,7 +103,7 @@ def different_uncertainty_sets(gamma, directly_uncertain_vars_subs, number_of_it
         robust_model_solution['numoflinearsections'])
     del robust_model, robust_model_solution, simulation
 
-    print ("elliptical, state of art, gamma = %s, max PWL = %s, "
+    print ("elliptical, two term, gamma = %s, max PWL = %s, "
            "min PWL = %s" % (gamma, min_num_of_linear_sections, max_num_of_linear_sections))
     robust_model = RobustModel(the_model, 'elliptical', gamma=gamma, boyd=True, nominalsolve=the_nominal_solve)
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
@@ -193,41 +193,41 @@ for i in xrange(len(aeys)):
     print fs[i]
 
 plt.figure()
-plt.plot(the_num_of_linear_sections, iter_box_obj, 'r--', label='Uncertain Exponents')
-plt.plot(the_num_of_linear_sections, coef_box_obj, 'bs', label='Uncertain Coefficients')
-plt.plot(the_num_of_linear_sections, boyd_box_obj, 'ro', label='State of Art')
-plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("Objective Function")
-plt.title("The Average Performance: Box Uncertainty Set")
+plt.plot(the_num_of_linear_sections, iter_box_obj, 'r--', label='Best Pairs')
+plt.plot(the_num_of_linear_sections, coef_box_obj, 'bs', label='Linearized Perturbations')
+plt.plot(the_num_of_linear_sections, boyd_box_obj, 'ro', label='Two Term')
+plt.xlabel("Number of Piece-wise Linear Sections", fontsize=20)
+plt.ylabel("Objective Function", fontsize=18)
+plt.title("The Average Performance: Box Uncertainty Set", fontsize=22)
 plt.legend(loc=0)
 plt.show()
 
 plt.figure()
-plt.plot(the_num_of_linear_sections, iter_box_worst_obj, 'r--', label='Uncertain Exponents')
-plt.plot(the_num_of_linear_sections, coef_box_worst_obj, 'bs', label='Uncertain Coefficients')
-plt.plot(the_num_of_linear_sections, boyd_box_worst_obj, 'ro', label='State of Art')
-plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("Objective Function")
-plt.title("The Worst-Case Performance: Box Uncertainty Set")
+plt.plot(the_num_of_linear_sections, iter_box_worst_obj, 'r--', label='Best Pairs')
+plt.plot(the_num_of_linear_sections, coef_box_worst_obj, 'bs', label='Linearized Perturbations')
+plt.plot(the_num_of_linear_sections, boyd_box_worst_obj, 'ro', label='Two Term')
+plt.xlabel("Number of Piece-wise Linear Sections", fontsize=20)
+plt.ylabel("Objective Function", fontsize=18)
+plt.title("The Worst-Case Performance: Box Uncertainty Set", fontsize=22)
 plt.legend(loc=0)
 plt.show()
 
 plt.figure()
-plt.plot(the_num_of_linear_sections, iter_ell_obj, 'r--', label='Uncertain Exponents')
-plt.plot(the_num_of_linear_sections, coef_ell_obj, 'bs', label='Uncertain Coefficients')
-plt.plot(the_num_of_linear_sections, boyd_ell_obj, 'ro', label='State of Art')
-plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("Objective Function")
-plt.title("The Average Performance: Elliptical Uncertainty Set")
+plt.plot(the_num_of_linear_sections, iter_ell_obj, 'r--', label='Best Pairs')
+plt.plot(the_num_of_linear_sections, coef_ell_obj, 'bs', label='Linearized Perturbations')
+plt.plot(the_num_of_linear_sections, boyd_ell_obj, 'ro', label='Two Term')
+plt.xlabel("Number of Piece-wise Linear Sections", fontsize=20)
+plt.ylabel("Objective Function", fontsize=18)
+plt.title("The Average Performance: Elliptical Uncertainty Set", fontsize=22)
 plt.legend(loc=0)
 plt.show()
 
 plt.figure()
-plt.plot(the_num_of_linear_sections, iter_ell_worst_obj, 'r--', label='Uncertain Exponents')
-plt.plot(the_num_of_linear_sections, coef_ell_worst_obj, 'bs', label='Uncertain Coefficients')
-plt.plot(the_num_of_linear_sections, boyd_ell_worst_obj, 'ro', label='State of Art')
-plt.xlabel("Number of Piece-wise Linear Sections")
-plt.ylabel("Objective Function")
-plt.title("The Worst-Case Performance: Elliptical Uncertainty Set")
+plt.plot(the_num_of_linear_sections, iter_ell_worst_obj, 'r--', label='Best Pairs')
+plt.plot(the_num_of_linear_sections, coef_ell_worst_obj, 'bs', label='Linearized Perturbations')
+plt.plot(the_num_of_linear_sections, boyd_ell_worst_obj, 'ro', label='Two Term')
+plt.xlabel("Number of Piece-wise Linear Sections", fontsize=20)
+plt.ylabel("Objective Function", fontsize=18)
+plt.title("The Worst-Case Performance: Elliptical Uncertainty Set", fontsize=22)
 plt.legend(loc=0)
 plt.show()
