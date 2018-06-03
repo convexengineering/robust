@@ -1,10 +1,12 @@
 import numpy as np
+import sys
+sys.path.insert(0, '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust')
 from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
 import scipy.optimize as op
 from gpkit import Variable, Model
 
 
-def function(x):
+def convex_function(x):
     return np.log(1 + np.exp(x))
 
 
@@ -14,21 +16,21 @@ def test_tangent_point_func():
         eps = np.random.rand() * 0.2
 
         x_old = - np.random.rand() * np.log(np.exp(0.2) - 1)
-        y_old = function(x_old) - eps
+        y_old = convex_function(x_old) - eps
 
         x_tangent = op.newton(LinearizeTwoTermPosynomials.tangent_point_func, x_old + 1, args=(x_old, eps))
-        y_tangent = function(x_tangent)
+        y_tangent = convex_function(x_tangent)
 
         assert (x_tangent > x_old)
 
         def tangent_line(x):
             return (y_old - y_tangent) * (x - x_tangent) / (x_old - x_tangent) + y_tangent
 
-        assert (function(x_tangent) - tangent_line(x_tangent) < 0.0001)
+        assert (convex_function(x_tangent) - tangent_line(x_tangent) < 0.0001)
 
         trial_points = list(np.arange(0, 20, 0.01))
 
-        function_points = [function(i) for i in trial_points]
+        function_points = [convex_function(i) for i in trial_points]
         tangent_points = [tangent_line(i) for i in trial_points]
 
         difference = [a - b for a, b in zip(function_points, tangent_points)]
@@ -44,10 +46,10 @@ def test_intersection_point_function():
         eps = np.random.rand() * 0.2
 
         x_old = - np.random.rand() * np.log(np.exp(0.2) - 1)
-        y_old = function(x_old) - eps
+        y_old = convex_function(x_old) - eps
 
         x_tangent = op.newton(LinearizeTwoTermPosynomials.tangent_point_func, x_old + 1, args=(x_old, eps))
-        y_tangent = function(x_tangent)
+        y_tangent = convex_function(x_tangent)
 
         tangent_slope = (y_old - y_tangent) / (x_old - x_tangent)
         tangent_intercept = - (y_old - y_tangent) * x_tangent / (x_old - x_tangent) + y_tangent
@@ -56,7 +58,7 @@ def test_intersection_point_function():
                                    x_tangent + 1, args=(tangent_slope, tangent_intercept, eps))
         assert (x_intersection > x_tangent)
 
-        diff = function(x_intersection) - eps - tangent_slope * x_intersection - tangent_intercept
+        diff = convex_function(x_intersection) - eps - tangent_slope * x_intersection - tangent_intercept
 
         assert (diff < 0.0001)
     return
@@ -77,8 +79,8 @@ def test_iterate_two_term_posynomial_linearization_coeff():
             return max(evaluations)
 
         # raise Exception("ejer")
-        tangent_difference = [function(k) - piece_wise_linear_function(k) for k in x_tangent]
-        intersection_difference = [function(k) - piece_wise_linear_function(k) for k in x_intersection]
+        tangent_difference = [convex_function(k) - piece_wise_linear_function(k) for k in x_tangent]
+        intersection_difference = [convex_function(k) - piece_wise_linear_function(k) for k in x_intersection]
 
         assert (all(i <= 0.00001 for i in tangent_difference))
         assert (all(i - eps <= 0.00001 for i in intersection_difference))
@@ -100,8 +102,8 @@ def test_two_term_posynomial_linearization_coeff():
             evaluations.append(x)
             return max(evaluations)
 
-        tangent_difference = [function(k) - piece_wise_linear_function(k) for k in x_tangent]
-        intersection_difference = [function(k) - piece_wise_linear_function(k) for k in x_intersection]
+        tangent_difference = [convex_function(k) - piece_wise_linear_function(k) for k in x_tangent]
+        intersection_difference = [convex_function(k) - piece_wise_linear_function(k) for k in x_intersection]
 
         assert (all(i <= 0.001 for i in tangent_difference))
         assert (all(np.abs(i - eps) <= 0.001 for i in intersection_difference))
@@ -150,6 +152,7 @@ def test_linearize_two_term_posynomial():
 
         assert (np.log(subs_p.cs[0]) - np.log(lower_pos[0].sub({"w_1": w_1}).cs[0]) <= eps + tol)
         assert (np.log(upper_pos[0].sub({"w_1": w_1}).cs[0]) - np.log(subs_p.cs[0]) <= eps + tol)
+
 
 def test():
     test_tangent_point_func()
