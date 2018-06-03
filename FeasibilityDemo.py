@@ -61,7 +61,7 @@ constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
 m = Model(D, constraints)
 sol = m.solve()
 def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2, val2, design_feasibility):
-    # plot_feasibilities(x, y, m)
+    plot_feasibilities(x, y, m)
     x.key.descr[str1] = val1
     y.key.descr[str2] = val2
     RM = RobustModel(m, type_of_uncertainty_set, linearizationTolerance=1e-4)
@@ -71,7 +71,7 @@ def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2
     print "robust: ", {k: v for k, v in RMsol["freevariables"].items()
            if k in m.varkeys and k.key.fix is True}
     print 'cost', RMsol['cost']
-    # plot_feasibilities(x, y, m, RM, numberofsweeps=120, design_feasibility=design_feasibility, skipfailures=True)
+    plot_feasibilities(x, y, m, RM, numberofsweeps=120, design_feasibility=design_feasibility, skipfailures=True)
     del x.key.descr[str1]
     del y.key.descr[str2]
 
