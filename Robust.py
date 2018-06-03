@@ -19,7 +19,7 @@ class RobustnessSetting:
             'gamma': 1,
             'simpleModel': False,
             'numberOfRegressionPoints': 2,
-            'numberOfRegressionPointsElliptical': 36,
+            'numberOfRegressionPointsElliptical': 25,
             'linearizeTwoTerm': True,
             'enableSP': True,
             'boyd': False,
@@ -27,7 +27,7 @@ class RobustnessSetting:
             'simpleTwoTerm': False,
             'smartTwoTermChoose': False,
             'allowedNumOfPerms': 30,
-            'linearizationTolerance': 0.01,
+            'linearizationTolerance': 0.001,
             'minNumOfLinearSections': 12,
             'maxNumOfLinearSections': 20,
             'iterationsRelativeTolerance': 1e-4,
@@ -67,7 +67,7 @@ class RobustModel:
                                         'intercepts': slopes_intercepts[1]
                                         }
 
-        self.number_of_stds = norm.ppf(self.setting.get("probabilityOfSuccess")/2.0 + 0.5)
+        self.number_of_stds = norm.ppf(self.setting.get("probabilityOfSuccess") / 2.0 + 0.5)
 
         if 'nominalsolve' in options:
             self.nominal_solve = options['nominalsolve']
@@ -201,7 +201,7 @@ class RobustModel:
                                                                 self.robust_solve_properties['numoflinearsections'],
                                                                 ready_constraints, feasible=True)
                     new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
-                # rel_tol = 2 * self.setting.get('iterationsRelativeTolerance')
+                    # rel_tol = 2 * self.setting.get('iterationsRelativeTolerance')
             rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             if verbosity > 0:
                 if not reached_feasibility:
@@ -209,9 +209,9 @@ class RobustModel:
                 elif reached_feasibility == 1:
                     print "feasibility is reached"
                 print "relative tolerance = %s" % rel_tol
-            if reached_feasibility <= 1:
+            if reached_feasibility <= 1 and two_term_data_posynomials:
                 self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], \
-                    _, _, _ = LinearizeTwoTermPosynomials.\
+                _, _, _ = LinearizeTwoTermPosynomials. \
                     two_term_posynomial_linearization_coeff(self.robust_solve_properties['numoflinearsections'])
 
             self._sequence_of_rgps.append(self._robust_model)
@@ -393,37 +393,49 @@ class RobustModel:
         return model_upper, model_lower
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints, feasible=False):
-        error = 2 * self.setting.get('linearizationTolerance')
-        r = self.setting.get('minNumOfLinearSections')
 
+        the_min_r = self.setting.get('minNumOfLinearSections')
+        the_max_r = self.setting.get('maxNumOfLinearSections')
+        r = None
+        error = None
         sol_upper = None
 
         model_upper = None
 
-        while r <= self.setting.get('maxNumOfLinearSections') and error > self.setting.get('linearizationTolerance'):
-
+        while the_min_r <= the_max_r:
+            r = int((the_min_r + the_max_r) / 2.0)
             model_upper, model_lower = self. \
                 linearize_and_return_upper_lower_models(two_term_data_posynomials, r, ready_constraints, feasible)
             upper_model_infeasible = 0
-
             try:
                 sol_upper = RobustModel.internalsolve(model_upper, verbosity=0)
             except:
                 upper_model_infeasible = 1
+            sol_lower = RobustModel.internalsolve(model_lower, verbosity=0)
             try:
                 sol_lower = RobustModel.internalsolve(model_lower, verbosity=0)
             except:
                 raise Exception("The model is infeasible")
-
+            if not two_term_data_posynomials:
+                self.robust_solve_properties['upperLowerRelError'] = 0
+                return 0, sol_upper, model_upper
             if upper_model_infeasible != 1:
                 error = (sol_upper.get('cost') - sol_lower.get('cost')) / sol_lower.get('cost')
+                if error <= self.setting.get('linearizationTolerance'):
+                    the_max_r = r
+                else:
+                    the_min_r = r + 1
             elif r == self.setting.get('maxNumOfLinearSections'):
                 self.lower_approximation_is_feasible = True
                 raise Exception("The model is infeasible. The lower approximation of the model is feasible, try "
                                 "increasing the maximum number of linear sections")
-            r += 1
+            else:
+                the_min_r = r + 1
             del model_lower, sol_lower
-        return r - 1, sol_upper, model_upper
+            if the_max_r == the_min_r and r == the_max_r:
+                break
+        self.robust_solve_properties['upperLowerRelError'] = error
+        return r, sol_upper, model_upper
 
     def new_permutation_indices(self, solution, large_posynomials):
         permutation_indices = []
