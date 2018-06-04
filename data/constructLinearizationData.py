@@ -14,3 +14,6 @@ def construct_linearization_data(max_num_of_linear_sections):
         the_file.write("%.16s" % a[4])
         the_file.write("\n")
     the_file.close()
+
+if __name__ == '__main__':
+    construct_linearization_data(100)
