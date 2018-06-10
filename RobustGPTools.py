@@ -1,5 +1,6 @@
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
+from gpkit.exceptions import InvalidGPConstraint
 
 import numpy as np
 from copy import copy
@@ -120,7 +121,6 @@ class RobustGPTools:
 
     @staticmethod
     def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
-
         failure = 0
         success = 0
 
@@ -130,6 +130,7 @@ class RobustGPTools:
                 print('iteration: %s' % i)
             new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
             fail_success, cost = RobustGPTools.fail_or_success(new_model)
+            _ = model.localsolve()
             # print cost
             sum_cost = sum_cost + cost
             if fail_success:
@@ -147,11 +148,6 @@ class RobustGPTools:
         def setup(self, model, solution, directly_uncertain_vars_subs):
             subs = {k: v for k, v in solution["freevariables"].items()
                     if k in model.varkeys and k.key.fix is True}
-            # directly_uncertain_vars_subs = {k: np.random.uniform(v - 0.01*k.key.pr * v / 100.0, v + 0.01*k.key.pr * v / 100.0)
-            #                                 for k, v in model.substitutions.items()
-            #                                 if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
-            # print subs
-            # print directly_uncertain_vars_subs
             subs.update(model.substitutions)
             subs.update(directly_uncertain_vars_subs)
             self.cost = model.cost
@@ -162,7 +158,7 @@ class RobustGPTools:
         try:
             try:
                 sol = model.solve(verbosity=0)
-            except:
+            except InvalidGPConstraint:
                 sol = model.localsolve(verbosity=0)
             return True, sol['cost']
         except:
