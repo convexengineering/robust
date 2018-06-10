@@ -34,6 +34,7 @@ class RobustifyLargePosynomial:
     def perturbation_function(perturbation_vector, type_of_uncertainty_set, number_of_regression_points):
         """
         A method used to do the linear regression
+        :param type_of_uncertainty_set: the type of uncertainty set
         :param perturbation_vector: A list representing the perturbation associated
         with each uncertain parameter
         :param number_of_regression_points: The number of regression points
@@ -42,8 +43,8 @@ class RobustifyLargePosynomial:
         """
         dim = len(perturbation_vector)
         result, input_list = [], []
-
-        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm' or dim == 1:
+        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm' or type_of_uncertainty_set == \
+                'elliptical' or dim == 1:
             if dim == 1:
                 x = [np.linspace(-1, 1, number_of_regression_points)]
             else:
@@ -93,54 +94,51 @@ class RobustifyLargePosynomial:
             if element >= max_value:
                 max_value = element
                 max_index = i
-        tol = 0
+        tol = float(0)
         the_index = -1
         while tol <= 1e-4:
             the_index += 1
             tol = abs(input_list[min_index][the_index] - input_list[max_index][the_index])
 
-        # y = [[(min_value - max_value) / (input_list[min_index][0] - input_list[max_index][0])]]
-        A = []
+        capital_a = []
         b = []
         y_m_i = input_list[min_index][the_index] - input_list[max_index][the_index]
         back_count = 0
         for k in xrange(num_of_inputs):
             if k != max_index and k != min_index:
-                A.append([])
+                capital_a.append([])
                 y_ratio = (input_list[k][the_index] - input_list[max_index][the_index])/y_m_i
                 b.append(result[k] + max_value*(y_ratio - 1) - min_value*y_ratio)
                 for l in xrange(dim):
                     if l != the_index:
                         y_k_l = input_list[k][l] - input_list[max_index][l]
                         y_m_l = input_list[min_index][l] - input_list[max_index][l]
-                        A[k-back_count].append(y_k_l - y_m_l*y_ratio)
+                        capital_a[k-back_count].append(y_k_l - y_m_l*y_ratio)
             else:
                 back_count += 1
 
-        capital_a_trans = map(list, zip(*A))
-
-        capital_b = np.dot(capital_a_trans, A)
+        capital_a_trans = map(list, zip(*capital_a))
+        capital_b = np.dot(capital_a_trans, capital_a)
         r_h_s = np.dot(capital_a_trans, b)
+
         try:
             solution = list(np.linalg.solve(capital_b, r_h_s))
-
             l1 = 0
             l2 = 0
-            sum = 0
+            the_sum = 0
             while l1 < dim - 1:
                 if l2 != the_index:
                     y_m_l = input_list[min_index][l2] - input_list[max_index][l2]
-                    sum += solution[l1]*y_m_l
+                    the_sum += solution[l1]*y_m_l
                     l1 += 1
                 l2 += 1
-
-            a_i = (min_value - max_value - sum)/y_m_i
+            a_i = (min_value - max_value - the_sum)/y_m_i
             coeff = solution[0:the_index] + [a_i] + solution[the_index:len(solution)]
-            sum = 0
+            the_sum = 0
             for l in xrange(dim):
-                sum += coeff[l]*input_list[max_index][l]
-            intercept = max_value - sum
-        except:
+                the_sum += coeff[l]*input_list[max_index][l]
+            intercept = max_value - the_sum
+        except np.linalg.LinAlgError:
             coeff = [(min_value - max_value)/y_m_i]
             intercept = max_value - coeff[0]*input_list[max_index][the_index]
         return coeff, intercept
