@@ -1,0 +1,235 @@
+Mission-Aircraft-Empennage-HorizontalTail-WingSkin-: 
+                                                   W: wing skin weight
+                                                   t: wing skin thickness
+
+Mission-Aircraft-Empennage-HorizontalTail-: 
+                                          W: wing weight
+                                          l_h: horizontal tail moment arm
+
+Mission-Aircraft-Empennage-VerticalTail-WingInterior-: 
+                                                     W: interior mass of wing
+
+Mission-Aircraft-Battery-: 
+                         W: battery weight
+                         \mathcal{V}: battery volume
+                         E: total battery energy
+
+Mission-Aircraft-Empennage-: 
+                           W: empennage weight
+
+Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
+                                                       W: interior mass of wing
+
+Mission-Aircraft-Empennage-VerticalTail-Planform-: 
+                                                 S: surface area
+                                                 c_{root}: root chord
+                                                 c_{ave}: mid section chord
+                                                 c_{MAC}: mean aerodynamic chord
+                                                 b: wing span
+                                                 AR: aspect ratio
+
+Mission-Aircraft-Wing-CapSpar-: 
+                              S_y: section modulus
+                              t: spar cap thickness
+                              dm: segment spar mass
+                              I: spar x moment of inertia
+                              t_{shear}: shear web thickness
+                              w: spar width
+                              W: spar weight
+                              h_{in}: inner spar height
+
+Mission-FlightSegment-WingLoading-ChordSparL-Beam-: 
+                                                  \bar{M}: normalized moment
+                                                  dx: normalized length of element
+                                                  \theta: deflection slope
+                                                  dx: normalized length of element
+                                                  \bar{EI}: normalized YM and moment of inertia
+                                                  \bar{\delta}: normalized displacement
+                                                  \bar{M}: normalized moment
+                                                  dx: normalized length of element
+                                                  \bar{M}: normalized moment
+                                                  \bar{S}: normalized shear
+                                                  \bar{S}: normalized shear
+                                                  \theta: deflection slope
+                                                  \bar{\delta}: normalized displacement
+                                                  \bar{EI}: normalized YM and moment of inertia
+                                                  \bar{\delta}: normalized displacement
+                                                  \bar{EI}: normalized YM and moment of inertia
+                                                  \theta: deflection slope
+                                                  \bar{S}: normalized shear
+
+Mission-Aircraft-SolarCells-: 
+                            S: solar cell area
+                            W: solar cell weight
+
+Mission-FlightSegment-AircraftPerf-WingAero-: 
+                                            C_L: lift coefficient
+                                            C_d: wing drag coefficient
+                                            Re: Reynold's number
+                                            C_L: lift coefficient
+                                            c_{dp}: wing profile drag coeff
+                                            c_{dp}: wing profile drag coeff
+                                            C_d: wing drag coefficient
+                                            C_d: wing drag coefficient
+                                            Re: Reynold's number
+                                            Re: Reynold's number
+                                            c_{dp}: wing profile drag coeff
+                                            C_L: lift coefficient
+
+Mission-Aircraft-Empennage-VerticalBoomTorsion-: 
+                                               T: vertical tail moment
+
+Mission-FlightSegment-AircraftPerf-TailAero-: 
+                                            C_d: vertical tail drag coefficient
+                                            C_d: horizontal tail drag coefficient
+                                            C_d: horizontal tail drag coefficient
+                                            Re: horizontal tail reynolds number
+                                            Re: vertical tail reynolds number
+                                            C_d: vertical tail drag coefficient
+                                            Re: vertical tail reynolds number
+                                            C_d: vertical tail drag coefficient
+                                            Re: horizontal tail reynolds number
+                                            Re: horizontal tail reynolds number
+                                            Re: vertical tail reynolds number
+                                            C_d: horizontal tail drag coefficient
+
+Mission-FlightSegment-AircraftPerf-: 
+                                   P_{shaft}: shaft power
+                                   CDA: non-wing drag coefficient
+                                   C_D: aircraft drag coefficient
+                                   P_{oper}: operating power
+                                   CDA: non-wing drag coefficient
+                                   P_{shaft}: shaft power
+                                   CDA: non-wing drag coefficient
+                                   P_{shaft}: shaft power
+                                   C_D: aircraft drag coefficient
+                                   C_D: aircraft drag coefficient
+                                   P_{oper}: operating power
+                                   P_{oper}: operating power
+
+Mission-FlightSegment-FlightState-: 
+                                  V: true airspeed
+                                  \rho: air density
+                                  (P/S)_{min}: minimum necessary solar power
+                                  (E/S)_C: energy for batteries during sunrise/set
+                                  V: true airspeed
+                                  (P/S)_{min}: minimum necessary solar power
+                                  (E/S)_{day}: solar cells energy during daytime
+                                  V_{wind}: wind velocity
+                                  (E/S)_C: energy for batteries during sunrise/set
+                                  V: true airspeed
+                                  \rho: air density
+                                  V_{wind}: wind velocity
+                                  (P/S)_{min}: minimum necessary solar power
+                                  (E/S)_{day}: solar cells energy during daytime
+                                  (E/S)_C: energy for batteries during sunrise/set
+                                  \rho: air density
+                                  V_{wind}: wind velocity
+                                  (E/S)_{day}: solar cells energy during daytime
+
+Mission-FlightSegment-SteadyLevelFlight-: 
+                                        T: thrust
+                                        T: thrust
+                                        T: thrust
+
+Mission-Aircraft-Empennage-VerticalTail-: 
+                                        l_v: vertical tail moment arm
+                                        W: wing weight
+
+Mission-Aircraft-Wing-: 
+                      W: wing weight
+
+Mission-FlightSegment-WingLoading-GustL-: 
+                                        \alpha_{gust}: gust angle of attack
+                                        \alpha_{gust}: gust angle of attack
+                                        \bar{q}: normalized loading
+                                        M_r: wing section root moment
+                                        \alpha_{gust}: gust angle of attack
+                                        M_r: wing section root moment
+                                        \bar{q}: normalized loading
+                                        M_r: wing section root moment
+                                        \bar{q}: normalized loading
+
+Mission-Aircraft-Empennage-HorizontalBoomBending-: 
+                                                 \theta: tail boom deflection angle
+                                                 F: horizontal tail force
+
+Mission-FlightSegment-WingLoading-ChordSparL-: 
+                                             M_r: wing section root moment
+                                             M_r: wing section root moment
+                                             M_r: wing section root moment
+
+Mission-FlightSegment-AircraftPerf-TailBoomAero-: 
+                                                C_f: fuselage skin friction coefficient
+                                                Re: fuselage reynolds number
+                                                C_f: fuselage skin friction coefficient
+                                                Re: fuselage reynolds number
+                                                C_f: fuselage skin friction coefficient
+                                                Re: fuselage reynolds number
+
+Mission-Aircraft-Wing-WingSkin-: 
+                               t: wing skin thickness
+                               W: wing skin weight
+
+Mission-Aircraft-Empennage-VerticalBoomBending-: 
+                                               F: vertical tail force
+                                               \theta: tail boom deflection angle
+
+Mission-Aircraft-Motor-: 
+                       P_{max}: max power
+                       W: motor weight
+                       m: motor mass
+
+Mission-Aircraft-Empennage-TailBoom-: 
+                                    t_0: tail boom thickness
+                                    I_0: tail boom moment of inertia
+                                    J: tail boom polar moment of inertia
+                                    S: tail boom surface area
+                                    l: tail boom length
+                                    d_0: tail boom diameter
+                                    W: tail boom weight
+
+Mission-Aircraft-Empennage-HorizontalTail-Planform-: 
+                                                   S: surface area
+                                                   b: wing span
+                                                   c_{MAC}: mean aerodynamic chord
+                                                   c_{ave}: mid section chord
+                                                   c_{root}: root chord
+
+Mission-Aircraft-Wing-Planform-: 
+                               c_{ave}: mid section chord
+                               c_{MAC}: mean aerodynamic chord
+                               b: wing span
+                               c_{root}: root chord
+                               S: surface area
+                               AR: aspect ratio
+
+Mission-FlightSegment-WingLoading-GustL-Beam-: 
+                                             \bar{EI}: normalized YM and moment of inertia
+                                             \theta: deflection slope
+                                             \bar{\delta}: normalized displacement
+                                             \bar{\delta}: normalized displacement
+                                             \theta: deflection slope
+                                             \bar{\delta}: normalized displacement
+                                             \bar{EI}: normalized YM and moment of inertia
+                                             dx: normalized length of element
+                                             dx: normalized length of element
+                                             \bar{EI}: normalized YM and moment of inertia
+                                             dx: normalized length of element
+                                             \bar{M}: normalized moment
+                                             \bar{S}: normalized shear
+                                             \bar{M}: normalized moment
+                                             \bar{M}: normalized moment
+                                             \bar{S}: normalized shear
+                                             \theta: deflection slope
+                                             \bar{S}: normalized shear
+
+Mission-Aircraft-Empennage-VerticalTail-WingSkin-: 
+                                                 W: wing skin weight
+                                                 t: wing skin thickness
+
+Mission-Aircraft-: 
+                 W_{cent}: center weight
+                 W_{total}: aircraft weight
+                 W_{wing}: wing weight
+
