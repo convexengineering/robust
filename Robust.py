@@ -85,8 +85,8 @@ class RobustModel:
             self.dependent_uncertainty_set = False
         else:
             self.dependent_uncertainty_set = True
-            if self.type_of_uncertainty_set == 'elliptical':
-                self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsElliptical'))
+            # if self.type_of_uncertainty_set == 'elliptical':
+            #     self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsElliptical'))
 
         self.ready_gp_constraints = []
         self.to_linearize_gp_posynomials = []
@@ -178,19 +178,19 @@ class RobustModel:
 
             two_term_data_posynomials += to_linearize_posynomials
 
-            try:
-                if not reached_feasibility:
-                    self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
-                        find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints)
-                else:
-                    self._robust_model, _ = self. \
-                        linearize_and_return_upper_lower_models(two_term_data_posynomials,
-                                                                self.robust_solve_properties['numoflinearsections'],
-                                                                ready_constraints)
-                    new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
-                reached_feasibility += 1
-                # rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
-            except:
+            # try:
+            if not reached_feasibility:
+                self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
+                    find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints)
+            else:
+                self._robust_model, _ = self. \
+                    linearize_and_return_upper_lower_models(two_term_data_posynomials,
+                                                            self.robust_solve_properties['numoflinearsections'],
+                                                            ready_constraints)
+                new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
+            reached_feasibility += 1
+            # rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
+            """except:
                 if not reached_feasibility:
                     self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
                         find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints,
@@ -202,6 +202,7 @@ class RobustModel:
                                                                 ready_constraints, feasible=True)
                     new_solution = RobustModel.internalsolve(self._robust_model, verbosity=0)
                     # rel_tol = 2 * self.setting.get('iterationsRelativeTolerance')
+            """
             rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             if verbosity > 0:
                 if not reached_feasibility:
