@@ -1,0 +1,17 @@
+Signomial Simple Wing Results: variable gamma
+----------------------------------------------------------
+Objective: Total Drag Force 
+Units: newton
+----------------------------------------------------------
+Number of iterations: 40
+Minimum number of piecewise-linear sections: 3
+Maximum number of piecewise-linear sections: 99
+Linearization tolerance: 0.001
+----------------------------------------------------------
+Nominal cost: 399.990350268 newton
+Average nominal solve time: 0.0964940786362
+Nominal number of constraints: 18
+----------------------------------------------------------
+Gamma = 0.3:
+	Best Pairs:
+		box:
