@@ -43,8 +43,7 @@ class RobustifyLargePosynomial:
         """
         dim = len(perturbation_vector)
         result, input_list = [], []
-        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm' or type_of_uncertainty_set == \
-                'elliptical' or dim == 1:
+        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm' or dim == 1:
             if dim == 1:
                 x = [np.linspace(-1, 1, number_of_regression_points)]
             else:
