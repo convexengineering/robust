@@ -130,7 +130,6 @@ class RobustGPTools:
                 print('iteration: %s' % i)
             new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
             fail_success, cost = RobustGPTools.fail_or_success(new_model)
-            _ = model.localsolve()
             # print cost
             sum_cost = sum_cost + cost
             if fail_success:
