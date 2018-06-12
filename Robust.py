@@ -1,18 +1,17 @@
 from gpkit import Model, Monomial, Variable
 from gpkit.nomials import SignomialInequality, MonomialEquality
 from gpkit.exceptions import InvalidGPConstraint
-
 import numpy as np
 from time import time
 import warnings
 from scipy.stats import norm
 
-from RobustGPTools import RobustGPTools
-from EquivalentPosynomials import EquivalentPosynomials
-from EquivalentModels import TwoTermBoydModel
-from TwoTermApproximation import TwoTermApproximation
-from RobustifyLargePosynomial import RobustifyLargePosynomial
-from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
+from robust_gp_tools import RobustGPTools
+from equivalent_posynomials import EquivalentPosynomials
+from equivalent_models import TwoTermBoydModel
+from twoterm_approximation import TwoTermApproximation
+from robustify_large_posynomial import RobustifyLargePosynomial
+from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 class RobustnessSetting:
