@@ -1,5 +1,5 @@
 from signomial_simple_wing.models import simple_wing_sp
-from RobustGPTools import RobustGPTools
+from robust_gp_tools import RobustGPTools
 from simulations.simulate import generate_model_properties
 
 simp = simple_wing_sp()
