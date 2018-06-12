@@ -1,8 +1,7 @@
 import numpy as np
-from numbers import Number
-
 from gpkit import Variable, Monomial, Posynomial
-from RobustGPTools import RobustGPTools
+
+from robust_gp_tools import RobustGPTools
 
 
 class EquivalentPosynomials:
@@ -267,3 +266,6 @@ class EquivalentPosynomials:
             if element in list_of_lists[i]:
                 return True
         return False
+
+if __name__ == '__main__':
+    pass

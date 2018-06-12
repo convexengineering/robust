@@ -1,7 +1,7 @@
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
-from simulations import simulate, read_simulation_data
-
 import numpy as np
+
+from simulations import simulate, read_simulation_data
 
 
 def simple_wing_sp():
@@ -109,7 +109,7 @@ def example_sp():
 if __name__ == '__main__':
     model = simple_wing_sp()
     number_of_time_average_solves = 2
-    number_of_iterations =40
+    number_of_iterations = 40
     nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
         simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
     model_name = 'Signomial Simple Wing'

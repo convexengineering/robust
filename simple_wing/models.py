@@ -1,8 +1,7 @@
-# coding=utf-8
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
-from simulations import simulate, read_simulation_data
-
 import numpy as np
+
+from simulations import simulate, read_simulation_data
 
 
 def simple_wing():

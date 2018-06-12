@@ -1,6 +1,7 @@
 from gpkit import Variable, Monomial
 import numpy as np
-from EquivalentPosynomials import EquivalentPosynomials
+
+from equivalent_posynomials import EquivalentPosynomials
 
 
 def test_merge_intersected_lists():

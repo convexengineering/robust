@@ -1,7 +1,7 @@
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled
 
-from RobustGPTools import RobustGPTools
+from robust_gp_tools import RobustGPTools
 
 
 class RobustifyLargePosynomial:
@@ -317,3 +317,6 @@ class RobustifyLargePosynomial:
                                         perturbation_matrix, intercept,
                                         mean_vector, setting.get('enableSP'), m)
         return constraints
+
+if __name__ == '__main__':
+    pass

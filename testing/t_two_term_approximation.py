@@ -1,7 +1,8 @@
 import numpy as np
 from gpkit import Variable, Monomial
 from copy import copy
-from TwoTermApproximation import TwoTermApproximation
+
+from twoterm_approximation import TwoTermApproximation
 
 
 def test_check_if_permutation_exists():

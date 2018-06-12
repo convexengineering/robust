@@ -1,5 +1,4 @@
 import gassolar.solar.solar as solar_mike
-from gpkit.small_scripts import mag
 
 model = solar_mike.Mission(latitude=11)
 model.cost = model["W_{total}"]

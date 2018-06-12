@@ -1,10 +1,8 @@
-import numpy as np
 from gpkit import Variable, Model
-from Robust import RobustModel
-from plot_feasibilities import plot_feasibilities
-from RobustGPTools import RobustGPTools
-from gpkit.small_scripts import mag
 import numpy as np
+
+from robust import RobustModel
+from plot_feasibilities import plot_feasibilities
 
 k = Variable("k", 1.17, "-", "form factor")
 e = Variable("e", 0.92, "-", "Oswald efficiency factor")
@@ -42,7 +40,7 @@ constraints = []
 C_D_fuse = CDA0 / S
 C_D_wpar = k * C_f * S_wetratio
 C_D_ind = C_L ** 2 / (np.pi * A * e)
-constraints += [C_D >= C_D_fuse*dummy + C_D_wpar/dummy + C_D_ind*dummy]
+constraints += [C_D >= C_D_fuse * dummy + C_D_wpar / dummy + C_D_ind * dummy]
 
 # Wing weight model
 # W_w_strc = W_W_coeff1 * (N_ult * A ** 1.5 * (W_0 * W * S) ** 0.5) / tau
@@ -60,6 +58,8 @@ constraints += [D >= 0.5 * rho * S * C_D * V ** 2,
 
 m = Model(D, constraints)
 sol = m.solve()
+
+
 def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2, val2, design_feasibility):
     plot_feasibilities(x, y, m)
     x.key.descr[str1] = val1
@@ -69,7 +69,7 @@ def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2
     print "nominal: ", {k: v for k, v in sol["freevariables"].items()
                         if k in m.varkeys and k.key.fix is True}
     print "robust: ", {k: v for k, v in RMsol["freevariables"].items()
-           if k in m.varkeys and k.key.fix is True}
+                       if k in m.varkeys and k.key.fix is True}
     print 'cost', RMsol['cost']
     plot_feasibilities(x, y, m, RM, numberofsweeps=120, design_feasibility=design_feasibility, skipfailures=True)
     del x.key.descr[str1]

@@ -2,7 +2,7 @@ import numpy as np
 from gpkit import Model, Variable, ConstraintSet, GPCOLORS, GPBLU
 from gpkit.small_scripts import mag
 
-from RobustGPTools import RobustGPTools
+from robust_gp_tools import RobustGPTools
 
 
 def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=False, numberofsweeps=150):

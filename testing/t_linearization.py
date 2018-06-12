@@ -1,9 +1,8 @@
 import numpy as np
-import sys
-sys.path.insert(0, '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust')
-from LinearizeTwoTermPosynomials import LinearizeTwoTermPosynomials
-import scipy.optimize as op
 from gpkit import Variable, Model
+import scipy.optimize as op
+
+from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 def convex_function(x):

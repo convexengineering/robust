@@ -1,7 +1,6 @@
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint
-
 import numpy as np
 from copy import copy
 
@@ -191,3 +190,6 @@ class EqualModel(Model):
         subs = model.substitutions
         self.cost = model.cost
         return model, subs
+
+if __name__ == '__main__':
+    pass
