@@ -232,9 +232,10 @@ class RobustModel:
         return sol
 
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
-        sp_gp_approximation = \
-            [cs.as_gpconstr(x0=solution["freevariables"], substitutions=solution["constants"]).as_posyslt1()[0]
-             for cs in self.sp_constraints]
+        sp_gp_approximation = []
+        for cs in self.sp_constraints:
+            cs.subinplace(solution["constants"])
+            sp_gp_approximation.append(cs.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
         return self.classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
