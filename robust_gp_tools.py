@@ -44,7 +44,7 @@ class RobustGPTools:
                     r = var.key.r * setting.get("gamma")
                     eta_max = np.log(r)
                     eta_min = - np.log(r)
-            except KeyError:
+            except TypeError:
                 if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
                     r = var.key.r * setting.get("gamma")
                     eta_max = np.log(r)

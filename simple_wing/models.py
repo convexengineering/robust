@@ -77,8 +77,7 @@ if __name__ == '__main__':
 
     model = simple_wing()
 
-    variable_gamma_file_name = \
-        '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust/simple_wing/simulation_data_variable_gamma.txt'
+    variable_gamma_file_name = 'simple_wing/simulation_data_variable_gamma.txt'
     simulate.generate_variable_gamma_results(model, model_name, gammas, number_of_iterations,
                                              min_num_of_linear_sections,
                                              max_num_of_linear_sections, verbosity, linearization_tolerance,
@@ -94,8 +93,7 @@ if __name__ == '__main__':
                {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
     uncertainty_sets = ['box', 'elliptical']
 
-    variable_pwl_file_name = \
-        '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust/simple_wing/simulation_data_variable_pwl.txt'
+    variable_pwl_file_name = 'simple_wing/simulation_data_variable_pwl.txt'
     simulate.generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                                numbers_of_linear_sections, linearization_tolerance,
                                                                verbosity, variable_pwl_file_name,
@@ -103,6 +101,6 @@ if __name__ == '__main__':
                                                                nominal_solution, nominal_solve_time,
                                                                nominal_number_of_constraints, directly_uncertain_vars_subs)
 
-    file_path_gamma = '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust/simple_wing/simulation_data_variable_gamma.txt'
-    file_path_pwl = '/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust/simple_wing/simulation_data_variable_pwl.txt'
+    file_path_gamma = 'simple_wing/simulation_data_variable_gamma.txt'
+    file_path_pwl = 'simple_wing/simulation_data_variable_pwl.txt'
     read_simulation_data.generate_all_plots(file_path_gamma, file_path_pwl)

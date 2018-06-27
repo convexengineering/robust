@@ -4,7 +4,7 @@ from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 def construct_linearization_data(max_num_of_linear_sections):
-    the_file = open("/home/saab/Dropbox (MIT)/MIT/Masters/Code/robust/data/linearization_data.txt", "w")
+    the_file = open("data/linearization_data.txt", "w")
     for i in range(2, max_num_of_linear_sections):
         print i
         a = LinearizeTwoTermPosynomials.compute_two_term_posynomial_linearization_coeff(i, 2*np.finfo(float).eps)
