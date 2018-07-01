@@ -32,5 +32,6 @@ setup(name='robust',
       author_email='saab@mit.edu',
       license=license,
       packages=["robust", "robust.data", "robust.feasibility_plots", "robust.signomial_simple_wing",
-                "robust.simple_wing", "robust.solar_model", "robust.synthetic_model", "robust.testing"],
-      install_requires=['gpkit'])
+                "robust.simple_wing", "robust.solar_model", "robust.synthetic_model", "robust.testing",
+                "robust.simulations"],
+      install_requires=['gpkit', 'gassolar', 'numpy', 'matplotlib', 'scipy'])

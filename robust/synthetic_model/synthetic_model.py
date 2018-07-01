@@ -1,6 +1,6 @@
 import models
 
-from robust import RobustModel
+from robust.robust import RobustModel
 
 
 def robustify_synthetic_model(the_model, is_two_term, is_boyd, is_simple_model, the_uncertainty_set,

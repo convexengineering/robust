@@ -1,7 +1,7 @@
 from gpkit import Variable, Monomial
 import numpy as np
 
-from robust_gp_tools import RobustGPTools
+from robust.robust_gp_tools import RobustGPTools
 
 
 def test_check_if_no_data():

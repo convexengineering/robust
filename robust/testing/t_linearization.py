@@ -2,7 +2,7 @@ import numpy as np
 from gpkit import Variable, Model
 import scipy.optimize as op
 
-from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
+from robust.linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 def convex_function(x):

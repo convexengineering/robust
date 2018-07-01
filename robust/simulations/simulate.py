@@ -2,8 +2,8 @@ import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
 
-from robust import RobustModel
-from robust_gp_tools import RobustGPTools
+from robust.robust import RobustModel
+from robust.robust_gp_tools import RobustGPTools
 
 
 def simulate_robust_model(the_model, the_method, the_uncertainty_set, the_gamma, the_directly_uncertain_vars_subs,

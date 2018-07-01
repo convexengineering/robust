@@ -1,6 +1,6 @@
 import numpy as np
 
-from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
+from robust.linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 def construct_linearization_data(max_num_of_linear_sections):

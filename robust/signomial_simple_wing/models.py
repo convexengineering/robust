@@ -1,7 +1,7 @@
 from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
 import numpy as np
 
-from simulations import simulate, read_simulation_data
+from robust.simulations import simulate, read_simulation_data
 
 
 def simple_wing_sp():

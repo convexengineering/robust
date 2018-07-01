@@ -1,7 +1,7 @@
 from gpkit import Variable, Model
 import numpy as np
 
-from robust import RobustModel
+from robust.robust import RobustModel
 from plot_feasibilities import plot_feasibilities
 
 k = Variable("k", 1.17, "-", "form factor")

@@ -1,7 +1,8 @@
 from gassolar.solar.solar import Mission as solar_mike
 
-from simulations import simulate, read_simulation_data
-from robust_gp_tools import SameModel
+from robust.simulations import simulate, read_simulation_data
+from robust.robust_gp_tools import SameModel
+
 
 def mike_solar_model(lat):
     model = solar_mike(latitude=lat)
@@ -24,7 +25,7 @@ if __name__ == '__main__':
         simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
     model_name = 'Solar Model'
     gammas = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.29, 0.33, 0.39, 0.45, 0.6, 0.87, 1.05]
-    gammas = [0.79*i for i in gammas]
+    gammas = [0.79 * i for i in gammas]
     min_num_of_linear_sections = 10
     max_num_of_linear_sections = 50
     linearization_tolerance = 1e-3
@@ -46,7 +47,7 @@ if __name__ == '__main__':
                                              uncertainty_sets, nominal_solution, nominal_solve_time,
                                              nominal_number_of_constraints, directly_uncertain_vars_subs)
 
-    gamma = 0.79*1.05
+    gamma = 0.79 * 1.05
     numbers_of_linear_sections = [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 60, 70, 80]
 
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
@@ -60,7 +61,8 @@ if __name__ == '__main__':
                                                                verbosity, variable_pwl_file_name,
                                                                number_of_time_average_solves, methods, uncertainty_sets,
                                                                nominal_solution, nominal_solve_time,
-                                                               nominal_number_of_constraints, directly_uncertain_vars_subs)
+                                                               nominal_number_of_constraints,
+                                                               directly_uncertain_vars_subs)
 
     file_path_gamma = 'solar_model/simulation_data_variable_gamma.txt'
     file_path_pwl = 'solar_model/simulation_data_variable_pwl.txt'
