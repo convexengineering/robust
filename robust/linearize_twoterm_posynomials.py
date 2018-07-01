@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.optimize as op
+import os
 from gpkit import Variable, Monomial, Posynomial
 
 
@@ -124,7 +125,7 @@ class LinearizeTwoTermPosynomials:
             raise Exception('The number of piece-wise sections should two or larger')
 
         if r < 100:
-            linearization_data_file = open("data/linearization_data.txt", "r")
+            linearization_data_file = open(os.path.dirname(__file__) + "/data/linearization_data.txt", "r")
             for _ in xrange(r-2):
                 linearization_data_file.readline()
             line = linearization_data_file.readline()
