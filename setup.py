@@ -1,5 +1,6 @@
 """Python setup script for robust"""
-from setuptools import setup
+from __future__ import print_function
+from distutils.core import setup
 
 description = """
 generates and solves robust formulations for geometric and signomial programming. 
