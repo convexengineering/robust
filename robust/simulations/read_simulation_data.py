@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import itertools
 
 
 def read_simulation_data(the_file_path_name):
@@ -62,19 +63,20 @@ def read_simulation_data(the_file_path_name):
     return the_variable_dictionary, the_simulation_properties
 
 
-def objective_proboffailure_vs_gamma(the_gammas, the_objective_values, the_objective_name, the_objective_units,
-                                     the_prob_of_failure, the_title):
+def objective_proboffailure_vs_gamma(the_gammas, the_objective_values, the_objective_name, the_objective_units, min_obj,
+                                     max_obj, the_prob_of_failure, the_title):
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     lines1 = ax1.plot(the_gammas, the_objective_values, 'r--', label=the_objective_name)
-    lines2 = ax2.plot(the_gammas, the_prob_of_failure, 'b-', label='Probability of Failure')
+    lines2 = ax2.plot(the_gammas, the_prob_of_failure, 'b-', label='Prob. of Fail.')
     ax1.set_xlabel(r'Uncertainty Set Scaling Factor $\Gamma$', fontsize=18)
-    ax1.set_ylabel(the_objective_name + ' (' + the_objective_units + ')', fontsize=18)
+    ax1.set_ylabel(the_objective_name + ' (' + the_objective_units.capitalize() + ')', fontsize=18)
     ax2.set_ylabel("Probability of Failure", fontsize=18)
+    ax1.set_ylim([min_obj, max_obj])
     plt.title(the_title, fontsize=18)
     lines = lines1 + lines2
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper center", fontsize=18)
+    ax1.legend(lines, labs, loc="upper center", fontsize=18, numpoints=1)
     plt.show()
 
 
@@ -88,14 +90,17 @@ def generate_comparison_plots(the_relative_objective_values, the_objective_name,
                      [0.25] * len(the_methods), color='r', label=the_objective_name)
     lines2 = ax2.bar(x + [0.5] * len(the_methods),
                      the_relative_number_of_constraints,
-                     [0.25] * len(the_methods), color='b', label='No. of Constraints')
+                     [0.25] * len(the_methods), color='b', label='No. of Cons.')
     ax1.set_ylabel("Scaled Average " + the_objective_name, fontsize=18)
+    ax1.set_ylim([min(the_relative_objective_values) - 0.1*min(the_relative_objective_values),
+                 max(the_relative_objective_values) + 0.1*max(the_relative_objective_values)])
     ax2.set_ylabel("Scaled Number of Constraints", fontsize=18)
-    plt.xticks(x + .45, the_methods, fontsize=18)
+    plt.xticks(x + .45, the_methods)
+    ax1.tick_params(axis='x', which='major', labelsize=17)
     plt.title(the_uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper left")
+    ax1.legend(lines, labs, loc="upper left", ncol=1)
     plt.show()
 
     fig, ax1 = plt.subplots()
@@ -109,11 +114,12 @@ def generate_comparison_plots(the_relative_objective_values, the_objective_name,
                      [0.25] * len(the_methods), color='b', label='Solve Time')
     ax1.set_ylabel("Scaled Setup Time", fontsize=18)
     ax2.set_ylabel("Scaled Solve Time", fontsize=18)
-    plt.xticks(x + .45, the_methods, fontsize=18)
+    plt.xticks(x + .45, the_methods)
+    ax1.tick_params(axis='x', which='major', labelsize=17)
     plt.title(the_uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper left")
+    ax1.legend(lines, labs, loc="upper left", ncol=1)
     plt.show()
 
 
@@ -121,12 +127,15 @@ def generate_performance_vs_pwl_plots(the_numbers_of_linear_sections, the_method
                                       the_objective_name, the_objective_units, the_uncertainty_set,
                                       worst_case_or_average):
     plt.figure()
+    marker = itertools.cycle(('s', '*', 'o', '.', ','))
     for method in the_method_performance_dictionary:
-        plt.plot(the_numbers_of_linear_sections, the_method_performance_dictionary[method], label=method)
+        plt.plot(the_numbers_of_linear_sections, the_method_performance_dictionary[method], marker=marker.next(),
+                 linestyle='', label=method)
     plt.xlabel("Number of Piecewise-linear Sections", fontsize=18)
     plt.ylabel(the_objective_name + '(' + the_objective_units + ')', fontsize=18)
-    plt.title('The ' + worst_case_or_average + ' Performance: ' + the_uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
-    plt.legend(loc=0)
+    plt.title('The ' + worst_case_or_average + ' Performance: ' + the_uncertainty_set.capitalize() + ' Uncertainty Set',
+              fontsize=18)
+    plt.legend(loc=0, numpoints=1)
     plt.show()
 
 
@@ -137,6 +146,15 @@ def generate_all_plots(the_variable_gamma_file_path_name, the_variable_pwl_file_
     the_gammas.sort()
     the_methods = dictionary_gamma.values()[0].keys()
     the_uncertainty_sets = dictionary_gamma.values()[0].values()[0].keys()
+    the_min_obj = min([dictionary_gamma[gamma][method][uncertainty_set]['Average performance']
+                       for gamma in the_gammas
+                       for method in the_methods
+                       for uncertainty_set in the_uncertainty_sets])
+
+    the_max_obj = max([dictionary_gamma[gamma][method][uncertainty_set]['Average performance']
+                       for gamma in the_gammas
+                       for method in the_methods
+                       for uncertainty_set in the_uncertainty_sets])
     for uncertainty_set in the_uncertainty_sets:
         for method in the_methods:
             objective_values = [dictionary_gamma[gamma][method][uncertainty_set]['Average performance'] for gamma in
@@ -144,7 +162,7 @@ def generate_all_plots(the_variable_gamma_file_path_name, the_variable_pwl_file_
             prob_of_failure = [dictionary_gamma[gamma][method][uncertainty_set]['Probability of failure'] for gamma in
                                the_gammas]
             objective_proboffailure_vs_gamma(the_gammas, objective_values, properties_gamma['Objective'],
-                                             properties_gamma['Units'],
+                                             properties_gamma['Units'], the_min_obj, the_max_obj,
                                              prob_of_failure,
                                              method + ' Formulation: ' + uncertainty_set.capitalize() + ' Uncertainty Set')
 
@@ -179,6 +197,7 @@ def generate_all_plots(the_variable_gamma_file_path_name, the_variable_pwl_file_
         generate_performance_vs_pwl_plots(the_numbers_of_linear_sections, method_worst_objective_dictionary,
                                           properties_pwl['Objective'], properties_pwl['Units'], uncertainty_set,
                                           'Worst-case')
+
 
 if __name__ == '__main__':
     pass
