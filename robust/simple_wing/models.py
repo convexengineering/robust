@@ -71,8 +71,8 @@ if __name__ == '__main__':
     verbosity = 0
 
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
-               {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
-               {'name': 'Simple Conservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
+               {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
+               {'name': 'Simple Cons.', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
                {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
     uncertainty_sets = ['box', 'elliptical']
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     numbers_of_linear_sections = [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 60, 70, 80]
 
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
-               {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
+               {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
     uncertainty_sets = ['box', 'elliptical']
 
