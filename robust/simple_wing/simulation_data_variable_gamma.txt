@@ -42,7 +42,7 @@ Gamma = 0:
 			Relative solve time: 1.06834901599
 			Number of linear sections: 35
 			Upper lower relative error: 0.000972959959776
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.477
 			Average performance: 321.06505179
@@ -71,7 +71,7 @@ Gamma = 0:
 			Relative solve time: 1.04273428144
 			Number of linear sections: 24
 			Upper lower relative error: 0.000909554903384
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.477
 			Average performance: 321.06505179
@@ -159,7 +159,7 @@ Gamma = 0.05:
 			Relative solve time: 1.08094063151
 			Number of linear sections: 35
 			Upper lower relative error: 0.000973831374127
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.47
 			Average performance: 322.267909521
@@ -188,7 +188,7 @@ Gamma = 0.05:
 			Relative solve time: 1.31240855157
 			Number of linear sections: 24
 			Upper lower relative error: 0.000910034808172
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.47
 			Average performance: 322.267909521
@@ -276,7 +276,7 @@ Gamma = 0.1:
 			Relative solve time: 1.0315778921
 			Number of linear sections: 35
 			Upper lower relative error: 0.000976479926883
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.46
 			Average performance: 324.957109175
@@ -305,7 +305,7 @@ Gamma = 0.1:
 			Relative solve time: 0.988639949741
 			Number of linear sections: 24
 			Upper lower relative error: 0.000911129344883
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.46
 			Average performance: 324.957109175
@@ -393,7 +393,7 @@ Gamma = 0.15:
 			Relative solve time: 0.998675110413
 			Number of linear sections: 35
 			Upper lower relative error: 0.000981085286421
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.441
 			Average performance: 329.277852029
@@ -422,7 +422,7 @@ Gamma = 0.15:
 			Relative solve time: 0.933087060788
 			Number of linear sections: 24
 			Upper lower relative error: 0.000921901697016
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.441
 			Average performance: 329.277852029
@@ -510,7 +510,7 @@ Gamma = 0.2:
 			Relative solve time: 1.12971729897
 			Number of linear sections: 35
 			Upper lower relative error: 0.000987424526654
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.427
 			Average performance: 333.820137008
@@ -539,7 +539,7 @@ Gamma = 0.2:
 			Relative solve time: 0.928145124199
 			Number of linear sections: 24
 			Upper lower relative error: 0.000937078835904
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.427
 			Average performance: 333.820137008
@@ -627,7 +627,7 @@ Gamma = 0.25:
 			Relative solve time: 1.06994367123
 			Number of linear sections: 35
 			Upper lower relative error: 0.000992993983779
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.397
 			Average performance: 342.321779832
@@ -656,7 +656,7 @@ Gamma = 0.25:
 			Relative solve time: 1.1961862185
 			Number of linear sections: 24
 			Upper lower relative error: 0.000956915112054
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.397
 			Average performance: 342.321779832
@@ -744,7 +744,7 @@ Gamma = 0.3:
 			Relative solve time: 1.02746262926
 			Number of linear sections: 35
 			Upper lower relative error: 0.000992947943724
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.363
 			Average performance: 350.820150469
@@ -773,7 +773,7 @@ Gamma = 0.3:
 			Relative solve time: 1.05109835328
 			Number of linear sections: 24
 			Upper lower relative error: 0.000981800219209
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.363
 			Average performance: 350.820150469
@@ -861,7 +861,7 @@ Gamma = 0.35:
 			Relative solve time: 1.14530319168
 			Number of linear sections: 35
 			Upper lower relative error: 0.000992940044424
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.318
 			Average performance: 362.085988482
@@ -890,7 +890,7 @@ Gamma = 0.35:
 			Relative solve time: 0.979500848486
 			Number of linear sections: 24
 			Upper lower relative error: 0.000990334552284
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.318
 			Average performance: 362.085988482
@@ -978,7 +978,7 @@ Gamma = 0.4:
 			Relative solve time: 1.08469377649
 			Number of linear sections: 35
 			Upper lower relative error: 0.000992940212761
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.27
 			Average performance: 373.498440355
@@ -1007,7 +1007,7 @@ Gamma = 0.4:
 			Relative solve time: 2.66987768801
 			Number of linear sections: 24
 			Upper lower relative error: 0.000989670115331
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.27
 			Average performance: 373.498440355
@@ -1095,7 +1095,7 @@ Gamma = 0.5:
 			Relative solve time: 1.03508885558
 			Number of linear sections: 35
 			Upper lower relative error: 0.000992955926334
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.181
 			Average performance: 403.360864324
@@ -1124,7 +1124,7 @@ Gamma = 0.5:
 			Relative solve time: 1.01379000688
 			Number of linear sections: 24
 			Upper lower relative error: 0.000988106965695
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.181
 			Average performance: 403.360864324
@@ -1212,7 +1212,7 @@ Gamma = 0.6:
 			Relative solve time: 1.0319267647
 			Number of linear sections: 36
 			Upper lower relative error: 0.000951866171904
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.09
 			Average performance: 441.012306452
@@ -1241,7 +1241,7 @@ Gamma = 0.6:
 			Relative solve time: 1.03117275756
 			Number of linear sections: 24
 			Upper lower relative error: 0.000986197579221
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.09
 			Average performance: 441.012306452
@@ -1329,7 +1329,7 @@ Gamma = 0.7:
 			Relative solve time: 0.985271524595
 			Number of linear sections: 36
 			Upper lower relative error: 0.000982597390231
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.034
 			Average performance: 487.198063714
@@ -1358,7 +1358,7 @@ Gamma = 0.7:
 			Relative solve time: 1.05201774377
 			Number of linear sections: 25
 			Upper lower relative error: 0.000958227561629
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.034
 			Average performance: 487.198063714
@@ -1446,7 +1446,7 @@ Gamma = 0.8:
 			Relative solve time: 1.04699451294
 			Number of linear sections: 37
 			Upper lower relative error: 0.000947044264211
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.003
 			Average performance: 551.910773238
@@ -1475,7 +1475,7 @@ Gamma = 0.8:
 			Relative solve time: 1.10352451252
 			Number of linear sections: 26
 			Upper lower relative error: 0.000933655518236
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.003
 			Average performance: 551.910773238
@@ -1563,7 +1563,7 @@ Gamma = 0.9:
 			Relative solve time: 1.10750124706
 			Number of linear sections: 38
 			Upper lower relative error: 0.000962413856107
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 651.671171126
@@ -1592,7 +1592,7 @@ Gamma = 0.9:
 			Relative solve time: 1.46960281869
 			Number of linear sections: 27
 			Upper lower relative error: 0.000978739414671
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 651.671171126
@@ -1680,7 +1680,7 @@ Gamma = 1:
 			Relative solve time: 1.05479171236
 			Number of linear sections: 39
 			Upper lower relative error: 0.000976938740574
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 836.453153118
@@ -1709,7 +1709,7 @@ Gamma = 1:
 			Relative solve time: 2.67529232207
 			Number of linear sections: 29
 			Upper lower relative error: 0.000986168796848
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 836.453153118

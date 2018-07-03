@@ -42,7 +42,7 @@ Gamma = 0.5:
 			Relative solve time: 1.15798183133
 			Number of linear sections: 14
 			Upper lower relative error: 0.0317963503608
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 57.4047406612
@@ -71,7 +71,7 @@ Gamma = 0.5:
 			Relative solve time: 8.25755194539
 			Number of linear sections: 14
 			Upper lower relative error: 0.0308909191906
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 57.2381606666
@@ -159,7 +159,7 @@ Gamma = 0.6:
 			Relative solve time: 1.40991739555
 			Number of linear sections: 14
 			Upper lower relative error: 0.0354955211712
-	Linearized Perturbations:
+	Linear. Perts.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 63.1394362823
@@ -188,7 +188,7 @@ Gamma = 0.6:
 			Relative solve time: 9.85266659083
 			Number of linear sections: 14
 			Upper lower relative error: 0.034501867069
-	Simple Conservative:
+	Simple Cons.:
 		box:
 			Probability of failure: 0.0
 			Average performance: 62.9045739823
