@@ -1,0 +1,174 @@
+Mission-FlightSegment-WingLoading-WingSkinL-:
+                                             rhosl = Variable("\\rho_{sl}", 1.225, "kg/m^3", "air density at sea level", pr=2)
+                                             Cmw = Variable("C_{m_w}", 0.121, "-", "negative wing moment coefficent", pr=0)
+                                             taucfrp = Variable("\\tau_{CFRP}", 570, "MPa", "torsional stress limit", pr=1)
+
+Mission-Aircraft-Empennage-TailBoomState-: 
+                                          rhosl = Variable("\\rho_{sl}", 1.225, "kg/m^3", "air density at sea level", pr=2)
+
+Mission-Aircraft-Empennage-HorizontalTail-WingSkin-:
+                                                    Jtbar = Variable("\\bar{J/t}", 0.01114, "1/mm", "torsional moment of inertia", pr=0)
+                                                    rhocfrp = Variable("\\rho_{CFRP}", 1.356, "g/cm^3", "density of CFRP", pr=6.5)  # substituted (kevlar used)
+                                                    tmin = Variable("t_{min}", 0.012, "in", "wing skin min gauge", pr=1)  # manufacturing error
+
+Mission-Aircraft-Empennage-HorizontalTail-: 
+                                           mh = Variable("m_h", "-", "horizontal tail span effectiveness", pr=0)
+                                           CLhmin = Variable("(C_{L_h})_{min}", 0.75, "-", "max downlift coefficient", pr=0)
+                                           mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                                       mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                                       mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)  # replaced m_{fac} = 1.1
+                                           Vh = Variable("V_h", 0.45, "-", "horizontal tail volume coefficient", pr=0) # substituted (was None)
+
+Mission-Aircraft-Empennage-VerticalTail-WingInterior-: 
+                                                      rhofoam = Variable("\\rho_{foam}", 0.024, "g/cm^3", "foam density", pr=10)  # substituted (0.036)
+                                                      Abar = Variable("\\bar{A}_{jh01}", 0.0548, "-", "jh01 non dimensional area", pr=0)  # substituted (0.036)
+
+Mission-Aircraft-Battery-: 
+                          hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery specific energy", pr=10)
+                          eta_discharge = Variable("\\eta_{discharge}", 0.97, "-", "discharging efficiency", pr=3.09)
+                          eta_charge = Variable("\\eta_{charge}", 0.97, "-", "charging efficiency", pr=3.09)
+                          vbatt = Variable("(E/\\mathcal{V})", 800, "W*hr/l", "volume battery energy density", pr=5)
+
+Mission-Aircraft-Empennage-: 
+                            mfachtopvar = Variable("m_{fachtopvar}", 1.0, "-", "Tail weight margin factor", pr=0)
+                            mfacvtopvar = Variable("m_{facvtopvar}", 1.0, "-", "Tail weight margin factor", pr=0)
+                            mfactailboom = Variable("m_{factailboom}", 1.0, "-", "Tail weight margin factor", pr=0)  # replaced m_{fac} = 1
+
+Mission-Aircraft-Empennage-HorizontalTail-WingInterior-: 
+                                                        rhofoam = Variable("\\rho_{foam}", 0.024, "g/cm^3", "foam density", pr=10)  # substituted (0.036)
+                                                        Abar = Variable("\\bar{A}_{jh01}", 0.0548, "-", "jh01 non dimensional area", pr=0)  # substituted (0.036)
+
+Mission-Aircraft-Wing-CapSpar-: 
+                               mfac = Variable("m_{fac}", 1, "-", "curvature knockdown factor", pr=0)
+                               rhocfrp = Variable("\\rho_{CFRP}", 1.5, "g/cm^3", "density of CFRP", pr=6.5)
+                               E = Variable("E", 2e7, "psi", "Youngs modulus of CFRP", pr=2)
+                               wlim = Variable("w_{lim}", 0.15, "-", "spar width to chord ratio", pr=0)
+                               rhofoam = Variable("\\rho_{foam}", 0.036, "g/cm^3", "foam density", pr=10)
+                               tshearmin = Variable("t_{shear-min}", 0.012, "in", "min shear web thickness", pr=0)
+
+Mission-FlightSegment-WingLoading-ChordSparL-Beam-: 
+                                                   Sbartip = Variable("\\bar{S}_{tip}", 1e-10, "-", "Tip loading", pr=0)
+                                                   Mbartip = Variable("\\bar{M}_{tip}", 1e-10, "-", "Tip moment", pr=0)
+                                                   throot = Variable("\\theta_{root}", 1e-10, "-", "Base angle", pr=0)
+                                                   dbarroot = Variable("\\bar{\\delta}_{root}", 1e-10, "-", "Base deflection", pr=0)
+
+Mission-Aircraft-SolarCells-: 
+                            rhosolar = Variable("\\rho_{solar}", 0.27, "kg/m^2", "solar cell area density", pr=5)
+                            etasolar = Variable("\\eta", 0.22, "-", "solar cell efficiency", pr=10)
+
+Mission-FlightSegment-AircraftPerf-WingAero-: 
+                                             # fit factor: 1.0
+                                             CLstall = Variable("C_{L_{stall}}", 1.3, "-", "stall CL", pr=10)
+                                             e = Variable("e", 0.9, "-", "span efficiency",pr=2)
+
+Mission-Aircraft-Empennage-VerticalBoomTorsion-: 
+                                                taucfrp = Variable("\\tau_{CFRP}", 210, "MPa", "torsional stress limit", pr=2)
+
+Mission-FlightSegment-AircraftPerf-TailAero-: 
+                                             RMS error of fit: 1.04070184606
+
+
+Mission-FlightSegment-AircraftPerf-: 
+                                    Pavn = Variable("P_{avn}", 0.0, "W", "Accessory power draw")
+                                    mfaccda = Variable("m_{faccda}", 1, "-", "cda drag margin factor", pr=0)
+                                    mfacwingcd = Variable("m_{facwingcd}", 1, "-", "wing cd drag margin factor", pr=0) #replaced m_{fac} = 1.2
+
+Mission-FlightSegment-FlightState-: 
+                                   mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity", pr=5)
+                                   ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2", "solar energy", pr=5)
+                                   rhoref = Variable("\\rho_{ref}", 1.0, "kg/m**3", "reference air density", pr=3)
+                                   Vwindref = Variable("V_{wind-ref}", 100.0, "m/s", "reference wind speed",pr=3)
+                                   pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds", pr=3)
+                                   # fit factor: 1.0
+
+Mission-FlightSegment-SteadyLevelFlight-: 
+                                         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propeller efficiency", pr=5)
+
+Mission-Aircraft-Empennage-VerticalTail-: 
+                                         Vv = Variable("V_v", "-", "vertical tail volume coefficient", pr=5)
+                                         mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                                     mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                                     mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)
+
+Mission-Aircraft-Wing-: 
+                       mfacskin = Variable("m_{facskin}", 1, "-", "skin wing weight margin factor", pr = 0)
+	                   mfacspar = Variable("m_{facspar}", 1, "-", "spar wing weight margin factor", pr = 0)
+	                   mfacfoam = Variable("m_{facfoam}", 1, "-", "foam wing weight margin factor", pr = 0)
+
+Mission-Aircraft-Empennage-HorizontalBoomBending-: 
+                                                  thmax = Variable("\\theta_{max}", 0.1, "-", "max tail boom deflection angle", pr=0)
+
+Mission-Aircraft-Empennage-VerticalBoomBending-: 
+                                                thmax = Variable("\\theta_{max}", 0.1, "-", "max tail boom deflection angle", pr=0)
+
+Mission-Aircraft-Empennage-TailBoom-: 
+                                     rhocfrp = Variable("\\rho_{CFRP}", 1.5, "g/cm^3", "density of CFRP", pr=6.5)
+                                     mfac = Variable("m_{fac}", 1.0, "-", "tail boom margin factor", pr=0)
+                                     E = Variable("E", 158e9, "N/m^2", "young's modulus carbon fiber", pr=2)
+                                     k = Variable("k", 0.85, "-", "tail boom inertia value", pr=6)
+                                     kfac = Variable("(1-k/2)", 1-k.value/2, "-", "(1-k/2)", pr=2.2*k**0.4345)
+                                     tmin = Variable("t_{min}", 0.25, "mm", "minimum tail boom thickness", pr=1) # manufacturing error
+
+Mission-Aircraft-Motor-:
+                        Bpm = Variable("B_{PM}", 4140.8, "W/kg", "power mass ratio", pr=5)
+                        eta = Variable("\\eta", 0.95, "-", "motor efficiency", pr=5)
+
+Mission-Aircraft-Empennage-VerticalTail-WingSkin-:
+                                                 Jtbar = Variable("\\bar{J/t}", 0.01114, "1/mm", "torsional moment of inertia", pr=0)
+                                                 rhocfrp = Variable("\\rho_{CFRP}", 1.356, "g/cm^3", "density of CFRP", pr=6.5)  # substituted (kevlar used)
+                                                 tmin = Variable("t_{min}", 0.012, "in", "wing skin min gauge", pr=1)  # manufacturing error
+
+Mission-Aircraft-: 
+                 Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight", pr=2)
+                 Wpay = Variable("W_{pay}", 0, "lbf", "payload weight", pr=0)
+
+Mission-FlightSegment-WingLoading-GustL-:
+                                        taucfrp = Variable("\\tau_{CFRP}", 450e6, "Pa", "CFRP fabric stress", pr=2)
+                                        # m_{fac--fit}: fit factor: 1.0
+                                        kappa = Variable("\\kappa", 0.2, "-", "max tip deflection ratio", pr=0)
+                                        vgust = Variable("V_{gust}", 10, "m/s", "gust velocity", pr=0)
+                                        sigmacfrp = Variable("\\sigma_{CFRP}", 1700e6, "Pa", "CFRP max stress", pr=2)
+                                        1-cos(\eta): 1 minus cosine factor: [  1.00000001e-10   7.61204660e-02   2.92893231e-01   6.17316544e-01    1.00000000e+00]
+
+
+Mission-FlightSegment-WingLoading-ChordSparL-:
+
+                                             sigmacfrp = Variable("\\sigma_{CFRP}", 1700e6, "Pa", "CFRP max stress", pr=2)
+                                             kappa = Variable("\\kappa", 0.2, "-", "max tip deflection ratio", pr=0)
+                                             taucfrp = Variable("\\tau_{CFRP}", 450e6, "Pa", "CFRP fabric stress", pr=2)
+                                             qbar = Variable("\\bar{q}", "-", "normalized loading",pr=5)  # [ 1.33333337  1.16666663  1.          0.83333331  0.66666669]
+
+Mission-Aircraft-Empennage-HorizontalTail-Planform-:
+                                                   cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.05555556  0.94444444] ---- None
+                                                   CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+                                                   cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                                   CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+                                                   eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.   0.5  1. ] ---- None
+                                                   deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.5  0.5] ---- None
+                                                   lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+                                                   cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.11111111  1.          0.88888889] ---- None
+                                                   AR = Variable("AR", 4, "-", "aspect ratio", pr=2)
+                                                   tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
+
+Mission-Aircraft-Wing-Planform-:
+                                tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
+                                CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+                                CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+                                cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.33333333  1.16666667  1.          0.83333333  0.66666667] -> None
+                                eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.    0.25  0.5   0.75  1.  ] -> None
+                                cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.25        1.08333333  0.91666667  0.75      ] -> None
+                                cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.25  0.25  0.25  0.25] -> None
+                                lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+
+Mission-Aircraft-Empennage-VerticalTail-Planform-:
+                                                  cbave = Variable("\\bar{c}_{ave}", "-", "normalized mid section chord", pr=0)  # [ 1.05555556  0.94444444] ---- None
+                                                  CM = Variable("C_M", 0.14, "-", "wing moment coefficient", pr=0)
+                                                  cbarmac = Variable("\\bar{c}_{MAC}", return_cmac, "-", "non-dim MAC", pr=1)
+                                                  CLmax = Variable("C_{L_{max}}", 1.39, "-", "maximum CL of JHO1", pr=0)
+                                                  eta = Variable("\\eta", "-", "(2y/b)", pr=0)  # [ 0.   0.5  1. ] ---- None
+                                                  deta = Variable("d\\eta", "-", "\\Delta (2y/b)", pr=0)  # [ 0.5  0.5] ---- None
+                                                  lam = Variable("\\lambda", 0.8, "-", "wing taper ratio", pr=0)
+                                                  cbar = Variable("\\bar{c}", "-", "normalized chord at mid element", pr=0)  # [ 1.11111111  1.          0.88888889] ---- None
+                                                  AR = Variable("AR", 4, "-", "aspect ratio", pr=2)
+                                                  tau = Variable("\\tau", 0.115, "-", "airfoil thickness ratio", pr=0)
