@@ -43,7 +43,7 @@ def read_simulation_data(the_file_path_name):
         if line[0] != '\t':
             line = line[0:-2]
             line_data = line.split(' = ')
-            a_variable = float(line_data[1][0:-1])
+            a_variable = float(line_data[1])
             the_variable_dictionary[a_variable] = {}
             line = f.readline()
         elif line[1] != '\t':
