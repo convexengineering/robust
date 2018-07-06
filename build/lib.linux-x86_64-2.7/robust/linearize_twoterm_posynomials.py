@@ -129,8 +129,6 @@ class LinearizeTwoTermPosynomials:
             for _ in xrange(r-2):
                 linearization_data_file.readline()
             line = linearization_data_file.readline()
-            print line
-            print os.path.dirname(__file__) + '/ '
             data = line.split(": ")
             slopes = data[0].split(", ")[0:-1]
             slopes = [float(item) for item in slopes]
