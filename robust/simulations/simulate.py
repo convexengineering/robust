@@ -74,13 +74,13 @@ def generate_variable_gamma_results(the_model, the_model_name, the_gammas, the_n
     f = open(the_file_name, 'w')
     f.write(the_model_name + ' Results: variable gamma\n')
     f.write('----------------------------------------------------------\n')
-    cost_label = the_model.cost.key.descr['label']
+    cost_label = the_model.cost.str_without()
     split_label = cost_label.split(' ')
     capitalized_cost_label = ''
     for word in split_label:
         capitalized_cost_label += word.capitalize() + ' '
     f.write('Objective: %s\n' % capitalized_cost_label)
-    f.write('Units: %s\n' % the_model.cost.key.descr['units'].units)
+    f.write('Units: %s\n' % the_model.cost.units)
     f.write('----------------------------------------------------------\n')
     f.write('Number of iterations: %s\n' % the_number_of_iterations)
     f.write('Minimum number of piecewise-linear sections: %s\n' % the_min_num_of_linear_sections)
@@ -119,13 +119,13 @@ def generate_variable_piecewiselinearsections_results(the_model, the_model_name,
     f = open(the_file_name, 'w')
     f.write(the_model_name + ' Results: variable piecewise-linear sections\n')
     f.write('----------------------------------------------------------\n')
-    cost_label = the_model.cost.key.descr['label']
+    cost_label = the_model.cost.str_without()
     split_label = cost_label.split(' ')
     capitalized_cost_label = ''
     for word in split_label:
         capitalized_cost_label += word.capitalize() + ' '
     f.write('Objective: %s\n' % capitalized_cost_label)
-    f.write('Units: %s\n' % the_model.cost.key.descr['units'].units)
+    f.write('Units: %s\n' % the_model.cost.units)
     f.write('----------------------------------------------------------\n')
     f.write('Number of iterations: %s\n' % the_number_of_iterations)
     f.write('gamma: %s\n' % the_gamma)
