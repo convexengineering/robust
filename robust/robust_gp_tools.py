@@ -124,6 +124,7 @@ class RobustGPTools:
         success = 0
 
         sum_cost = 0
+
         for i in xrange(number_of_iterations):
             if verbosity > 0:
                 print('iteration: %s' % i)
@@ -159,7 +160,7 @@ class RobustGPTools:
             except InvalidGPConstraint:
                 sol = model.localsolve(verbosity=0)
             return True, sol['cost']
-        except RuntimeWarning:
+        except:  # ValueError:
             return False, 0
 
 
