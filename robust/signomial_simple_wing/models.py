@@ -18,7 +18,9 @@ def example_sp():
 
 
 def simple_wing_sp():
-    return simpleWingSP()
+    the_model = simpleWingSP()
+    the_model.cost = the_model['W_f']
+    return the_model
 
 
 def simple_ac():
