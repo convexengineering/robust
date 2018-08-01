@@ -1,9 +1,10 @@
-from gpkit import Variable, Model, SignomialsEnabled, VarKey, units, Vectorize
-import numpy as np
+from gpkit import Variable, Model, SignomialsEnabled, units
 from robust.simulations import simulate, read_simulation_data
 import os
 
 from gpkitmodels.SP.SimPleAC.SimPleAC_mission import SimPleAC, Mission
+from gpkitmodels.SP.SimPleAC.SimPleAC import SimPleAC as simpleWingSP
+
 
 def example_sp():
     x = Variable('x')
@@ -15,19 +16,25 @@ def example_sp():
         constraints = constraints + [x >= 1 - a * y, b * y <= 0.1]
     return Model(x, constraints)
 
+
 def simple_wing_sp():
-    model = Mission(SimPleAC(), 4)
-    model.substitutions.update({
-        'h_{cruise_m}'   :5000*units('m'),
-        'Range_m'        :3000*units('km'),
-        'W_{p_m}'        :6250*units('N'),
-        'C_m'            :120*units('1/hr'),
-        'V_{min_m}'      :25*units('m/s'),
-        'T/O factor_m'   :2,
+    return simpleWingSP()
+
+
+def simple_ac():
+    the_model = Mission(SimPleAC(), 4)
+    the_model.substitutions.update({
+        'h_{cruise_m}': 5000 * units('m'),
+        'Range_m': 3000 * units('km'),
+        'W_{p_m}': 6250 * units('N'),
+        'C_m': 120 * units('1/hr'),
+        'V_{min_m}': 25 * units('m/s'),
+        'T/O factor_m': 2,
     })
-    c = Variable('c','-','model cost')
-    model = Model(c, [model, c >= model['W_{f_m}']*units('1/N') + model['C_m']*model['t_m']])
-    return model
+    c = Variable('c', '-', 'model cost')
+    the_model = Model(c, [the_model, c >= the_model['W_{f_m}'] * units('1/N') + the_model['C_m'] * the_model['t_m']])
+    return the_model
+
 
 if __name__ == '__main__':
     model = simple_wing_sp()
@@ -70,7 +77,8 @@ if __name__ == '__main__':
                                                                verbosity, variable_pwl_file_name,
                                                                number_of_time_average_solves, methods, uncertainty_sets,
                                                                nominal_solution, nominal_solve_time,
-                                                               nominal_number_of_constraints, directly_uncertain_vars_subs)
+                                                               nominal_number_of_constraints,
+                                                               directly_uncertain_vars_subs)
 
     file_path_gamma = os.path.dirname(__file__) + '/simulation_data_variable_gamma.txt'
     file_path_pwl = os.path.dirname(__file__) + '/simulation_data_variable_pwl.txt'
