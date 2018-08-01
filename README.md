@@ -2,4 +2,4 @@
 
 # Robust is a tool for manipulating geometric and signomial programs under uncertainty. four different formulations of approximate robust geometric programming are implemented.
 
-# This repository has supplies tools that can test your design given different formulations and uncertainty sets.
+# This repository has tools that can test your design given different formulations and uncertainty sets.
