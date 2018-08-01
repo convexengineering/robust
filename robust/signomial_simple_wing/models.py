@@ -3,7 +3,7 @@ import numpy as np
 from robust.simulations import simulate, read_simulation_data
 import os
 
-from gplibrary.SP.SimPleAC.SimPleAC_mission import SimPleAC, Mission
+from gpkitmodels.SP.SimPleAC.SimPleAC_mission import SimPleAC, Mission
 
 def example_sp():
     x = Variable('x')
