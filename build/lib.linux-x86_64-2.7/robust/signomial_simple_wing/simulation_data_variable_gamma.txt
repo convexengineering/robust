@@ -9,7 +9,7 @@ Maximum number of piecewise-linear sections: 99
 Linearization tolerance: 0.001
 ----------------------------------------------------------
 Nominal cost: 399.990350268 newton
-Average nominal solve time: 0.154160022736
+Average nominal solve time: 0.147464871407
 Nominal number of constraints: 18
 ----------------------------------------------------------
 Gamma = 0.3:
