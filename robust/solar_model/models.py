@@ -2,7 +2,6 @@ from gassolar.solar.solar import Mission as solar_mike
 import os
 
 from robust.simulations import simulate, read_simulation_data
-from robust.robust_gp_tools import SameModel
 
 
 def mike_solar_model(lat):
