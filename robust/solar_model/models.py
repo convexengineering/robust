@@ -8,14 +8,7 @@ from robust.robust_gp_tools import SameModel
 def mike_solar_model(lat):
     model = solar_mike(latitude=lat)
     model.cost = model["W_{total}"]
-    # new_model = model
-    new_model = SameModel(model)
-    new_model.substitutions.update(model.substitutions)
-    new_model.unique_varkeys = model.varkeys
-    new_model.reset_varkeys()
-
-    # print new_model.variables_byname('V_h')[0].key.descr
-    return new_model
+    return model
 
 
 if __name__ == '__main__':
