@@ -93,11 +93,17 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
         fc = FeasCircle(m, rm.get_robust_model().solution, rob=True)
         for interesting_var in interesting_vars:
             del fc.substitutions[interesting_var]
-        sol = fc.solve(skipsweepfailures=skipfailures)
+        try:
+        	sol = fc.solve(skipsweepfailures=skipfailures)
+        except:
+        	sol = fc.localsolve(skipsweepfailures=skipfailures)
     ofc = FeasCircle(m, m.solution)
     for interesting_var in interesting_vars:
         del ofc.substitutions[interesting_var]
-    origfeas = ofc.solve(skipsweepfailures=skipfailures)
+    try:
+    	origfeas = ofc.solve(skipsweepfailures=skipfailures)
+    except:
+    	origfeas = ofc.localsolve(skipsweepfailures=skipfailures)
     from matplotlib import pyplot as plt
     fig, axes = plt.subplots(2)
 
