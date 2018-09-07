@@ -39,24 +39,24 @@ def simple_ac():
 
 
 if __name__ == '__main__':
-    model = simple_wing_sp()
-    number_of_time_average_solves = 100
-    number_of_iterations = 1000
+    model = simple_ac()
+    number_of_time_average_solves = 3  # 100
+    number_of_iterations = 15  # 1000
     nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
         simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
     model_name = 'Signomial Simple Flight'
-    gammas = [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    gammas = [0.6, 1]  # [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
     min_num_of_linear_sections = 3
     max_num_of_linear_sections = 99
     linearization_tolerance = 1e-3
-    verbosity = 0
+    verbosity = 1
 
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                {'name': 'Simple Conservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True}]
     uncertainty_sets = ['box', 'elliptical']
 
-    model = simple_wing_sp()
+    model = simple_ac()
 
     variable_gamma_file_name = os.path.dirname(__file__) + '/simulation_data_variable_gamma.txt'
     simulate.generate_variable_gamma_results(model, model_name, gammas, number_of_iterations,
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                                              nominal_number_of_constraints, directly_uncertain_vars_subs)
 
     gamma = 1
-    numbers_of_linear_sections = [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 60, 70, 80]
+    numbers_of_linear_sections = [40, 60]  # [12, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 30, 32, 36, 44, 52, 60, 70, 80]
 
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False}]
