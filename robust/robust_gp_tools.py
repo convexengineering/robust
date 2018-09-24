@@ -28,39 +28,17 @@ class RobustGPTools:
         return all_vars
 
     @staticmethod
-    def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
+    def generate_etas(var):
 
-        eta_max, eta_min = 0, 0
-        if setting.get("lognormal") and var.key.sigma is not None:
-            eta_max = var.key.sigma * number_of_stds
-            eta_min = -var.key.sigma * number_of_stds
-        else:
-            try:
-                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-                    pr = var.key.pr * setting.get("gamma")
-                    eta_max = np.log(1 + pr / 100.0)
-                    eta_min = np.log(1 - pr / 100.0)
-                elif type_of_uncertainty_set == 'elliptical':
-                    r = var.key.r * setting.get("gamma")
-                    eta_max = np.log(r)
-                    eta_min = - np.log(r)
-            except TypeError:
-                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-                    r = var.key.r * setting.get("gamma")
-                    eta_max = np.log(r)
-                    eta_min = - np.log(r)
-                elif type_of_uncertainty_set == 'elliptical':
-                    pr = var.key.pr * setting.get("gamma")
-                    eta_max = np.log(1 + pr / 100.0)
-                    eta_min = np.log(1 - pr / 100.0)
+        r = var.key.r
+        eta_max = np.log(r)
+        eta_min = - np.log(r)
+
         return eta_min, eta_max
 
     @staticmethod
     def is_directly_uncertain(variable):
-        return ((variable.key.pr is not None and variable.key.pr > 0)
-                or (variable.key.r is not None and variable.key.r > 1)
-                or variable.key.sigma is not None) \
-               and variable.key.rel is None
+        return variable.key.r is not None and variable.key.r > 1 and variable.key.rel is None
 
     @staticmethod
     def is_indirectly_uncertain(variable):
