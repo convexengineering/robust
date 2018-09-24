@@ -12,7 +12,7 @@ robust_model_solution = robust_model.robustsolve(verbosity=0)  # solve the robus
 # Below, we are testing the SimPleAC model against failure. The free variables with attribute fixed=True are fixed using
 # the robust solution, and the uncertain parameters are replaced by the realizations generated above. The model is then
 # solved to check if a feasible solution exists.
-designed_model = RobustGPTools.DesignedModel(model, robust_model_solution, directly_uncertain_vars_subs[0])
-designed_model.localsolve()
+# designed_model = RobustGPTools.DesignedModel(model, robust_model_solution, directly_uncertain_vars_subs[0])
+# designed_model.localsolve()
 # The designed model is not converging although it has the same set of constraints as the original model by with
 # different substitutions
