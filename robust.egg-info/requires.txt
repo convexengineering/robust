@@ -1,5 +1,0 @@
-gpkit
-gassolar
-numpy
-matplotlib
-scipy
