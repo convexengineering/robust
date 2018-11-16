@@ -7,19 +7,19 @@ from robust.simulations import simulate, read_simulation_data
 
 def simple_wing():
     # Substitutions Variables
-    k = Variable("k", 1.17, "-", "form factor", pr=31.111111, sigma=0.035)
-    e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
-    mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
-    rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)
-    tau = Variable("\\tau", 0.12, "-", "airfoil thickness to chord ratio", pr=33.333333)
-    N_ult = Variable("N_{ult}", 3.3, "-", "ultimate load factor", pr=33.333333)
-    V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
-    C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)
-    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
-    W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m", "Wing Weight Coefficent 1", pr=60)
-    W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa", "Wing Weight Coefficent 2", pr=66)
-    CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
-    W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
+    k = Variable("k", 1.111, "-", "form factor", pr=31.111111, sigma=0.035, r=1.38)  # OV = 1.17
+    e = Variable("e", 0.917, "-", "Oswald efficiency factor", pr=7.6086956, r=1.08)  # OV = 0.92
+    mu = Variable("\\mu", 1.773e-5, "kg/m/s", "viscosity of air", pr=4.225352, r=1.043)  # OV = 1.775e-5
+    rho = Variable("\\rho", 1.224, "kg/m^3", "density of air", pr=10, r=1.106)  # OV = 1.23
+    tau = Variable("\\tau", 0.113, "-", "airfoil thickness to chord ratio", pr=33.333333, r=1.414)  # OV = 0.12
+    N_ult = Variable("N_{ult}", 3.111, "-", "ultimate load factor", pr=33.333333, r=1.414)  # OV = 3.3
+    V_min = Variable("V_{min}", 24.49, "m/s", "takeoff speed", pr=20, r=1.225)  # OV = 25
+    C_Lmax = Variable("C_{L,max}", 1.55, "-", "max CL with flaps down", pr=25, r=1.29)  # OV = 1.6
+    S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.073, "-", "wetted area ratio", pr=3.6144578, r=1.037)  # OV = 2.075
+    W_W_coeff1 = Variable("W_{W_{coeff1}}", 9.6e-5, "1/m", "Wing Weight Coefficent 1", pr=60, r=2.0)  # OV = 12e-5
+    W_W_coeff2 = Variable("W_{W_{coeff2}}", 45.08, "Pa", "Wing Weight Coefficent 2", pr=66, r=2.21)  # OV = 60
+    CDA0 = Variable("(CDA0)", 0.0316, "m^2", "fuselage drag area", pr=42.857142, r=1.58)  # OV = 0.035
+    W_0 = Variable("W_0", 5000, "N", "aircraft weight excluding wing", pr=60, r=2.0)  # OV = 6250
 
     # Free Variables
     D = Variable("D", "N", "total drag force")
