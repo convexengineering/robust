@@ -138,8 +138,7 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
     plt.legend(loc=0, numpoints=1)
     plt.show()
 
-
-def generate_all_plots(variable_gamma_file_path_name, variable_pwl_file_path_name):
+def generate_variable_gamma_plots(variable_gamma_file_path_name):
     dictionary_gamma, properties_gamma = read_simulation_data(variable_gamma_file_path_name)
 
     gammas = dictionary_gamma.keys()
@@ -179,6 +178,7 @@ def generate_all_plots(variable_gamma_file_path_name, variable_pwl_file_path_nam
         generate_comparison_plots(rel_objective_values, properties_gamma['Objective'], rel_num_of_cons, rel_setup_times,
                                   rel_solve_times, uncertainty_set, methods)
 
+def generate_variable_pwl_plots(variable_pwl_file_path_name):
     dictionary_pwl, properties_pwl = read_simulation_data(variable_pwl_file_path_name)
     numbers_of_linear_sections = dictionary_pwl.keys()
     numbers_of_linear_sections.sort()
@@ -198,6 +198,9 @@ def generate_all_plots(variable_gamma_file_path_name, variable_pwl_file_path_nam
                                           properties_pwl['Objective'], properties_pwl['Units'], uncertainty_set,
                                           'Worst-case')
 
+def generate_all_plots(variable_gamma_file_path_name, variable_pwl_file_path_name):
+    generate_variable_gamma_plots(variable_gamma_file_path_name)
+    generate_variable_pwl_plots(variable_pwl_file_path_name)
 
 if __name__ == '__main__':
     pass
