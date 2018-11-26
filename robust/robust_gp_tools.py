@@ -117,7 +117,7 @@ class RobustGPTools:
         if success > 0:
             cost_average = sum_cost / (success + 0.0)
         else:
-            cost_average = 1e10
+            cost_average = None
         prob = failure / (failure + success + 0.0)
         return prob, cost_average
 

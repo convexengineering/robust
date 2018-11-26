@@ -109,6 +109,29 @@ def generate_variable_gamma_results(model, model_name, gammas, number_of_iterati
                                          simulation_results, f)
     f.close()
 
+def variable_gamma_results(model, methods, gammas, number_of_iterations,
+                                    min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
+                                    linearization_tolerance, number_of_time_average_solves,
+                                    uncertainty_sets, nominal_solution, directly_uncertain_vars_subs):
+    solutions = {}
+    solve_times = {}
+    prob_of_failure = {}
+    avg_cost = {}
+    for gamma in gammas:
+        for method in methods:
+            for uncertainty_set in uncertainty_sets:
+                robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
+                    simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
+                                          number_of_iterations, linearization_tolerance,
+                                          min_num_of_linear_sections,
+                                          max_num_of_linear_sections, verbosity, nominal_solution,
+                                          number_of_time_average_solves)
+                ind = (gamma, method['name'], uncertainty_set)
+                solutions[ind] = robust_model_solution
+                solve_times[ind] = robust_model_solve_time
+                prob_of_failure[ind] = simulation_results[0]
+                avg_cost[ind] = simulation_results[1]
+    return solutions, solve_times, prob_of_failure, avg_cost
 
 def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
