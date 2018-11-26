@@ -177,7 +177,7 @@ def generate_variable_piecewiselinearsections_results(model, model_name, gamma, 
     f.close()
 
 
-def generate_model_properties(model, number_of_time_average_solves, number_of_iterations):
+def generate_model_properties(model, number_of_time_average_solves, number_of_iterations, distribution = None):
     try:
         nominal_solution = model.solve(verbosity=0)
         nominal_solve_time = nominal_solution['soltime']
@@ -190,7 +190,13 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
             nominal_solve_time += model.localsolve(verbosity=0)['soltime']
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
-    directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
+    if distribution == 'normal':
+        directly_uncertain_vars_subs = [{k: v + 1./3.*k.key.pr*np.random.standard_normal()
+                                         for k, v in model.substitutions.items()
+                                     if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
+                                    for _ in xrange(number_of_iterations)]
+    else:
+        directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
                                      for k, v in model.substitutions.items()
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in xrange(number_of_iterations)]
