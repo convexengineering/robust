@@ -238,13 +238,13 @@ class RobustModel:
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
         sp_gp_approximation = []
         for cs in self.sp_constraints:
-            cs.subinplace(solution["constants"])
-            sp_gp_approximation.append(cs.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
+            css = cs.sub(solution['constants'])
+            sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
         ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial = self.\
             classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
         for cs in self.sp_equality_constraints:
-            cs.subinplace(solution["constants"])
-            ready_sp_constraints.append(cs.as_gpconstr(x0=solution["freevariables"]))
+            css = cs.sub(solution['constants'])
+            ready_sp_constraints.append(css.as_gpconstr(x0=solution["freevariables"]))
         return ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
