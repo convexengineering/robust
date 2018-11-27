@@ -191,7 +191,7 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
     if distribution == 'normal':
-        directly_uncertain_vars_subs = [{k: v + 1./3.*k.key.pr*np.random.standard_normal()
+        directly_uncertain_vars_subs = [{k: v + 1./300.*k.key.pr*np.random.standard_normal()
                                          for k, v in model.substitutions.items()
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in xrange(number_of_iterations)]
