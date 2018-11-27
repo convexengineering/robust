@@ -1,4 +1,4 @@
-from gpkit import Model, Monomial, Variable
+from gpkit import Model, Monomial, Variable, SignomialsEnabled
 from gpkit.nomials import SignomialInequality, MonomialEquality
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.nomials import SingleSignomialEquality
@@ -237,14 +237,15 @@ class RobustModel:
 
     def approximate_and_classify_sp_constraints(self, solution, number_of_gp_posynomials):
         sp_gp_approximation = []
-        for cs in self.sp_constraints:
-            css = cs.sub(solution['constants'])
-            sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
-        ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial = self.\
-            classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
-        for cs in self.sp_equality_constraints:
-            css = cs.sub(solution['constants'])
-            ready_sp_constraints.append(css.as_gpconstr(x0=solution["freevariables"]))
+        with SignomialsEnabled():
+            for cs in self.sp_constraints:
+                css = SignomialInequality(cs.left.sub(solution['constants']), cs.oper, cs.right.sub(solution['constants']))
+                sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
+            ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial = self.\
+                classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
+            for cs in self.sp_equality_constraints:
+                css = SingleSignomialEquality(cs.left.sub(solution['constants']), cs.right.sub(solution['constants']))
+                ready_sp_constraints.append(css.as_gpconstr(x0=solution["freevariables"]))
         return ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
