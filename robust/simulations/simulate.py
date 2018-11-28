@@ -137,12 +137,12 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                 avg_cost[ind] = simulation_results[1]
     return solutions, solve_times, prob_of_failure, avg_cost
 
-def get_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
-    result = {}
+def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
+    filteredResult = {}
     for i in sorted(dict.iterkeys()):
         if i[tupInd1] == tupVal1 and i[tupInd2] == tupVal2:
-            result[i] = dict[i]
-    return result
+            filteredResult[i] = dict[i]
+    return filteredResult
 
 def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredPoF, filteredCost):
     gammas = []
