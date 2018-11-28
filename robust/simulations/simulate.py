@@ -8,7 +8,7 @@ from robust.robust_gp_tools import RobustGPTools
 from robust.simulations.read_simulation_data import objective_proboffailure_vs_gamma
 
 import matplotlib.pyplot as plt
-
+import multiprocessing as mp
 
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
@@ -29,8 +29,12 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              linearizationTolerance=linearization_tolerance)
 
     robust_model_solve_time = robust_model_solution['soltime']
-    for _ in xrange(number_of_time_average_solves-1):
-        robust_model_solve_time += robust_model.robustsolve(verbosity=0)['soltime']
+    processes = [mp.Process(target=robustmodel.robustsolve(verbosity=0), args=()) for _ in xrange(number_of_time_average_solves-1)]
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+    robust_model_solve_time = [output.get() for p in processes]
     robust_model_solve_time = robust_model_solve_time / number_of_time_average_solves
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
@@ -125,6 +129,7 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
     for gamma in gammas:
         for method in methods:
             for uncertainty_set in uncertainty_sets:
+                ind = (gamma, method['name'], uncertainty_set)
                 robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
                     simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                                           number_of_iterations, linearization_tolerance,
@@ -137,7 +142,6 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                 except AttributeError:
                     nconstraints = \
                         len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
-                ind = (gamma, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
                 prob_of_failure[ind] = simulation_results[0]
