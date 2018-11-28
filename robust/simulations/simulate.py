@@ -1,9 +1,13 @@
 import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
+from gpkit.small_scripts import mag
 
 from robust.robust import RobustModel
 from robust.robust_gp_tools import RobustGPTools
+from robust.simulations.read_simulation_data import objective_proboffailure_vs_gamma
+
+import matplotlib.pyplot as plt
 
 
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
@@ -133,6 +137,25 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                 avg_cost[ind] = simulation_results[1]
     return solutions, solve_times, prob_of_failure, avg_cost
 
+def get_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
+    result = {}
+    for i in sorted(dict.iterkeys()):
+        if i[tupInd1] == tupVal1 and i[tupInd2] == tupVal2:
+            result[i] = dict[i]
+    return result
+
+def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredPoF, filteredCost):
+    gammas = []
+    avg_costs = []
+    pofs = []
+    for i in sorted(filteredResult.iterkeys()):
+        gammas.append(i[0])
+        avg_costs.append(mag(filteredCost[i]))
+        pofs.append(filteredPoF[i])
+    min_obj = min(avg_costs)
+    max_obj = max(avg_costs)
+    objective_proboffailure_vs_gamma(gammas, avg_costs, objective_name, objective_units, min_obj, max_obj, pofs, title)
+
 def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
                                                       verbosity, file_name, number_of_time_average_solves,
@@ -190,8 +213,8 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
             nominal_solve_time += model.localsolve(verbosity=0)['soltime']
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
-    if distribution == 'normal':
-        directly_uncertain_vars_subs = [{k: v + 1./300.*k.key.pr*np.random.standard_normal()
+    if distribution == 'normal' or 'Gaussian':
+        directly_uncertain_vars_subs = [{k: v + 1./300.*v*k.key.pr*np.random.standard_normal()
                                          for k, v in model.substitutions.items()
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in xrange(number_of_iterations)]
