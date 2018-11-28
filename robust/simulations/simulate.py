@@ -28,13 +28,13 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
 
-    robust_model_solve_time = robust_model_solution['soltime']
-    processes = [mp.Process(target=robustmodel.robustsolve(verbosity=0), args=()) for _ in xrange(number_of_time_average_solves-1)]
+    processes = [mp.Process(target=robustmodel.robustsolve, args=()) for _ in xrange(number_of_time_average_solves-1)]
     for p in processes:
         p.start()
     for p in processes:
         p.join()
-    robust_model_solve_time = [output.get() for p in processes]
+    robust_model_solve_time = [p.wait(100) for p in processes]
+    robust_model_solve_time = [p['soltime'] for p in processes]
     robust_model_solve_time = sum(robust_model_solve_time) / number_of_time_average_solves
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
