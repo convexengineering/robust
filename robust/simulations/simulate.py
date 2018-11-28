@@ -121,6 +121,7 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
     solve_times = {}
     prob_of_failure = {}
     avg_cost = {}
+    number_of_constraints = {}
     for gamma in gammas:
         for method in methods:
             for uncertainty_set in uncertainty_sets:
@@ -130,12 +131,19 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                           min_num_of_linear_sections,
                                           max_num_of_linear_sections, verbosity, nominal_solution,
                                           number_of_time_average_solves)
+                try:
+                    nconstraints = \
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])
+                except AttributeError:
+                    nconstraints = \
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
                 ind = (gamma, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
                 prob_of_failure[ind] = simulation_results[0]
                 avg_cost[ind] = simulation_results[1]
-    return solutions, solve_times, prob_of_failure, avg_cost
+                number_of_constraints[ind] = nconstraints
+    return solutions, solve_times, prob_of_failure, avg_cost, number_of_constraints
 
 def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
     filteredResult = {}
