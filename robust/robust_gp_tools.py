@@ -4,6 +4,7 @@ from gpkit.exceptions import InvalidGPConstraint
 import numpy as np
 from copy import copy
 
+import multiprocessing as mp
 
 class RobustGPTools:
     def __init__(self):
@@ -98,27 +99,15 @@ class RobustGPTools:
 
     @staticmethod
     def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
-        failure = 0
-        success = 0
-
-        sum_cost = 0
-
-        for i in xrange(number_of_iterations):
-            if verbosity > 0:
-                print('iteration: %s' % i)
-            new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
-            fail_success, cost = RobustGPTools.fail_or_success(new_model)
-            # print cost
-            sum_cost = sum_cost + cost
-            if fail_success:
-                success = success + 1
-            else:
-                failure = failure + 1
-        if success > 0:
-            cost_average = sum_cost / (success + 0.0)
+        pool = mp.Pool(mp.cpu_count()-1)
+        results = [pool.apply_async(confirmSuccess, args = (model,directly_uncertain_vars_subs[i])) for i in range(number_of_iterations)]
+        costs = [p.wait(100) for p in results]
+        costs = [0 if costs[i] is None else costs[i] for i in range(number_of_iterations)]
+        if np.sum(costs) > 0:
+            cost_average = np.sum(costs) / (np.sum(costs > 0.) + 0.0)
         else:
             cost_average = None
-        prob = failure / (failure + success + 0.0)
+        prob = 1. - (np.sum(costs > 0.)/(number_of_iterations + 0.0))
         return prob, cost_average
 
     class DesignedModel(Model):
@@ -140,7 +129,6 @@ class RobustGPTools:
             return True, sol['cost']
         except:  # ValueError:
             return False, 0
-
 
 class SameModel(Model):
     """
@@ -169,6 +157,11 @@ class EqualModel(Model):
         subs = model.substitutions
         self.cost = model.cost
         return model, subs
+
+def confirmSuccess(model, uncertainsub):
+    new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
+    fail_success, cost = RobustGPTools.fail_or_success(new_model)
+    return cost
 
 if __name__ == '__main__':
     pass

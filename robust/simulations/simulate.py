@@ -35,7 +35,7 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
     for p in processes:
         p.join()
     robust_model_solve_time = [output.get() for p in processes]
-    robust_model_solve_time = robust_model_solve_time / number_of_time_average_solves
+    robust_model_solve_time = sum(robust_model_solve_time) / number_of_time_average_solves
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
