@@ -28,7 +28,7 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
 
-    processes = [mp.Process(target=robustmodel.robustsolve, args=()) for _ in xrange(number_of_time_average_solves-1)]
+    processes = [mp.Process(target=robust_model.robustsolve, args=()) for _ in xrange(number_of_time_average_solves)]
     for p in processes:
         p.start()
     for p in processes:
