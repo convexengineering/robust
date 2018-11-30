@@ -102,6 +102,8 @@ class RobustGPTools:
         pool = mp.Pool(mp.cpu_count()-1)
         results = [pool.apply_async(confirmSuccess, args = (model,directly_uncertain_vars_subs[i])) for i in range(number_of_iterations)]
         costs = [p.wait(100) for p in results]
+        pool.close()
+        pool.join()
         costs = [0 if costs[i] is None else costs[i] for i in range(number_of_iterations)]
         if np.sum(costs) > 0:
             cost_average = np.sum(costs) / (np.sum(costs > 0.) + 0.0)

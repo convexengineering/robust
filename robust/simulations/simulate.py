@@ -10,6 +10,17 @@ from robust.simulations.read_simulation_data import objective_proboffailure_vs_g
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 
+def pickleable_robust_solve(robust_model,verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections, linearization_tolerance):
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                             minNumOfLinearSections=min_num_of_linear_sections,
+                                                             maxNumOfLinearSections=max_num_of_linear_sections,
+                                                             linearizationTolerance=linearization_tolerance)
+    return robust_model_solution
+
+def log_result(result):
+    robust_model_solve_time.append(result)
+
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
                           max_num_of_linear_sections, verbosity, nominal_solution,
@@ -27,14 +38,12 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              minNumOfLinearSections=min_num_of_linear_sections,
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
-
-    processes = [mp.Process(target=robust_model.robustsolve, args=()) for _ in xrange(number_of_time_average_solves)]
-    for p in processes:
-        p.start()
-    for p in processes:
-        p.join()
-    robust_model_solve_time = [p.wait(100) for p in processes]
-    robust_model_solve_time = [p['soltime'] for p in processes]
+    pool = mp.Pool(mp.cpu_count()-1)
+    robust_model_solve_time = []
+    processes = [pool.apply_async(pickleable_robust_solve, args = (robust_model,verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections,linearization_tolerance), callback = log_result) for _ in xrange(number_of_time_average_solves)]
+    pool.close()
+    pool.join()
     robust_model_solve_time = sum(robust_model_solve_time) / number_of_time_average_solves
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
