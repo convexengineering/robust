@@ -8,18 +8,19 @@ from robust.robust_gp_tools import RobustGPTools
 from robust.simulations.read_simulation_data import objective_proboffailure_vs_gamma
 
 import matplotlib.pyplot as plt
-import multiprocessing as mp
+# import multiprocessing as mp
+import scipy.stats as stats
 
-def pickleable_robust_solve(robust_model,verbosity, min_num_of_linear_sections,
-                            max_num_of_linear_sections, linearization_tolerance):
-    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-                                                             minNumOfLinearSections=min_num_of_linear_sections,
-                                                             maxNumOfLinearSections=max_num_of_linear_sections,
-                                                             linearizationTolerance=linearization_tolerance)
-    return robust_model_solution
-
-def log_result(result):
-    robust_model_solve_time.append(result)
+# def pickleable_robust_solve(robust_model,verbosity, min_num_of_linear_sections,
+#                             max_num_of_linear_sections, linearization_tolerance):
+#     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+#                                                              minNumOfLinearSections=min_num_of_linear_sections,
+#                                                              maxNumOfLinearSections=max_num_of_linear_sections,
+#                                                              linearizationTolerance=linearization_tolerance)
+#     return robust_model_solution
+#
+# def log_sol_time(result):
+#     robust_model_solve_time.append(result['soltime'])
 
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
@@ -38,13 +39,21 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              minNumOfLinearSections=min_num_of_linear_sections,
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
-    pool = mp.Pool(mp.cpu_count()-1)
+    # pool = mp.Pool(mp.cpu_count()-1)
     robust_model_solve_time = []
-    processes = [pool.apply_async(pickleable_robust_solve, args = (robust_model,verbosity, min_num_of_linear_sections,
-                            max_num_of_linear_sections,linearization_tolerance), callback = log_result) for _ in xrange(number_of_time_average_solves)]
-    pool.close()
-    pool.join()
-    robust_model_solve_time = sum(robust_model_solve_time) / number_of_time_average_solves
+    # processes = []
+    # for i in range(number_of_time_average_solves):
+    #     p = pool.apply_async(pickleable_robust_solve, args = (robust_model,verbosity, min_num_of_linear_sections,
+    #                         max_num_of_linear_sections,linearization_tolerance), callback = log_sol_time)
+    #     processes.append(p)
+    #     p.wait(100)
+    timesolutions = [robust_model.robustsolve(verbosity=verbosity)
+                                                               for i in range(number_of_time_average_solves)]
+        # processes.append(p)
+        # p.wait(100)
+    # pool.close()
+    # pool.join()
+    robust_model_solve_time = sum(r['soltime'] for r in timesolutions) / number_of_time_average_solves
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
@@ -235,10 +244,11 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
     if distribution == 'normal' or 'Gaussian':
-        directly_uncertain_vars_subs = [{k: v + 1./300.*v*k.key.pr*np.random.standard_normal()
+        directly_uncertain_vars_subs = [{k: stats.truncnorm.rvs(-3. , 3. , loc=v, scale=(v*k.key.pr/300.))
                                          for k, v in model.substitutions.items()
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in xrange(number_of_iterations)]
+        print directly_uncertain_vars_subs
     else:
         directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
                                      for k, v in model.substitutions.items()

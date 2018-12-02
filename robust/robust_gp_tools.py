@@ -1,6 +1,7 @@
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint
+from gpkit.small_scripts import mag
 import numpy as np
 from copy import copy
 
@@ -99,12 +100,15 @@ class RobustGPTools:
 
     @staticmethod
     def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
-        pool = mp.Pool(mp.cpu_count()-1)
-        results = [pool.apply_async(confirmSuccess, args = (model,directly_uncertain_vars_subs[i])) for i in range(number_of_iterations)]
-        costs = [p.wait(100) for p in results]
-        pool.close()
-        pool.join()
-        costs = [0 if costs[i] is None else costs[i] for i in range(number_of_iterations)]
+        # pool = mp.Pool(mp.cpu_count()-1)
+        # results = [pool.apply_async(confirmSuccess, args = (model, solution, directly_uncertain_vars_subs[i])) for i in range(number_of_iterations)]
+        results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
+        # costs = [p.wait(100) for p in results]
+        # print costs
+        # pool.close()
+        # pool.join()
+        costs = [0 if results[i] is None else mag(results[i]) for i in range(number_of_iterations)]
+        print costs
         if np.sum(costs) > 0:
             cost_average = np.sum(costs) / (np.sum(costs > 0.) + 0.0)
         else:
@@ -160,7 +164,7 @@ class EqualModel(Model):
         self.cost = model.cost
         return model, subs
 
-def confirmSuccess(model, uncertainsub):
+def confirmSuccess(model, solution, uncertainsub):
     new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
     fail_success, cost = RobustGPTools.fail_or_success(new_model)
     return cost
