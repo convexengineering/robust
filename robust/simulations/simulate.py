@@ -248,7 +248,6 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
                                          for k, v in model.substitutions.items()
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in xrange(number_of_iterations)]
-        print directly_uncertain_vars_subs
     else:
         directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
                                      for k, v in model.substitutions.items()
