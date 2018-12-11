@@ -118,7 +118,7 @@ class RobustGPTools:
             inds = list(np.nonzero(costs)[0])
             nonzero_costs = [costs[i] for i in inds]
             cost_average = np.mean(nonzero_costs)
-            cost_variance = np.var(nonzero_costs)
+            cost_variance = np.sqrt(np.var(nonzero_costs))
         else:
             cost_average = None
             cost_variance = None

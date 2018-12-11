@@ -176,14 +176,14 @@ def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filtere
     gammas = []
     objective_costs = []
     pofs = []
-    objective_vars = []
+    objective_stddev = []
     for i in sorted(filteredResult.iterkeys()):
         gammas.append(i[0])
-        objective_vars.append(filteredSimulations[i][2])
+        objective_stddev.append(filteredSimulations[i][2])
         objective_costs.append(filteredSimulations[i][1])
         pofs.append(filteredSimulations[i][0])
     objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
-                                     min(objective_costs), max(objective_costs), pofs, title, objective_vars)
+                                     min(objective_costs), max(objective_costs), pofs, title, objective_stddev)
 
 def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
