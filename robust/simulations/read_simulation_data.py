@@ -64,10 +64,15 @@ def read_simulation_data(file_path_name):
 
 
 def objective_proboffailure_vs_gamma(gammas, objective_values, objective_name, objective_units, min_obj,
-                                     max_obj, prob_of_failure, title):
+                                     max_obj, prob_of_failure, title, objective_var = None):
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
     lines1 = ax1.plot(gammas, objective_values, 'r--', label=objective_name)
+    if objective_var:
+        inds = np.nonzero(np.ones(len(gammas))-prob_of_failure)
+        ax1.fill_between(gammas[inds], objective_values[inds] - np.sqrt(objective_var[inds]),
+                         objective_values + np.sqrt(objective_var[inds]),
+                         alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     lines2 = ax2.plot(gammas, prob_of_failure, 'b-', label='Prob. of Fail.')
     ax1.set_xlabel(r'Uncertainty Set Scaling Factor $\Gamma$', fontsize=18)
     ax1.set_ylabel(objective_name + ' (' + objective_units.capitalize() + ')', fontsize=18)

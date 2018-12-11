@@ -115,11 +115,15 @@ class RobustGPTools:
         costs = [0 if results[i] is None else mag(results[i]) for i in range(number_of_iterations)]
         print costs
         if np.sum(costs) > 0:
-            cost_average = np.sum(costs) / (len(np.nonzero(costs)[0]) + 0.0)
+            inds = list(np.nonzero(costs)[0])
+            nonzero_costs = [costs[i] for i in inds]
+            cost_average = np.mean(nonzero_costs)
+            cost_variance = np.var(nonzero_costs)
         else:
             cost_average = None
+            cost_variance = None
         prob = 1. - (len(np.nonzero(costs)[0])/(number_of_iterations + 0.0))
-        return prob, cost_average
+        return prob, cost_average, cost_variance
 
     class DesignedModel(Model):
         def setup(self, model, solution, directly_uncertain_vars_subs):

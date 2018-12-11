@@ -141,8 +141,7 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                     uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=False):
     solutions = {}
     solve_times = {}
-    prob_of_failure = {}
-    avg_cost = {}
+    simulations = {}
     number_of_constraints = {}
     for gamma in gammas:
         for method in methods:
@@ -162,10 +161,9 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                         len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
-                prob_of_failure[ind] = simulation_results[0]
-                avg_cost[ind] = simulation_results[1]
+                simulations[ind] = simulation_results
                 number_of_constraints[ind] = nconstraints
-    return solutions, solve_times, prob_of_failure, avg_cost, number_of_constraints
+    return solutions, solve_times, simulations, number_of_constraints
 
 def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
     filteredResult = {}
@@ -174,17 +172,18 @@ def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
             filteredResult[i] = dict[i]
     return filteredResult
 
-def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredPoF, filteredCost):
+def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredSimulations):
     gammas = []
-    avg_costs = []
+    objective_costs = []
     pofs = []
+    objective_vars = []
     for i in sorted(filteredResult.iterkeys()):
         gammas.append(i[0])
-        avg_costs.append(mag(filteredCost[i]))
-        pofs.append(filteredPoF[i])
-    min_obj = min(avg_costs)
-    max_obj = max(avg_costs)
-    objective_proboffailure_vs_gamma(gammas, avg_costs, objective_name, objective_units, min_obj, max_obj, pofs, title)
+        objective_vars.append(filteredSimulations[i][2])
+        objective_costs.append(filteredSimulations[i][1])
+        pofs.append(filteredSimulations[i][0])
+    objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
+                                     min(objective_costs), max(objective_costs), pofs, title, objective_vars)
 
 def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
