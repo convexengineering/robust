@@ -8,24 +8,21 @@ from robust.robust_gp_tools import RobustGPTools
 from robust.simulations.read_simulation_data import objective_proboffailure_vs_gamma
 
 import matplotlib.pyplot as plt
-# import multiprocessing as mp
+import multiprocessing as mp
 import scipy.stats as stats
 
-# def pickleable_robust_solve(robust_model,verbosity, min_num_of_linear_sections,
-#                             max_num_of_linear_sections, linearization_tolerance):
-#     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
-#                                                              minNumOfLinearSections=min_num_of_linear_sections,
-#                                                              maxNumOfLinearSections=max_num_of_linear_sections,
-#                                                              linearizationTolerance=linearization_tolerance)
-#     return robust_model_solution
-#
-# def log_sol_time(result):
-#     robust_model_solve_time.append(result['soltime'])
+def pickleable_robust_solve_time(robust_model,verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections, linearization_tolerance):
+    robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
+                                                             minNumOfLinearSections=min_num_of_linear_sections,
+                                                             maxNumOfLinearSections=max_num_of_linear_sections,
+                                                             linearizationTolerance=linearization_tolerance)
+    return robust_model_solution['soltime']
 
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
                           max_num_of_linear_sections, verbosity, nominal_solution,
-                          number_of_time_average_solves):
+                          number_of_time_average_solves, parallel=False):
     print(
         method[
             'name'] + ' under ' + uncertainty_set + ' uncertainty set: \n' + '\t' + 'gamma = %s\n' % gamma
@@ -39,25 +36,28 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                                                              minNumOfLinearSections=min_num_of_linear_sections,
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
-    # pool = mp.Pool(mp.cpu_count()-1)
-    robust_model_solve_time = []
-    # processes = []
-    # for i in range(number_of_time_average_solves):
-    #     p = pool.apply_async(pickleable_robust_solve, args = (robust_model,verbosity, min_num_of_linear_sections,
-    #                         max_num_of_linear_sections,linearization_tolerance), callback = log_sol_time)
-    #     processes.append(p)
-    #     p.wait(100)
-    timesolutions = [robust_model.robustsolve(verbosity=verbosity)
+    if parallel:
+        pool = mp.Pool(mp.cpu_count()-1)
+        processes = []
+        for i in range(number_of_time_average_solves):
+            p = pool.apply_async(pickleable_robust_solve_time, (robust_model, verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections,linearization_tolerance))
+            processes.append(p)
+        pool.close()
+        pool.join()
+        solutions = [p.get() for p in processes]
+    else:
+        solutions = [robust_model.robustsolve(verbosity=verbosity)
                                                                for i in range(number_of_time_average_solves)]
-        # processes.append(p)
-        # p.wait(100)
-    # pool.close()
-    # pool.join()
-    robust_model_solve_time = sum(r['soltime'] for r in timesolutions) / number_of_time_average_solves
+    timesolutions = [s['soltime'] for s in solutions]
+    print timesolutions
+    robust_model_solve_time = sum(timesolutions) / number_of_time_average_solves
+
+
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
-                                                                  verbosity=0)
+                                                                  verbosity=0, parallel=parallel)
     return robust_model, robust_model_solution, robust_model_solve_time, simulation_results
 
 
@@ -138,7 +138,7 @@ def generate_variable_gamma_results(model, model_name, gammas, number_of_iterati
 def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                     min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
                                     linearization_tolerance, number_of_time_average_solves,
-                                    uncertainty_sets, nominal_solution, directly_uncertain_vars_subs):
+                                    uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=False):
     solutions = {}
     solve_times = {}
     prob_of_failure = {}
@@ -153,7 +153,7 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                           number_of_iterations, linearization_tolerance,
                                           min_num_of_linear_sections,
                                           max_num_of_linear_sections, verbosity, nominal_solution,
-                                          number_of_time_average_solves)
+                                          number_of_time_average_solves, parallel)
                 try:
                     nconstraints = \
                         len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])

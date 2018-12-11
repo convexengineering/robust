@@ -99,14 +99,19 @@ class RobustGPTools:
             return False
 
     @staticmethod
-    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
-        # pool = mp.Pool(mp.cpu_count()-1)
-        # results = [pool.apply_async(confirmSuccess, args = (model, solution, directly_uncertain_vars_subs[i])) for i in range(number_of_iterations)]
-        results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
-        # costs = [p.wait(100) for p in results]
-        # print costs
-        # pool.close()
-        # pool.join()
+    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0, parallel=False):
+        if parallel:
+            pool = mp.Pool(mp.cpu_count()-1)
+            processes = []
+            for i in range(number_of_time_average_solves):
+                p = pool.apply_async(confirmSuccess, (model, solution, directly_uncertain_vars_subs[i]))
+                processes.append(p)
+            pool.close()
+            pool.join()
+            results = [p.get() for p in processes]
+        else:
+            results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
+
         costs = [0 if results[i] is None else mag(results[i]) for i in range(number_of_iterations)]
         print costs
         if np.sum(costs) > 0:
