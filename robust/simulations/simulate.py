@@ -19,6 +19,24 @@ def pickleable_robust_solve_time(robust_model,verbosity, min_num_of_linear_secti
                                                              linearizationTolerance=linearization_tolerance)
     return robust_model_solution['soltime']
 
+def get_avg_robust_solve_time(number_of_time_average_solves, robust_model, verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections, linearization_tolerance, parallel=False):
+    if parallel:
+        pool = mp.Pool(mp.cpu_count()-1)
+        processes = []
+        for i in range(number_of_time_average_solves):
+            p = pool.apply_async(pickleable_robust_solve_time, (robust_model, verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections,linearization_tolerance,))
+            processes.append(p)
+        timesolutions = [p.get(timeout=1) for p in processes]
+        pool.close()
+        pool.join()
+    else:
+        solutions = [robust_model.robustsolve(verbosity=verbosity)
+                                                               for i in range(number_of_time_average_solves)]
+        timesolutions = [s['soltime'] for s in solutions]
+    return np.mean(timesolutions)
+
 def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
                           max_num_of_linear_sections, verbosity, nominal_solution,
@@ -32,32 +50,22 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
     robust_model = RobustModel(model, uncertainty_set, gamma=gamma, twoTerm=method['twoTerm'],
                                    boyd=method['boyd'], simpleModel=method['simpleModel'],
                                    nominalsolve=nominal_solution)
+
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                              minNumOfLinearSections=min_num_of_linear_sections,
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
                                                              linearizationTolerance=linearization_tolerance)
-    if parallel:
-        pool = mp.Pool(mp.cpu_count()-1)
-        processes = []
-        for i in range(number_of_time_average_solves):
-            p = pool.apply_async(pickleable_robust_solve_time, (robust_model, verbosity, min_num_of_linear_sections,
-                            max_num_of_linear_sections,linearization_tolerance))
-            processes.append(p)
-        pool.close()
-        pool.join()
-        solutions = [p.get() for p in processes]
-    else:
-        solutions = [robust_model.robustsolve(verbosity=verbosity)
-                                                               for i in range(number_of_time_average_solves)]
-    timesolutions = [s['soltime'] for s in solutions]
-    print timesolutions
-    robust_model_solve_time = sum(timesolutions) / number_of_time_average_solves
 
+    robust_model_solve_time = get_avg_robust_solve_time(number_of_time_average_solves,
+                                                        robust_model, verbosity, min_num_of_linear_sections,
+                                                        max_num_of_linear_sections,
+                                                        linearization_tolerance, parallel)
 
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
                                                                   verbosity=0, parallel=parallel)
+
     return robust_model, robust_model_solution, robust_model_solve_time, simulation_results
 
 
