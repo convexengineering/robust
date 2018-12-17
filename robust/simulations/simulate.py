@@ -2,6 +2,7 @@ import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.small_scripts import mag
+from gpkit import Model, Variable
 
 from robust.robust import RobustModel
 from robust.robust_gp_tools import RobustGPTools
@@ -157,6 +158,42 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                 ind = (gamma, method['name'], uncertainty_set)
                 robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
                     simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncertain_vars_subs,
+                                          number_of_iterations, linearization_tolerance,
+                                          min_num_of_linear_sections,
+                                          max_num_of_linear_sections, verbosity, nominal_solution,
+                                          number_of_time_average_solves, parallel)
+                try:
+                    nconstraints = \
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])
+                except AttributeError:
+                    nconstraints = \
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
+                solutions[ind] = robust_model_solution
+                solve_times[ind] = robust_model_solve_time
+                simulations[ind] = simulation_results
+                number_of_constraints[ind] = nconstraints
+    return solutions, solve_times, simulations, number_of_constraints
+
+def variable_goal_results(model, methods, deltas, number_of_iterations,
+                                    min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
+                                    linearization_tolerance, number_of_time_average_solves,
+                                    uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=False):
+    solutions = {}
+    solve_times = {}
+    simulations = {}
+    number_of_constraints = {}
+    Gamma = Variable('\\Gamma', '-', 'Uncertainty bound', fix = True)
+    solBound = Variable('1+\\delta', '-', 'Acceptable optimal solution bound', fix = True)
+    origcost = model.cost
+    mGoal = Model(1 / Gamma, [m, origcost <= Monomial(sol(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
+                  m.substitutions)
+    for delta in deltas:
+        mGoal.substitutions.update({'1+\\delta': 1 + delta})
+        for method in methods:
+            for uncertainty_set in uncertainty_sets:
+                ind = (delta, method['name'], uncertainty_set)
+                robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
+                    simulate_robust_model(mGoal, method, uncertainty_set, Gamma, directly_uncertain_vars_subs,
                                           number_of_iterations, linearization_tolerance,
                                           min_num_of_linear_sections,
                                           max_num_of_linear_sections, verbosity, nominal_solution,
