@@ -2,7 +2,7 @@ import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.small_scripts import mag
-from gpkit import Model, Variable
+from gpkit import Model, Variable, Monomial
 
 from robust.robust import RobustModel
 from robust.robust_gp_tools import RobustGPTools
@@ -185,8 +185,9 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
     Gamma = Variable('\\Gamma', '-', 'Uncertainty bound', fix = True)
     solBound = Variable('1+\\delta', '-', 'Acceptable optimal solution bound', fix = True)
     origcost = model.cost
-    mGoal = Model(1 / Gamma, [m, origcost <= Monomial(sol(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
-                  m.substitutions)
+    mGoal = Model(1 / Gamma, [model, origcost <= Monomial(nominal_solution(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
+                  model.substitutions)
+    newSol = mGoal.localsolve()
     for delta in deltas:
         mGoal.substitutions.update({'1+\\delta': 1 + delta})
         for method in methods:
@@ -196,7 +197,7 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                     simulate_robust_model(mGoal, method, uncertainty_set, Gamma, directly_uncertain_vars_subs,
                                           number_of_iterations, linearization_tolerance,
                                           min_num_of_linear_sections,
-                                          max_num_of_linear_sections, verbosity, nominal_solution,
+                                          max_num_of_linear_sections, verbosity, newSol,
                                           number_of_time_average_solves, parallel)
                 try:
                     nconstraints = \
