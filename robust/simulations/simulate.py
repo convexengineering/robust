@@ -192,7 +192,6 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
         mGoal.substitutions.update({'1+\\delta': 1 + delta})
         for method in methods:
             for uncertainty_set in uncertainty_sets:
-                ind = (delta, method['name'], uncertainty_set)
                 robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
                     simulate_robust_model(mGoal, method, uncertainty_set, Gamma, directly_uncertain_vars_subs,
                                           number_of_iterations, linearization_tolerance,
@@ -205,6 +204,7 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                 except AttributeError:
                     nconstraints = \
                         len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
+                ind = (robust_model_solution('\\Gamma').magnitude, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
                 simulations[ind] = simulation_results
