@@ -18,7 +18,7 @@ from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 class RobustnessSetting:
     def __init__(self, **options):
         self._options = {
-            'gamma': np.exp(1),
+            'gamma': 1,
             'simpleModel': False,
             'numberOfRegressionPoints': 2,
             'numberOfRegressionPointsElliptical': 25,
@@ -283,10 +283,13 @@ class RobustModel:
             only_uncertain_vars_monomial(monomial.exps[0])
         m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if RobustGPTools.is_uncertain(var)]
 
+        total_center = 0
         l_norm = 0
         for var in m_direct_uncertain_vars:
-            eta_min, eta_max = RobustGPTools.generate_etas(var)
-            scale = eta_max
+            eta_min, eta_max = RobustGPTools.generate_etas(var, self.type_of_uncertainty_set,
+                                                           self.number_of_stds, self.setting)
+            center = (eta_min + eta_max) / 2.0
+            scale = eta_max - center
             exponent = -new_monomial_exps.get(var.key)
             pert = exponent * scale
 
@@ -298,10 +301,11 @@ class RobustModel:
                 l_norm = max(l_norm, np.abs(pert))
             else:
                 raise Exception('This type of set is not supported')
+            total_center = total_center + exponent * center
         if self.type_of_uncertainty_set == 'elliptical':
             l_norm = np.sqrt(l_norm)
 
-        return monomial * self.setting.get('gamma')*np.exp(l_norm)
+        return monomial * np.exp(self.setting.get('gamma') * l_norm) / np.exp(total_center)
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
         robust_set_of_monomial_constraints = []
