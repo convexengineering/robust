@@ -25,11 +25,11 @@ def get_avg_robust_solve_time(number_of_time_average_solves, robust_model, verbo
     if parallel:
         pool = mp.Pool(mp.cpu_count()-1)
         processes = []
+        timesolutions = []
         for i in range(number_of_time_average_solves):
-            p = pool.apply_async(pickleable_robust_solve_time, (robust_model, verbosity, min_num_of_linear_sections,
-                            max_num_of_linear_sections,linearization_tolerance,))
+            p = pool.apply_async(pickleable_robust_solve_time, args=(robust_model, verbosity, min_num_of_linear_sections,
+                            max_num_of_linear_sections,linearization_tolerance), callback=timesolutions.append)
             processes.append(p)
-        timesolutions = [p.get(timeout=1) for p in processes]
         pool.close()
         pool.join()
     else:

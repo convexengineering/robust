@@ -125,16 +125,16 @@ class RobustGPTools:
         if parallel:
             pool = mp.Pool(mp.cpu_count()-1)
             processes = []
-            for i in range(number_of_time_average_solves):
-                p = pool.apply_async(confirmSuccess, (model, solution, directly_uncertain_vars_subs[i]))
+            results=[]
+            for i in range(number_of_iterations):
+                p = pool.apply_async(confirmSuccess, args=(model, solution, directly_uncertain_vars_subs[i]), callback=results.append)
                 processes.append(p)
             pool.close()
             pool.join()
-            results = [p.get() for p in processes]
         else:
             results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
 
-        costs = [0 if results[i] is None else mag(results[i]) for i in range(number_of_iterations)]
+        costs = [0 if i is None else mag(i) for i in results]
         print costs
         if np.sum(costs) > 0:
             inds = list(np.nonzero(costs)[0])
