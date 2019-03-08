@@ -1,16 +1,7 @@
 """
 This module contains functions and wrappers for running code in parallel.
 """
-try:
-    from mpi4py import MPI
-    from mpi4py.futures import MPIPoolExecutor
-    comm = MPI.COMM_WORLD
-    has_mpi = True
-except ImportError:
-    print("mpi4py not loaded. Falling back on multiprocessing")
-    has_mpi = False
-    from multiprocessing import Pool, cpu_count
-import copy
+from multiprocessing import Pool, cpu_count
 import math
 
 
@@ -30,7 +21,7 @@ def _wrapped_f(argstup):
     return func(*args, **kwargs)
 
 
-def parfor(func, dynamic_args=None, static_args=None, dynamic_kwargs=None, static_kwargs=None, num_processes=None, chunksize=16, maxtasksperchild=None):
+def parfor(func, args = None, kwargs = None, num_processes=None, chunksize=16, maxtasksperchild=None):
     """
     Function for running a function multiple times with different inputs.
 
@@ -58,63 +49,32 @@ def parfor(func, dynamic_args=None, static_args=None, dynamic_kwargs=None, stati
     :return: list of results
     :rtype: list
     """
-    if static_args is None:
-        static_args = tuple()
-    if static_kwargs is None:
-        static_kwargs = dict()
+    if args and kwargs:
+        num_jobs = len(args)
+        if num_jobs != len(kwargs):
+            print "Warning: Different numbers of args and kwargs for function. "
+    elif args:
+        num_jobs = len(args)
+        kwargs = [None for _ in args]
+    elif kwargs:
+        num_jobs = len(kwargs)
+        args = [None for _ in kwargs]
 
-    num_jobs = 0
-    # todo: this logic seems bad fix
-    if dynamic_kwargs is not None and dynamic_args is not None:
-        assert len(dynamic_kwargs) == len(dynamic_args), "Lengths of dynamic inputs must be the same"
-    if dynamic_args is None:
-        dynamic_args = [tuple() for i in range(len(dynamic_kwargs))]
-        num_jobs = len(dynamic_kwargs)
-    if dynamic_kwargs is None:
-        dynamic_kwargs = [dict() for i in range(len(dynamic_args))]
-        num_jobs = len(dynamic_args)
+    if num_processes is None:
+        num_processes = cpu_count()
+    print("Initializing multiprocessing.Pool with %s workers, %s tasks/child" %(num_processes, maxtasksperchild))
+    pool = Pool(processes=num_processes, maxtasksperchild=maxtasksperchild)
 
-    if has_mpi:
-        if num_processes is None:
-            num_processes = num_jobs
-        print("Creating MPIPoolExecutor with %s workers" %num_processes)
-        pool = MPIPoolExecutor(max_workers=num_processes, unordered=True)
-        argslist = [(func, a+static_args, static_kwargs) for a in dynamic_args]
-        for j in range(num_jobs):
-            argslist[j][2].update(dynamic_kwargs[j])
-
-        tmp = pool.map(_wrapped_f, argslist, chunksize=1)
-        jobs = [r for r in tmp]
-
-    else:
-        if num_processes is None:
-            num_processes = cpu_count()
-        print("Initializing multiprocessing.Pool with %s workers, %s tasks/child" %(num_processes, maxtasksperchild))
-        pool = Pool(processes=num_processes, maxtasksperchild=maxtasksperchild)
-
-        num_chunks = int(math.ceil(float(num_jobs)/float(chunksize)))
-        jobs = list()
-        ct = 0
-        for i in range(num_chunks):
-            num_part = min(chunksize, num_jobs-ct)
-
-            print("Copying arguments for parallel pool, chunk %s of %s, size %s" %(i+1, num_chunks, num_part))
-            argslist = [(func, a+static_args, static_kwargs) for a in dynamic_args[ct:ct+num_part]]
-
-            for j in range(num_part):
-                argslist[j][2].update(dynamic_kwargs[ct+j])
-
-            print("Running chunk")
-            # result = pool.map_async(_wrapped_f, argslist)
-            # jobs += result.get()
-            jobs += pool.map(_wrapped_f, argslist)
-
-            ct += num_part
-
-    if has_mpi:
-        pool.shutdown()
-    else:
-        pool.close()
-        pool.join()
-
+    num_chunks = int(math.ceil(float(num_jobs)/float(chunksize)))
+    jobs = list()
+    ct = 0
+    for i in range(num_chunks):
+        num_part = min(chunksize, num_jobs-ct)
+        print("Copying arguments for parallel pool, chunk %s of %s, size %s" %(i+1, num_chunks, num_part))
+        argslist = [(func, args[i], kwargs[i]) for i in range(ct,ct+num_part)]
+        print("Running chunk")
+        jobs += pool.map(_wrapped_f, argslist)
+        ct += num_part
+    pool.close()
+    pool.join()
     return jobs
