@@ -98,7 +98,7 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     lines2 = ax2.bar(x + [0.5] * len(methods),
                      relative_number_of_constraints,
                      [0.25] * len(methods), color='b', label='No. of Cons.')
-    ax1.set_ylabel("Scaled Average " + objective_name, fontsize=18)
+    ax1.set_ylabel("Scaled Average Cost", fontsize=18)
     ax1.set_ylim([min(relative_objective_values) - 0.1*min(relative_objective_values),
                  max(relative_objective_values) + 0.1*max(relative_objective_values)])
     ax2.set_ylabel("Scaled Number of Constraints", fontsize=18)
@@ -107,7 +107,9 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper right", ncol=1)
+    leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
+    leg.remove()
+    ax2.add_artist(leg)
     plt.show()
 
     fig, ax1 = plt.subplots()
@@ -126,7 +128,9 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper right", ncol=1)
+    leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
+    leg.remove()
+    ax2.add_artist(leg)
     plt.show()
 
 
