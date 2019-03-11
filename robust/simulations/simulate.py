@@ -204,7 +204,7 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                 except AttributeError:
                     nconstraints = \
                         len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
-                ind = (robust_model_solution('\\Gamma').magnitude, method['name'], uncertainty_set)
+                ind = (delta, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
                 simulations[ind] = simulation_results
@@ -224,7 +224,7 @@ def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filtere
     pofs = []
     objective_stddev = []
     for i in sorted(filteredResult.iterkeys()):
-        gammas.append(i[0])
+        gammas.append(filteredResult[i]("\\Gamma").magnitude)
         objective_stddev.append(filteredSimulations[i][2])
         objective_costs.append(filteredSimulations[i][1])
         pofs.append(filteredSimulations[i][0])
