@@ -223,10 +223,23 @@ def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filtere
     objective_costs = []
     pofs = []
     objective_stddev = []
-    for i in sorted(filteredResult.iterkeys()):
-        gammas.append(filteredResult[i]("\\Gamma").magnitude)
+    for i in sorted(filteredResult.keys()):
+        gammas.append(i[0])
         objective_stddev.append(filteredSimulations[i][2])
         objective_costs.append(filteredSimulations[i][1])
+        pofs.append(filteredSimulations[i][0])
+    objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
+                                     np.min(objective_costs), np.max(objective_costs), pofs, title, objective_stddev)
+
+def plot_goal_result_PoFandCost(title, objective_name, objective_varkey, objective_units, filteredResult, filteredSimulations):
+    gammas = []
+    objective_costs = []
+    pofs = []
+    objective_stddev = []
+    for i in sorted(filteredResult.keys()):
+        gammas.append(filteredResult[i]("\\Gamma").magnitude)
+        objective_stddev.append(filteredSimulations[i][2])
+        objective_costs.append(filteredResult[i](objective_varkey))
         pofs.append(filteredSimulations[i][0])
     objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
                                      min(objective_costs), max(objective_costs), pofs, title, objective_stddev)

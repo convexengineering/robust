@@ -80,6 +80,7 @@ def objective_proboffailure_vs_gamma(gammas, objective_values, objective_name, o
     ax1.set_ylabel(objective_name + ' (' + objective_units.capitalize() + ')', fontsize=18)
     ax2.set_ylabel("Probability of Failure", fontsize=18)
     ax1.set_ylim([min_obj, max_obj])
+    # ax2.set_ylim([0, 1])
     plt.title(title, fontsize=18)
     lines = lines1 + lines2
     labs = [l.get_label() for l in lines]
