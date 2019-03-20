@@ -218,7 +218,7 @@ def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
             filteredResult[i] = dict[i]
     return filteredResult
 
-def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredSimulations):
+def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filteredResult, filteredSimulations, stddev = True):
     gammas = []
     objective_costs = []
     pofs = []
@@ -228,6 +228,8 @@ def plot_gamma_result_PoFandCost(title, objective_name, objective_units, filtere
         objective_stddev.append(filteredSimulations[i][2])
         objective_costs.append(filteredSimulations[i][1])
         pofs.append(filteredSimulations[i][0])
+    if not stddev:
+        objective_stddev = None
     objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
                                      np.min(objective_costs), np.max(objective_costs), pofs, title, objective_stddev)
 
@@ -239,10 +241,10 @@ def plot_goal_result_PoFandCost(title, objective_name, objective_varkey, objecti
     for i in sorted(filteredResult.keys()):
         gammas.append(filteredResult[i]("\\Gamma").magnitude)
         objective_stddev.append(filteredSimulations[i][2])
-        objective_costs.append(filteredResult[i](objective_varkey))
+        objective_costs.append(mag(filteredResult[i](objective_varkey)))
         pofs.append(filteredSimulations[i][0])
     objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
-                                     min(objective_costs), max(objective_costs), pofs, title, objective_stddev)
+                                     np.min(objective_costs), np.max(objective_costs), pofs, title, None)
 
 def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
