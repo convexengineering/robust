@@ -113,11 +113,9 @@ class RobustModel:
                 else:
                     p = cs.as_posyslt1()[0]
                     if len(p.exps) == 1:
-                        robust_monomial = self.robustify_monomial(p)
-                        self.ready_gp_constraints += [robust_monomial <= 1]
-                        # robust_monomial, l_norm = self.robustify_monomial(p)
-                        # a = Variable()
-                        # self.ready_gp_constraints += [robust_monomial == a**(1/l_norm), a <= 1]
+                        robust_monomial, l_norm = self.robustify_monomial(p)
+                        a = Variable()
+                        self.ready_gp_constraints += [robust_monomial <= a**(1/l_norm), a <= 1]
                     else:
                         self.to_linearize_gp_posynomials += [p]
             del safe_model_constraints
@@ -183,7 +181,6 @@ class RobustModel:
                     two_term_equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 ready_constraints += no_data
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
-
             two_term_data_posynomials += to_linearize_posynomials
             if reached_feasibility:
                 self._robust_model, _ = self. \
@@ -265,11 +262,9 @@ class RobustModel:
         large_gp_posynomials = []
         for i, p in enumerate(data_gp_posynomials):
             if len(p.exps) == 1:
-                robust_monomial = self.robustify_monomial(p)
-                ready_gp_constraints += [robust_monomial <= 1]
-                # robust_monomial, l_norm = self.robustify_monomial(p)
-                # a = Variable()
-                # ready_gp_constraints += [robust_monomial == a**(1/l_norm), a <= 1]
+                robust_monomial, l_norm = self.robustify_monomial(p)
+                a = Variable()
+                ready_gp_constraints += [robust_monomial <= a**(1/l_norm), a <= 1]
             elif len(p.exps) == 2 and self.setting.get('linearizeTwoTerm'):
                 to_linearize_gp_posynomials += [p]
             else:
@@ -307,19 +302,17 @@ class RobustModel:
         if self.type_of_uncertainty_set == 'elliptical':
             l_norm = np.sqrt(l_norm)
         g = self.setting.get('gamma')
-        return monomial * np.exp(g * l_norm)
-        # return monomial * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4)**l_norm
-        # robust_monomial =  monomial * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4)
-        # return robust_monomial, l_norm
+        # Fifth order Taylor approx of the e**gamma, so that gamma can be a variable
+        robust_monomial =  monomial**(1/l_norm) * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)
+        return robust_monomial, l_norm
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
         robust_set_of_monomial_constraints = []
         slackvar = Variable()
         for monomial in set_of_monomials:
-            robust_set_of_monomial_constraints += [self.robustify_monomial(monomial) <= slackvar ** feasible]
-            # robust_monomial, l_norm = self.robustify_monomial(monomial)
-            # a = Variable()
-            # robust_set_of_monomial_constraints += [robust_monomial == a**(1/l_norm), a <= slackvar ** feasible]
+            robust_monomial, l_norm = self.robustify_monomial(monomial)
+            a = Variable()
+            robust_set_of_monomial_constraints += [robust_monomial <= a**(1/l_norm), a <= slackvar ** feasible]
         robust_set_of_monomial_constraints += [slackvar >= 1, slackvar <= 1000]
         return robust_set_of_monomial_constraints, slackvar
 
@@ -349,21 +342,16 @@ class RobustModel:
             subs_monomials = []
             for j in xrange(len(monomials)):
                 # st3 = time()
-                monomials[j] = self.robustify_monomial(monomials[j])
-                monomials[j] = monomials[j].sub(solution['variables'])
-                # robust_monomial, l_norm = self.robustify_monomial(monomials[j])
-                # monomials[j] = robust_monomial.sub(solution['variables'])
+                robust_monomial, l_norm = self.robustify_monomial(monomials[j])
+                monomials[j] = robust_monomial.sub(solution['variables'])
                 # print "subs for a monomial is taking too much time", time()-st3
                 subs_monomials.append(monomials[j].cs[0])
             values.append(max(subs_monomials))
         if number_of_two_terms % 2 != 0:
             monomial = Monomial(two_term_approximation.p.exps[permutation[len(permutation) - 1]],
                                     two_term_approximation.p.cs[permutation[len(permutation) - 1]])
-            monomial = self.robustify_monomial(monomial)
-            monomial = monomial.sub(solution['variables'])
-            # robust_monomial, l_norm = self.robustify_monomial(monomial)
-            # the_monomial = the_monomial.sub(self.substitutions)
-            # monomials[j] = robust_monomial.sub(solution['variables'])
+            robust_monomial, l_norm = self.robustify_monomial(monomial)
+            monomial = robust_monomial.sub(solution['variables'])
             values.append(monomial.cs[0])
         return sum(values)
 
