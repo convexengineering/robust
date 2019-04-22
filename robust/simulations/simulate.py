@@ -182,7 +182,7 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
     solve_times = {}
     simulations = {}
     number_of_constraints = {}
-    Gamma = Variable('\\Gamma', '-', 'Uncertainty bound', fix = True)
+    Gamma = Variable('\\Gamma', '-', 'Uncertainty bound')
     solBound = Variable('1+\\delta', '-', 'Acceptable optimal solution bound', fix = True)
     origcost = model.cost
     mGoal = Model(1 / Gamma, [model, origcost <= Monomial(nominal_solution(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
