@@ -187,23 +187,33 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
     origcost = model.cost
     mGoal = Model(1 / Gamma, [model, origcost <= Monomial(nominal_solution(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
                   model.substitutions)
-    newSol = mGoal.localsolve()
     for delta in deltas:
         mGoal.substitutions.update({'1+\\delta': 1 + delta})
         for method in methods:
             for uncertainty_set in uncertainty_sets:
-                robust_model, robust_model_solution, robust_model_solve_time, simulation_results = \
-                    simulate_robust_model(mGoal, method, uncertainty_set, Gamma, directly_uncertain_vars_subs,
-                                          number_of_iterations, linearization_tolerance,
-                                          min_num_of_linear_sections,
-                                          max_num_of_linear_sections, verbosity, newSol,
-                                          number_of_time_average_solves, parallel)
+                robust_goal_model = RobustModel(mGoal, uncertainty_set, gamma=Gamma, twoTerm=method['twoTerm'],
+                                   boyd=method['boyd'], simpleModel=method['simpleModel'])
+
+                robust_model_solution = robust_goal_model.robustsolve(verbosity=verbosity,
+                                                             minNumOfLinearSections=min_num_of_linear_sections,
+                                                             maxNumOfLinearSections=max_num_of_linear_sections,
+                                                             linearizationTolerance=linearization_tolerance)
+
+                robust_model_solve_time = get_avg_robust_solve_time(number_of_time_average_solves,
+                                                        robust_goal_model, verbosity, min_num_of_linear_sections,
+                                                        max_num_of_linear_sections,
+                                                        linearization_tolerance, parallel)
+
+                simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
+                                                                  directly_uncertain_vars_subs,
+                                                                  number_of_iterations,
+                                                                  verbosity=0, parallel=parallel)
                 try:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model().flat(constraintsets=False)])
                 except AttributeError:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model()[-1].flat(constraintsets=False)])
                 ind = (delta, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
