@@ -1,9 +1,11 @@
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint
+from gpkit.small_scripts import mag
 import numpy as np
 from copy import copy
 
+import multiprocessing as mp
 
 class RobustGPTools:
     def __init__(self):
@@ -28,31 +30,13 @@ class RobustGPTools:
         return all_vars
 
     @staticmethod
-    def generate_etas(var, type_of_uncertainty_set, number_of_stds, setting):
-
-        eta_max, eta_min = 0, 0
-        if setting.get("lognormal") and var.key.sigma is not None:
-            eta_max = var.key.sigma * number_of_stds
-            eta_min = -var.key.sigma * number_of_stds
-        else:
-            try:
-                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-                    pr = var.key.pr * setting.get("gamma")
-                    eta_max = np.log(1 + pr / 100.0)
-                    eta_min = np.log(1 - pr / 100.0)
-                elif type_of_uncertainty_set == 'elliptical':
-                    r = var.key.r * setting.get("gamma")
-                    eta_max = np.log(r)
-                    eta_min = - np.log(r)
-            except TypeError:
-                if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'one norm':
-                    r = var.key.r * setting.get("gamma")
-                    eta_max = np.log(r)
-                    eta_min = - np.log(r)
-                elif type_of_uncertainty_set == 'elliptical':
-                    pr = var.key.pr * setting.get("gamma")
-                    eta_max = np.log(1 + pr / 100.0)
-                    eta_min = np.log(1 - pr / 100.0)
+    def generate_etas(var):
+        try:
+            r = np.sqrt((100+var.key.pr)/(100-var.key.pr))
+        except:
+            r = var.key.r
+        eta_max = np.log(r)
+        eta_min = - np.log(r)
         return eta_min, eta_max
 
     @staticmethod
@@ -119,29 +103,31 @@ class RobustGPTools:
             return False
 
     @staticmethod
-    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0):
-        failure = 0
-        success = 0
+    def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0, parallel=False):
+        if parallel:
+            pool = mp.Pool(mp.cpu_count()-1)
+            processes = []
+            results=[]
+            for i in range(number_of_iterations):
+                p = pool.apply_async(confirmSuccess, args=(model, solution, directly_uncertain_vars_subs[i]), callback=results.append)
+                processes.append(p)
+            pool.close()
+            pool.join()
+        else:
+            results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
 
-        sum_cost = 0
-
-        for i in xrange(number_of_iterations):
-            if verbosity > 0:
-                print('iteration: %s' % i)
-            new_model = RobustGPTools.DesignedModel(model, solution, directly_uncertain_vars_subs[i])
-            fail_success, cost = RobustGPTools.fail_or_success(new_model)
-            # print cost
-            sum_cost = sum_cost + cost
-            if fail_success:
-                success = success + 1
-            else:
-                failure = failure + 1
-        if success > 0:
-            cost_average = sum_cost / (success + 0.0)
+        costs = [0 if i is None else mag(i) for i in results]
+        print costs
+        if np.sum(costs) > 0:
+            inds = list(np.nonzero(costs)[0])
+            nonzero_costs = [costs[i] for i in inds]
+            cost_average = np.mean(nonzero_costs)
+            cost_variance = np.sqrt(np.var(nonzero_costs))
         else:
             cost_average = None
-        prob = failure / (failure + success + 0.0)
-        return prob, cost_average
+            cost_variance = None
+        prob = 1. - (len(np.nonzero(costs)[0])/(number_of_iterations + 0.0))
+        return prob, cost_average, cost_variance
 
     class DesignedModel(Model):
         def setup(self, model, solution, directly_uncertain_vars_subs):
@@ -162,7 +148,6 @@ class RobustGPTools:
             return True, sol['cost']
         except:  # ValueError:
             return False, 0
-
 
 class SameModel(Model):
     """
@@ -191,6 +176,11 @@ class EqualModel(Model):
         subs = model.substitutions
         self.cost = model.cost
         return model, subs
+
+def confirmSuccess(model, solution, uncertainsub):
+    new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
+    fail_success, cost = RobustGPTools.fail_or_success(new_model)
+    return cost
 
 if __name__ == '__main__':
     pass

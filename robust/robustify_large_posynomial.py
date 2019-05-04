@@ -154,8 +154,7 @@ class RobustifyLargePosynomial:
         coeff, intercept = [], []
 
         for i in xrange(len(p_uncertain_vars)):
-            eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i], self.type_of_uncertainty_set,
-                                                           self.number_of_stds, self.setting)
+            eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i])
             center.append((eta_min + eta_max) / 2.0)
             scale.append(eta_max - center[i])
 

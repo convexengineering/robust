@@ -32,7 +32,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                 thetas += [th]
             for i_set in xrange(len(interesting_vars)):
                 if rob:
-                    eta_min_x, eta_max_x = RobustGPTools.generate_etas(interesting_vars[i_set], rmtype, rm.number_of_stds, rm.setting)
+                    eta_min_x, eta_max_x = RobustGPTools.generate_etas(interesting_vars[i_set])
                 else:
                     eta_min_x, eta_max_x = 0, 0
                 center_x = (eta_min_x + eta_max_x) / 2.0
@@ -105,8 +105,8 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
         xo, yo = map(mag, map(m.solution, [x, y]))
         ax.plot(xo, yo, "k.")
         if rm:
-            eta_min_x, eta_max_x = RobustGPTools.generate_etas(x, rmtype, rm.number_of_stds, rm.setting)
-            eta_min_y, eta_max_y = RobustGPTools.generate_etas(y, rmtype, rm.number_of_stds, rm.setting)
+            eta_min_x, eta_max_x = RobustGPTools.generate_etas(x)
+            eta_min_y, eta_max_y = RobustGPTools.generate_etas(y)
             center_x = (eta_min_x + eta_max_x) / 2.0
             center_y = (eta_min_y + eta_max_y) / 2.0
             x_center = np.log(xo) + center_x
