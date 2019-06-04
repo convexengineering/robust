@@ -108,7 +108,7 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
+    leg = ax1.legend(lines, labs, loc="upper left", ncol=1)
     leg.remove()
     ax2.add_artist(leg)
     plt.show()
@@ -129,7 +129,7 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
-    leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
+    leg = ax1.legend(lines, labs, loc="upper left", ncol=1)
     leg.remove()
     ax2.add_artist(leg)
     plt.show()

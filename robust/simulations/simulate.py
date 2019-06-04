@@ -188,9 +188,9 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
     mGoal = Model(1 / Gamma, [model, origcost <= Monomial(nominal_solution(origcost)) * solBound, Gamma <= 1e30, solBound <= 1e30],
                   model.substitutions)
     for delta in deltas:
-        mGoal.substitutions.update({'1+\\delta': 1 + delta})
         for method in methods:
             for uncertainty_set in uncertainty_sets:
+                mGoal.substitutions.update({'1+\\delta': 1 + delta})
                 robust_goal_model = RobustModel(mGoal, uncertainty_set, gamma=Gamma, twoTerm=method['twoTerm'],
                                    boyd=method['boyd'], simpleModel=method['simpleModel'])
 
