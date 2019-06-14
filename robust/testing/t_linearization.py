@@ -137,9 +137,7 @@ def test_linearize_two_term_posynomial():
         assert (len(no_data_lower) == 1)
 
         subs_p = p.sub(subs)
-        subs_data = [i.sub(subs) for i in data]
-
-        m = Model(Variable("w_1"), subs_data)
+        m = Model(Variable("w_1"), data, subs)
         sol = m.solve(verbosity=0)
         w_1 = sol['cost']
 
