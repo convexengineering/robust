@@ -22,14 +22,15 @@ and suggest areas for improvement.
 Table of contents:
 
 .. toctree::
-   :maxdepth: 2
-   robust101
-   installation
-   methods
-   math
-   references
-
-
+    :maxdepth: 2
+    
+		robust101
+        installation
+        whyro
+   		methods
+   		math
+   		goal
+   		references
 
 Indices and tables
 ==================
