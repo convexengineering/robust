@@ -9,15 +9,13 @@ To be able to use **robust**, you will need the following software installed on 
 - `GPkit`_
 - `numpy`_
 - `scipy`_
-- `pandas`_
 
 .. _Python 2.7 or higher: https://www.python.org/downloads/
 .. _GPkit: http://gpkit.readthedocs.io/en/latest/installation.html
 .. _numpy: https://docs.scipy.org/doc/numpy/user/index.html
 .. _scipy: https://www.scipy.org/install.html
-.. _pandas: https://pandas.pydata.org/pandas-docs/stable/install.html
 
-Please click on each link to see installation instructions
+Please click on each link to see installation instructions.
 
 Clone + install **robust**
 --------------------------

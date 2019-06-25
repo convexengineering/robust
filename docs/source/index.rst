@@ -26,8 +26,8 @@ Table of contents:
    robust101
    installation
    whyro
-   methods
    math
+   methods
    goal
    references
 
