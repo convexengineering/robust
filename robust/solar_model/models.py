@@ -3,12 +3,17 @@ import os
 
 from robust.simulations import simulate, read_simulation_data
 
-
 def mike_solar_model(lat):
+    """
+    This model comes from convexengineering/gassolar.
+    Please clone from and see https://github.com/convexengineering/gassolar
+    for details.
+    :param lat:
+    :return:
+    """
     model = solar_mike(latitude=lat)
     model.cost = model["W_{total}"]
     return model
-
 
 if __name__ == '__main__':
     model = mike_solar_model(20)

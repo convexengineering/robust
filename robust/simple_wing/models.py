@@ -6,8 +6,8 @@ from robust.simulations import simulate, read_simulation_data
 
 
 def simple_wing():
-    # Substitutions Variables
-    k = Variable("k", 1.17, "-", "form factor", pr=31.111111, sigma=0.035)
+    # Uncertain parameters
+    k = Variable("k", 1.17, "-", "form factor", pr=31.111111)
     e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)

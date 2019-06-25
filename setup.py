@@ -37,4 +37,4 @@ setup(name='robust',
                 "robust.simulations"],
       package_data={"robust.data":['*.txt'], "robust.solar_model":['*.txt'], "robust.signomial_simple_wing":['*.txt'],
                     "robust.simple_wing":['*.txt']},
-      install_requires=['gpkit', 'gassolar', 'numpy', 'matplotlib', 'scipy'])
+      install_requires=['gpkit', 'numpy', 'matplotlib', 'scipy'])
