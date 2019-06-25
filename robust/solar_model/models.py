@@ -49,7 +49,7 @@ if __name__ == '__main__':
     uncertainty_sets = ['box', 'elliptical']
 
     variable_pwl_file_name = os.path.dirname(__file__) + '/simulation_data_variable_pwl.txt'
-    simulate.generate_variable_pwlsections_results(model, model_name, gamma, number_of_iterations,
+    simulate.print_variable_pwlsections_results(model, model_name, gamma, number_of_iterations,
                                                                numbers_of_linear_sections, linearization_tolerance,
                                                                verbosity, variable_pwl_file_name,
                                                                number_of_time_average_solves, methods, uncertainty_sets,
