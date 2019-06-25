@@ -12,8 +12,29 @@ import matplotlib.pyplot as plt
 import multiprocessing as mp
 import scipy.stats as stats
 
-def pickleable_robust_solve_time(robust_model,verbosity, min_num_of_linear_sections,
+# For the following simulation functions, we define common inputs as the following:
+#     :model: GP or SP model of interest
+#     :model_name: string for printing
+#     :gamma: array of floats to specify set size
+#     :number_of_iterations: # of MC samples
+#     :numbers_of_linear_sections: array of integer sections
+#     :linearization_tolerance: max error of pwl approx
+#     :verbosity: 0-4 for printout
+#     :file_name: directory for printing
+#     :number_of_time_average_solves: # of solves for solution time analysis
+#     :methods: type of conservative approximation used, dict
+#     :uncertainty_sets: string defining type of set
+#     :nominal_solution: solution of model with zero uncertainty
+#     :nominal_solve_time: solve time of model with zero uncertainty
+#     :nominal_number_of_constraints:
+#     :directly_uncertain_vars_subs: dict of uncertain parameter MC samples
+#     :return:
+
+def pickleable_robust_solve_time(robust_model, verbosity, min_num_of_linear_sections,
                             max_num_of_linear_sections, linearization_tolerance):
+    """
+    Wrapper for robustsolve for parallelism.
+    """
     robust_model_solution = robust_model.robustsolve(verbosity=verbosity,
                                                              minNumOfLinearSections=min_num_of_linear_sections,
                                                              maxNumOfLinearSections=max_num_of_linear_sections,
@@ -22,6 +43,9 @@ def pickleable_robust_solve_time(robust_model,verbosity, min_num_of_linear_secti
 
 def get_avg_robust_solve_time(number_of_time_average_solves, robust_model, verbosity, min_num_of_linear_sections,
                             max_num_of_linear_sections, linearization_tolerance, parallel=False):
+    """
+    Given a number of solves, gives the average solution time of a robust model. Parallel option.
+    """
     if parallel:
         pool = mp.Pool(mp.cpu_count()-1)
         processes = []
@@ -42,6 +66,9 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
                           number_of_iterations, linearization_tolerance, min_num_of_linear_sections,
                           max_num_of_linear_sections, verbosity, nominal_solution,
                           number_of_time_average_solves, parallel=False):
+    """
+    Simulates a robust model given uncertain outcomes.
+    """
     print(
         method[
             'name'] + ' under ' + uncertainty_set + ' uncertainty set: \n' + '\t' + 'gamma = %s\n' % gamma
@@ -100,7 +127,7 @@ def print_simulation_results(robust_model, robust_model_solution, robust_model_s
         '\t\t\t' + 'Upper lower relative error: %s\n' % mag(robust_model_solution['upperLowerRelError']))
 
 
-def generate_variable_gamma_results(model, model_name, gammas, number_of_iterations,
+def print_variable_gamma_results(model, model_name, gammas, number_of_iterations,
                                     min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
                                     linearization_tolerance, file_name, number_of_time_average_solves,
                                     methods, uncertainty_sets, nominal_solution, nominal_solve_time,
@@ -148,6 +175,10 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                     min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
                                     linearization_tolerance, number_of_time_average_solves,
                                     uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=False):
+    """
+    Simulates a GP or SP model for a range of gammas, i.e. uncertainty set size.
+    Outputs are dicts that have the key format: [deltaValue (float), methodName (string), uncertaintySet (string)]
+    """
     solutions = {}
     solve_times = {}
     simulations = {}
@@ -178,6 +209,11 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                                     min_num_of_linear_sections, max_num_of_linear_sections, verbosity,
                                     linearization_tolerance, number_of_time_average_solves,
                                     uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=False):
+    """
+    Simulates a GP or SP model for a range of deltas in the goal programming form.
+    i.e. maximizes uncertainty set size given an acceptable penalty delta on the objective.
+    Outputs are dicts that have the key format: [deltaValue (float), methodName (string), uncertaintySet (string)]
+    """
     solutions = {}
     solve_times = {}
     simulations = {}
@@ -222,6 +258,10 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
     return solutions, solve_times, simulations, number_of_constraints
 
 def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
+    """
+    Filters the items in outputs of variable_gamma_results or variable_goal_results
+    with 2 out of 3 keys.
+    """
     filteredResult = {}
     for i in sorted(dict.iterkeys()):
         if i[tupInd1] == tupVal1 and i[tupInd2] == tupVal2:
@@ -256,11 +296,14 @@ def plot_goal_result_PoFandCost(title, objective_name, objective_varkey, objecti
     objective_proboffailure_vs_gamma(gammas, objective_costs, objective_name, objective_units,
                                      np.min(objective_costs), np.max(objective_costs), pofs, title, None)
 
-def generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
+def print_variable_pwlsections_results(model, model_name, gamma, number_of_iterations,
                                                       numbers_of_linear_sections, linearization_tolerance,
                                                       verbosity, file_name, number_of_time_average_solves,
                                                       methods, uncertainty_sets, nominal_solution, nominal_solve_time,
                                                       nominal_number_of_constraints, directly_uncertain_vars_subs):
+    """
+    Simulates a model for different numbers of PWL sections for each posy.
+    """
 
     f = open(file_name, 'w')
     f.write(model_name + ' Results: variable piecewise-linear sections\n')
@@ -301,6 +344,14 @@ def generate_variable_piecewiselinearsections_results(model, model_name, gamma, 
 
 
 def generate_model_properties(model, number_of_time_average_solves, number_of_iterations, distribution = None):
+    """
+    Solves the nominal model, and generates MC samples
+    :param model: GP or SP model of interest, with uncertainties
+    :param number_of_time_average_solves: # of solves for solution time analysis
+    :param number_of_iterations: # of MC samples for simulation
+    :param distribution: distribution for MC samples, 'normal' or 'uniform otherwise
+    :return: nominal solution, nominal solve time, nominal number of constraints, and MC samples of uncertain inputs
+    """
     try:
         nominal_solution = model.solve(verbosity=0)
         nominal_solve_time = nominal_solution['soltime']
