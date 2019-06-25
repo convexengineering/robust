@@ -3,17 +3,10 @@ Why robust optimization?
 
 Firstly we should ask, why optimization under uncertainty? 
 
+Comparison of general SO methods with RO
+========================================
 
 
-SPaircraft is a signomial programming compatible transonic aircraft conceptual design optimization tool.
-It is of similar level of fidelity as TASOPT, and can perform the single- and multi-mission optimization of many
-different configurations of aircraft.
-
-    * `Efficient and Reliable Aircraft Multidisciplinary
-Design Optimization via Signomial Programming
-<http://hoburg.mit.edu/publications/SP_tasopt_watermark.pdf>`_ extends these models to multiple
-aircraft configurations, and demonstrates the advantages of SPaircraft relative to other existing
-multidisciplinary design optimization tools.
 
 Advantages of RO over SO
 ========================
@@ -21,5 +14,17 @@ Advantages of RO over SO
 Tractability
 ------------
 
+In general, SO methods are intractable due to the nature of
+and methods for uncertainty propagation. The propagation of probability distributions of parameters through physics
+requires the integration of PDFs with objective and constraint
+outcomes. Since this is difficult, this is often achieved 
+through high-dimensional quadrature and the enumeration of
+potential outcomes into scenarios. 
+
 Probabilistic guarantees
 ------------------------
+
+RO methods give probabilistic guarantees of constraint
+satisfaction for uncertain outcomes within a 
+defined uncertainty set. 
+
