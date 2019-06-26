@@ -25,9 +25,11 @@ Table of contents:
 
    robust101
    installation
+   gettingstarted
    whyro
    math
    methods
+   simulation
    goal
    references
 
