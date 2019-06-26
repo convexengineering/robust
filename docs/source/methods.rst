@@ -3,7 +3,8 @@ Robustification methods
 
 Within **robust**, there are 3 tractable approximate robust formulations for
 GPs and SPs. The methods are detailed at a high level below, in decreasing order of conservativeness.
-Please see [Saab, 2018] for further details.
+Please see [Saab, 2018] for further details. The following descriptions have been
+borrowed from [Ozturk, 2019].
 
 Simple Conservative Approximation
 ---------------------------------

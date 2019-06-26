@@ -29,6 +29,7 @@ Table of contents:
    whyro
    math
    methods
+   rspapproaches
    simulation
    goal
    references

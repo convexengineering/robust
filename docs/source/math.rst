@@ -51,7 +51,7 @@ of posynomials.
 |picHsiung|
 
 .. |picHsiung| image:: picHsiung.png
-        :width: 70%
+        :width: 80%
 
 For derivation of robust GPs, the central finding is in Corollary 1 of the paper,
 which asserts that there is an analytical solution for the lowest-error
@@ -86,9 +86,32 @@ by adding auxiliary variables and using properties of inequalities.
 GPs have robust formulations.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Since we can represent all posynomials as PWL functions, we can robustify
+GP inequalities. Note that equalities cannot be robustified like inequalities, since
+under perturbation they would be infeasible. As such, it is preferred that equalities
+are relaxed whenever possible in GP models that will be robustified.
+
+The final addition to this framework to enable robust GPs
+is to separate posynomials
+according to the dependence of monomial terms, as described in [Saab, 2018] and [Ozturk, 2019]. 
+We show an example of such a partition, borrowed from Ozturk et al.. 
+
+|partitioning|
+
+.. |partitioning| image:: partitioning.png
+        :width: 80%
 
 RSPs can be represented as sequential RGPs.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Just as SPs are solved as a sequence of GPs, RSPs can be solved as a
+sequence of RGPs. We solve the nominal RSP, then use the solution
+as the initial guess for the RSP solution heuristic outlined below.
 
-Work in progress...
+|rspSolve|
+
+.. |rspSolve| image:: rspSolve.png
+        :width: 80%
+
+Within this framework, all GPs and SPs, given that they
+are feasible, have tractable robust counterparts.
