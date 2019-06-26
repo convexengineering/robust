@@ -9,8 +9,8 @@ unlike general stochastic optimization methods which optimize statistics of the 
 of the objective over probability distributions of uncertain parameters. As such, RO
 sacrifices generality for tractability, probabilistic guarantees and engineering intuition.
 
-Basic mathematical principle
-----------------------------
+Basic mathematical principles
+-----------------------------
 
 [*paraphrased from Ozturk and Saab, 2019*]
 
