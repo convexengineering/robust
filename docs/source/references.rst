@@ -3,6 +3,8 @@ References
 
 [Ben-Tal, 1999] Ben-Tal, A., and Nemirovski, A., “Robust solutions of uncertain linear programs,” Operations Research Letters, 1999.
 
+[Chassein, 2014] Chassein, A., and Goerigk, M., "Robust Geometric Programming is co-NP hard.”, Fachbereich Mathematik, Technische Universitat Kaiserslautern, Germany, 2014, pp. 1–6.
+
 [Hsiung, 2008] Hsiung, K. L., Kim, S. J., and Boyd, S., “Tractable approximate robust geometric programming,” Optimization and Engineering, vol. 9, 2008, pp. 95–118.
 
 [Ozturk, 2019] Ozturk, B. and Saab, A., "Optimal Aircraft Design Decisions Under Uncertainty via Robust Signomial Programming", AIAA Aviation 2019 Conference Proceedings.

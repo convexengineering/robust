@@ -45,6 +45,5 @@ bounded support
         \end{split}
 
 where :math:`\Gamma` is defined by the user as a global uncertainty bound. The larger the :math:`\Gamma`,
-the greater the size of the uncertainty set that is protected against.
+the greater the size of the uncertainty set that is protected against!
 
-Work in progress...

@@ -5,17 +5,17 @@ Firstly, why optimization under uncertainty? Simply put,
 we want to preserve constraint feasibility under perturbations of uncertain parameters,
 with as little a penalty as possible to objective performance. In other words,
 we want designs that protect against uncertainty *least conservatively*, especially when compared
-with designs that leverage convential methods such as design with margins and multimission design.
+with designs that leverage conventional design methods such as design with margins or multimission design.
 
-By using RO, we aim to reduce the sensitivity of our design performance to uncertain parameters, thereby
-reducing program risk and introducing mathematical rigor to design under uncertainty.
+RO introduces mathematical rigor to design under uncertainty, and aims to reduce the sensitivity of
+design performance to uncertain parameters, thereby reducing risk.
 
 Comparison of general SO methods with RO
 ========================================
 
-|picOUC| |picSO|
+|picOUC1| |picSO|
 
-.. |picOUC| image:: ouc.png
+.. |picOUC1| image:: ouc.png
         :width: 48%
 
 .. |picSO| image:: so.png
@@ -38,9 +38,9 @@ outcomes. Since this is difficult, this is often achieved
 through high-dimensional quadrature and the enumeration of
 potential outcomes into scenarios. And even so, SO has big computational requirements.
 
-|picOUC| |picRO|
+|picOUC2| |picRO|
 
-.. |picOUC| image:: ouc.png
+.. |picOUC2| image:: ouc.png
         :width: 48%
 
 .. |picRO| image:: ro.png

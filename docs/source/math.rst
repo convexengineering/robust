@@ -51,7 +51,7 @@ of posynomials.
 |picHsiung|
 
 .. |picHsiung| image:: picHsiung.png
-        :width: 80%
+        :width: 90%
 
 For derivation of robust GPs, the central finding is in Corollary 1 of the paper,
 which asserts that there is an analytical solution for the lowest-error
@@ -99,7 +99,7 @@ We show an example of such a partition, borrowed from Ozturk et al..
 |partitioning|
 
 .. |partitioning| image:: partitioning.png
-        :width: 80%
+        :width: 90%
 
 RSPs can be represented as sequential RGPs.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

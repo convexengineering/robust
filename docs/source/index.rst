@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to **robust**'s documentation!
-==================================
+======================================
 
 **robust** is a framework for engineering system optimization
 under uncertainty using geometric and signomial programming. 

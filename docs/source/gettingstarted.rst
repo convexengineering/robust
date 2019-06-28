@@ -8,17 +8,16 @@ out of GPkit, and *robust* to describe models that have been robustified using *
 The uncertainties in **robust** are defined by adding attribute *pr* to any variable
 in your model. This attribute
 describes the :math:`3\sigma` uncertainty for the given parameter, normalized by its mean (otherwise known
-as 3 times the coefficient of variation, eg. :math:`pr = 10`
-would specify a 10% 3CV). Note that these attributes
+as 3 times the coefficient of variation). Note that these attributes
 are carried by nominal models but only come into effect when **robust** is applied.
 
 .. code-block:: python
 
     from gpkit import Variable, Model
-    x = Variable('x', pr = 10)
-    % ...
-    % after more variables, constraints
-    % ...
+    x = Variable('x', pr = 12) # 3CV = 12%
+    # ...
+    # after more variables, constraints
+    # ...
     m = Model(objective, constraints, substitutions)
 
 Once you have added uncertainties to parameters, and created a GPkit model,
