@@ -13,8 +13,8 @@ Robust optimization is a tractable stochastic optimization
 method that protects against uncertain parameters in 
 well-defined sets, and optimizes for the worst case objective. 
 
-This website is under construction. If you have 
-a GP model that you would like to robustify but are not able to find answers to your questions in the documentation,
+This website is under construction. If you are
+not able to find answers to your questions in the documentation.
 please feel free to post `issues <https://github.com/convexengineering/robust/issues>`_
 and suggest areas for improvement.
 

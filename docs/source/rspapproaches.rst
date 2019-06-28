@@ -3,9 +3,9 @@
 Approaches to solving robust SPs
 ================================
 
-*(borrowed from [Ozturk, 2019])*
+*(paraphrased from [Ozturk, 2019])*
 
-This section presents a heuristic algorithm to solve a RSP
+**robust** implements a heuristic to solve a RSP
 based on our previous discussion on robust geometric programming.
 
 General RSP Solver

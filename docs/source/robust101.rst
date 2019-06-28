@@ -1,8 +1,6 @@
 Robust optimization 101
 ***********************
 
-This section will help you understand the basic ideas behind robust optimization (RO).
-
 RO is a tractable method for optimization under uncertainty, and specifically under uncertain
 parameters. It optimizes the worst-case objective outcome over uncertainty sets,
 unlike general stochastic optimization methods which optimize statistics of the distribution
