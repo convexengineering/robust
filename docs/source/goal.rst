@@ -34,8 +34,8 @@ design variable against with all objectives can be weighed.
 Implementation
 --------------
 
-To use the goal programming functions in **robust**, you can use the ```simulate.variable_goal_results```
-function, which has the same inputs as ```simulate.variable_gamma_result``` except for
+To use the goal programming functions in **robust**, you can use the ``simulate.variable_goal_results``
+function, which has the same inputs as ``simulate.variable_gamma_results`` except for
 having the penalty parameter :math:`\delta` instead of the uncertainty set size :math:`\Gamma` as its input.
 
 What occurs to the solved nominal model under the hood is the following:

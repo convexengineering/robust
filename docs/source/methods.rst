@@ -6,7 +6,7 @@ GPs, which can then be extended to SPs through heuristics
 The methods are detailed at a high level below, in decreasing order of conservativeness.
 Please see [Saab, 2018] for further details.
 
-*(The following overview has been paraphrased from [Ozturk, 2019].)*
+*(paraphrased from [Ozturk, 2019])*
 
 The robust counterpart of an uncertain geometric program is:
 
