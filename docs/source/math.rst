@@ -50,7 +50,7 @@ of posynomials.
 
 |picHsiung|
 
-.. |picHsiung| image:: picHsiung.png
+.. |picHsiung| image:: picHsiung.PNG
         :width: 90%
 
 For derivation of robust GPs, the central finding is in Corollary 1 of the paper,
@@ -98,7 +98,7 @@ We show an example of such a partition, borrowed from Ozturk et al..
 
 |partitioning|
 
-.. |partitioning| image:: partitioning.png
+.. |partitioning| image:: partitioning.PNG
         :width: 90%
 
 RSPs can be represented as sequential RGPs.
@@ -110,7 +110,7 @@ as the initial guess for the RSP solution heuristic outlined below.
 
 |rspSolve|
 
-.. |rspSolve| image:: rspSolve.png
+.. |rspSolve| image:: rspSolve.PNG
         :width: 80%
 
 Within this framework, all GPs and SPs, given that they

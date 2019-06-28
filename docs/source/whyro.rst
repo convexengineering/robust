@@ -15,10 +15,10 @@ Comparison of general SO methods with RO
 
 |picOUC1| |picSO|
 
-.. |picOUC1| image:: ouc.png
+.. |picOUC1| image:: ouc.PNG
         :width: 48%
 
-.. |picSO| image:: so.png
+.. |picSO| image:: so.PNG
         :width: 48%
 
 General optimization 'under certainty', eg. gradient descent, is done using methods that sample the
@@ -40,10 +40,10 @@ potential outcomes into scenarios. And even so, SO has big computational require
 
 |picOUC2| |picRO|
 
-.. |picOUC2| image:: ouc.png
+.. |picOUC2| image:: ouc.PNG
         :width: 48%
 
-.. |picRO| image:: ro.png
+.. |picRO| image:: ro.PNG
         :width: 48%
 
 RO takes a different approach, choosing to optimize designs for worst-case objective outcomes
