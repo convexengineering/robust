@@ -6,8 +6,8 @@ from robust.simulations import simulate, read_simulation_data
 
 
 def simple_wing():
-    # Substitutions Variables
-    k = Variable("k", 1.17, "-", "form factor", pr=31.111111, sigma=0.035)
+    # Uncertain parameters
+    k = Variable("k", 1.17, "-", "form factor", pr=31.111111)
     e = Variable("e", 0.92, "-", "Oswald efficiency factor", pr=7.6086956)
     mu = Variable("\\mu", 1.775e-5, "kg/m/s", "viscosity of air", pr=4.225352)
     rho = Variable("\\rho", 1.23, "kg/m^3", "density of air", pr=10)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     model = simple_wing()
 
     variable_gamma_file_name = os.path.dirname(__file__) + '/simulation_data_variable_gamma.txt'
-    simulate.generate_variable_gamma_results(model, model_name, gammas, number_of_iterations,
+    simulate.print_variable_gamma_results(model, model_name, gammas, number_of_iterations,
                                              min_num_of_linear_sections,
                                              max_num_of_linear_sections, verbosity, linearization_tolerance,
                                              variable_gamma_file_name, number_of_time_average_solves, methods,
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     uncertainty_sets = ['box', 'elliptical']
 
     variable_pwl_file_name = os.path.dirname(__file__) + '/simulation_data_variable_pwl.txt'
-    simulate.generate_variable_piecewiselinearsections_results(model, model_name, gamma, number_of_iterations,
+    simulate.print_variable_pwlsections_results(model, model_name, gamma, number_of_iterations,
                                                                numbers_of_linear_sections, linearization_tolerance,
                                                                verbosity, variable_pwl_file_name,
                                                                number_of_time_average_solves, methods, uncertainty_sets,

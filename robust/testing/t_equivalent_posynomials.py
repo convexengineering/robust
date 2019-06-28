@@ -81,8 +81,7 @@ def test_correlated_monomials():
         theoretical_partition = EquivalentPosynomials.merge_intersected_lists(correlations)
 
         p = sum(m)
-
-        equivalent_posynomial = EquivalentPosynomials(p, p_uncertain_vars, [], 0, False, False)
+        equivalent_posynomial = EquivalentPosynomials(p, 0, False, False)
         equivalent_posynomial.main_p = p
         actual_partition = equivalent_posynomial.correlated_monomials()
 
@@ -101,7 +100,7 @@ def test_correlated_monomials():
             temp += part
 
         theoretical_partition = list(set(dependent_theoretical_partition))
-        equivalent_posynomial = EquivalentPosynomials(p, p_uncertain_vars, [], 0, False, True)
+        equivalent_posynomial = EquivalentPosynomials(p, 0, False, True)
         equivalent_posynomial.main_p = p
         actual_partition = equivalent_posynomial.correlated_monomials()
 

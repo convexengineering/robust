@@ -148,7 +148,7 @@ def test_bad_relations():
 
         p = sum(m)
 
-        actual_relations, actual_sizes = TwoTermApproximation.bad_relations(p, p_uncertain_vars, [])
+        actual_relations, actual_sizes = TwoTermApproximation.bad_relations(p)
 
         keys = actual_relations.keys()
         actual_relations_mons = {}
