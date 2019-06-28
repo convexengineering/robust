@@ -26,11 +26,11 @@ Table of contents:
    robust101
    installation
    gettingstarted
+   commands
    whyro
    math
    methods
    rspapproaches
-   simulation
    goal
    references
 
