@@ -21,7 +21,7 @@ The deterministic solution of the uncertain SP is in general a good candidate :m
 
 |rspSolve|
 
-.. |rspSolve| image:: rspSolve.png
+.. |rspSolve| image:: rspSolve.PNG
         :width: 80%
 
 For comparisons between methods ahead, we write the algorithm explicitly as follows:
