@@ -1,5 +1,4 @@
-# Robust geometric and signomial programming assumes that uncertainties belong to an uncertainty set, and solves the problem for the worst case scenario.
+## robust
+robust is a tool for designing engineering systems under uncertainty using geometric and signomial programming. Four different formulations of approximate robust geometric programming are implemented, for norm uncertainty sets, for models formulated in [GPkit](https://github.com/convexengineering/gpkit). 
 
-# Robust is a tool for manipulating geometric and signomial programs under uncertainty. four different formulations of approximate robust geometric programming are implemented.
-
-# This repository has tools that can test your design given different formulations and uncertainty sets.
+Documentation for robust is pending. In the short term, if you are interested in robustifying your GP models, please contact Berk Ozturk (bozturk@mit.edu) and Ali Saab (alikassemsaab@gmail.com). 
