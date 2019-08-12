@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 from gpkit import Model, Monomial, Variable, SignomialsEnabled
 from gpkit.nomials import SignomialInequality, MonomialEquality
 from gpkit.exceptions import InvalidGPConstraint
@@ -7,12 +9,12 @@ from time import time
 import warnings
 from scipy.stats import norm
 
-from robust_gp_tools import RobustGPTools
-from equivalent_posynomials import EquivalentPosynomials
-from equivalent_models import TwoTermBoydModel
-from twoterm_approximation import TwoTermApproximation
-from robustify_large_posynomial import RobustifyLargePosynomial
-from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
+from .robust_gp_tools import RobustGPTools
+from .equivalent_posynomials import EquivalentPosynomials
+from .equivalent_models import TwoTermBoydModel
+from .twoterm_approximation import TwoTermApproximation
+from .robustify_large_posynomial import RobustifyLargePosynomial
+from .linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
 class RobustnessSetting:
@@ -166,7 +168,7 @@ class RobustModel:
 
         for count in xrange(self.setting.get('iterationLimit')):
             if verbosity > 0:
-                print "iteration %s" % (count + 1)
+                print("iteration %s" % (count + 1))
             ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomials = self. \
                 approximate_and_classify_sp_constraints(old_solution, self.number_of_gp_posynomials)
 
@@ -203,10 +205,10 @@ class RobustModel:
             rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             if verbosity > 0:
                 if not reached_feasibility:
-                    print "feasibility is not reached yet"
+                    print("feasibility is not reached yet")
                 elif reached_feasibility == 1:
-                    print "feasibility is reached"
-                print "relative tolerance = %s" % rel_tol
+                    print("feasibility is reached")
+                print("relative tolerance = %s" % rel_tol)
             if reached_feasibility <= 1 and two_term_data_posynomials:
                 self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], _, _, _ = \
                     LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(

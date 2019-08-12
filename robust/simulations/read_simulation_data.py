@@ -141,7 +141,7 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
     plt.figure()
     marker = itertools.cycle(('s', '*', 'o', '.', ','))
     for method in method_performance_dictionary:
-        plt.plot(numbers_of_linear_sections, method_performance_dictionary[method], marker=marker.next(),
+        plt.plot(numbers_of_linear_sections, method_performance_dictionary[method], marker=next(marker),
                  linestyle='', label=method)
     plt.xlabel("Number of Piecewise-linear Sections", fontsize=18)
     plt.ylabel(objective_name + '(' + objective_units + ')', fontsize=18)

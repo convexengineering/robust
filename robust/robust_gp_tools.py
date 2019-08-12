@@ -1,3 +1,4 @@
+from __future__ import print_function
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint
@@ -117,7 +118,7 @@ class RobustGPTools:
             results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
 
         costs = [0 if i is None else mag(i) for i in results]
-        print costs
+        print(costs)
         if np.sum(costs) > 0:
             inds = list(np.nonzero(costs)[0])
             nonzero_costs = [costs[i] for i in inds]

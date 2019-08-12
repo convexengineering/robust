@@ -1,7 +1,8 @@
+from __future__ import absolute_import
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled
 
-from robust_gp_tools import RobustGPTools
+from .robust_gp_tools import RobustGPTools
 
 
 class RobustifyLargePosynomial:

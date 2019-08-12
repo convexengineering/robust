@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 import numpy as np
 from gpkit import Variable, Monomial, Posynomial
 import random
 import math
 from copy import copy
 
-from robust_gp_tools import RobustGPTools
+from .robust_gp_tools import RobustGPTools
 
 
 class TwoTermApproximation:

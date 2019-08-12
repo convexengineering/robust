@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
