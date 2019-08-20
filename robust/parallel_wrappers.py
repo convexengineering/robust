@@ -2,6 +2,7 @@
 This module contains functions and wrappers for running code in parallel.
 """
 from __future__ import print_function
+from builtins import range
 from multiprocessing import Pool, cpu_count
 import math
 

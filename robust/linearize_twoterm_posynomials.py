@@ -1,10 +1,13 @@
+from __future__ import division
+from builtins import range
+from builtins import object
 import numpy as np
 import scipy.optimize as op
 import os
 from gpkit import Variable, Monomial, Posynomial
 
 
-class LinearizeTwoTermPosynomials:
+class LinearizeTwoTermPosynomials(object):
     """
     Linearizes two term posynomials
     """
@@ -126,7 +129,7 @@ class LinearizeTwoTermPosynomials:
 
         if r < 100:
             linearization_data_file = open(os.path.dirname(__file__) + "/data/linearization_data.txt", "r")
-            for _ in xrange(r-2):
+            for _ in range(r-2):
                 linearization_data_file.readline()
             line = linearization_data_file.readline()
             data = line.split(": ")
@@ -174,7 +177,7 @@ class LinearizeTwoTermPosynomials:
         second_monomial = Monomial(self.p.exps[1], self.p.cs[1])
         data_constraints += [first_monomial <= w]
 
-        for i in xrange(r - 2):
+        for i in range(r - 2):
             data_constraints += [first_monomial ** a[r - 3 - i] *
                                  second_monomial ** a[i] * np.exp(b[i]) <= w]
 

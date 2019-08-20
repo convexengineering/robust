@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import range
 import numpy as np
 from gpkit import Variable, Monomial
 from copy import copy
@@ -6,28 +8,28 @@ from robust.twoterm_approximation import TwoTermApproximation
 
 
 def test_check_if_permutation_exists():
-    for _ in xrange(10):
+    for _ in range(10):
         number_of_monomials = int(np.random.rand()*15) + 3
         number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
 
         number_of_gp_variables = int(np.random.rand()*20) + 1
 
-        m = [np.random.rand()*10 for _ in xrange(number_of_monomials)]
+        m = [np.random.rand()*10 for _ in range(number_of_monomials)]
 
-        for j in xrange(number_of_monomials):
-            for i in xrange(number_of_gp_variables):
+        for j in range(number_of_monomials):
+            for i in range(number_of_gp_variables):
                 x = Variable('x_%s' % i)
                 m[j] *= x**(np.random.rand()*10 - 5)
 
         p = sum(m)
 
-        permutation_list = range(0, number_of_monomials)
+        permutation_list = list(range(0, number_of_monomials))
         list_of_permutations = []
         list_of_posynomials = []
 
         counter = 0
 
-        while counter < min(100, int(number_of_permutations/2)):
+        while counter < min(100, int(np.floor(number_of_permutations/2))):
             temp = copy(permutation_list)
             np.random.shuffle(temp)
 
@@ -43,7 +45,7 @@ def test_check_if_permutation_exists():
 
         counter = 0
 
-        while counter < min(100, int(number_of_permutations/2)):
+        while counter < min(100, int(np.floor(number_of_permutations/2))):
             temp = copy(permutation_list)
             np.random.shuffle(temp)
 
@@ -59,35 +61,35 @@ def test_check_if_permutation_exists():
 
 
 def test_bad_relations():
-    for _ in xrange(100):
+    for _ in range(100):
         number_of_monomials = int(20*np.random.random()) + 3
         number_of_gp_variables = int(np.random.rand()*10) + 1
         number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
         vector_to_choose_from_pos_only = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
 
-        m = [np.random.rand()*10 for _ in xrange(number_of_monomials)]
+        m = [np.random.rand()*10 for _ in range(number_of_monomials)]
         p_uncertain_vars = []
         relations = {}
         sizes = {}
         neg_pos_neutral_powers = []
 
-        for j in xrange(number_of_monomials):
-            for i in xrange(number_of_gp_variables):
+        for j in range(number_of_monomials):
+            for i in range(number_of_gp_variables):
                 x = Variable('x_%s' % i)
                 m[j] *= x**(np.random.rand()*10 - 5)
 
         number_of_elements_in_relation = min(number_of_monomials, int(number_of_monomials*np.random.rand()+2))
         all_elements = []
 
-        for dummy_one in xrange(number_of_elements_in_relation):
-            element = np.random.choice(range(0, number_of_monomials))
+        for dummy_one in range(number_of_elements_in_relation):
+            element = np.random.choice(list(range(0, number_of_monomials)))
             while element in all_elements:
-                element = np.random.choice(range(0, number_of_monomials))
+                element = np.random.choice(list(range(0, number_of_monomials)))
             all_elements.append(element)
 
             element_map = {}
             number_of_element_map_elements = min(number_of_monomials - 1, int(number_of_monomials*np.random.rand()+2))
-            for dummy_two in xrange(number_of_element_map_elements):
+            for dummy_two in range(number_of_element_map_elements):
                 element_map_element = int(np.random.rand()*number_of_monomials)
                 while element_map_element in element_map or element_map_element == element:
                     element_map_element = int(np.random.rand()*number_of_monomials)
@@ -105,13 +107,13 @@ def test_bad_relations():
                 relations[element] = element_map
 
         relations_copy = {}
-        for key in relations.keys():
+        for key in list(relations.keys()):
             relations_copy[key] = copy(relations[key])
             sizes[key] = len(relations[key])
 
         counter = 0
         while relations_copy:
-            keys = relations_copy.keys()
+            keys = list(relations_copy.keys())
             for key in keys:
                 if not relations_copy[key]:
                     del relations_copy[key]
@@ -124,7 +126,7 @@ def test_bad_relations():
                 el_pow = np.random.choice([-1, 1])
                 m[key] *= u**(np.random.rand()*5*el_pow)
 
-                element_keys = relations_copy[key].keys()
+                element_keys = list(relations_copy[key].keys())
                 for element_key in element_keys:
                     m[element_key] *= u**(-np.random.rand()*5*el_pow)
 
@@ -136,38 +138,38 @@ def test_bad_relations():
                     if relations_copy[element_key][key] == 0:
                         del relations_copy[element_key][key]
 
-        for i in xrange(number_of_additional_uncertain_variables):
+        for i in range(number_of_additional_uncertain_variables):
             u = Variable('u_%s' % counter, np.random.random(), pr=100*np.random.random())
             counter += 1
             p_uncertain_vars.append(u.key)
             el_pow = np.random.choice([-1, 1])
             neg_pos_neutral_powers.append([el_pow*vector_to_choose_from_pos_only[int(10*np.random.random())]
-                                           for _ in xrange(number_of_monomials)])
-            for j in xrange(number_of_monomials):
+                                           for _ in range(number_of_monomials)])
+            for j in range(number_of_monomials):
                 m[j] *= u**(np.random.rand()*5*neg_pos_neutral_powers[i][j])
 
         p = sum(m)
 
         actual_relations, actual_sizes = TwoTermApproximation.bad_relations(p)
 
-        keys = actual_relations.keys()
+        keys = list(actual_relations.keys())
         actual_relations_mons = {}
         actual_sizes_mons = {}
         for key in keys:
             internal_map = actual_relations[key]
-            map_keys = internal_map.keys()
+            map_keys = list(internal_map.keys())
             map_mons = {}
             for map_key in map_keys:
                 map_mons[Monomial(p.exps[map_key], p.cs[map_key])] = internal_map[map_key]
             actual_relations_mons[Monomial(p.exps[key], p.cs[key])] = map_mons
             actual_sizes_mons[Monomial(p.exps[key], p.cs[key])] = actual_sizes[key]
 
-        keys = relations.keys()
+        keys = list(relations.keys())
         relations_mons = {}
         sizes_mons = {}
         for key in keys:
             internal_map = relations[key]
-            map_keys = internal_map.keys()
+            map_keys = list(internal_map.keys())
             map_mons = {}
             for map_key in map_keys:
                 map_mons[m[map_key]] = internal_map[map_key]

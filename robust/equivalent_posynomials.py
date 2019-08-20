@@ -1,11 +1,14 @@
 from __future__ import absolute_import
+from __future__ import division
+from builtins import range
+from builtins import object
 import numpy as np
 from gpkit import Variable, Monomial, Posynomial
 
 from .robust_gp_tools import RobustGPTools
 
 
-class EquivalentPosynomials:
+class EquivalentPosynomials(object):
     """
     replaces a posynomial by an equivalent set of posynomials
     """
@@ -35,8 +38,8 @@ class EquivalentPosynomials:
 
         new_direct_uncertain_vars = []
         for var in self.p_indirect_uncertain_vars:
-            new_direct_uncertain_vars += RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys()
+            new_direct_uncertain_vars += list(RobustGPTools.\
+                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys())
 
         new_direct_uncertain_vars = [var for var in new_direct_uncertain_vars
                                      if RobustGPTools.is_directly_uncertain(var)]
@@ -58,13 +61,13 @@ class EquivalentPosynomials:
 
         uncertain_vars_exps = []
         uncertain_vars_exps_mons = []
-        for i in xrange(len(p.exps)):
+        for i in range(len(p.exps)):
             m_uncertain_vars_exps = {}
 
             only_uncertain_vars_monomial_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(p.exps[i])
 
-            for var in only_uncertain_vars_monomial_exps.keys():
+            for var in list(only_uncertain_vars_monomial_exps.keys()):
                 if RobustGPTools.is_directly_uncertain(var):
                     m_uncertain_vars_exps[var] = only_uncertain_vars_monomial_exps[var]
             if m_uncertain_vars_exps in uncertain_vars_exps:
@@ -125,7 +128,7 @@ class EquivalentPosynomials:
                 ts.append(t)
                 self.data_constraints += [Monomial(self.main_p.exps[i], self.main_p.cs[i]) <= t]
 
-        for i in xrange(len(coupled_monomial_partitions)):
+        for i in range(len(coupled_monomial_partitions)):
             if coupled_monomial_partitions[i]:
                 posynomial = 0
                 t = Variable('t_%s^%s' % (m, super_script))
@@ -215,7 +218,7 @@ class EquivalentPosynomials:
         if j == len(a):
             return True
 
-        for i in xrange(len(a) - 1):
+        for i in range(len(a) - 1):
             if a[j] * a[i + 1] < 0:
                 return False
         return True
@@ -229,7 +232,7 @@ class EquivalentPosynomials:
         coupled_partition = []
 
         if self.dependent_uncertainties:
-            for j in xrange(number_of_monomials):
+            for j in range(number_of_monomials):
 
                 only_uncertain_vars_monomial_exps = RobustGPTools.\
                     only_uncertain_vars_monomial(self.main_p.exps[j])
@@ -245,7 +248,7 @@ class EquivalentPosynomials:
                 partition = []
                 check_sign = []
 
-                for j in xrange(number_of_monomials):
+                for j in range(number_of_monomials):
 
                     only_uncertain_vars_monomial_exps = RobustGPTools.\
                         only_uncertain_vars_monomial(self.main_p.exps[j])
@@ -263,7 +266,7 @@ class EquivalentPosynomials:
 
     @staticmethod
     def check_if_in_list_of_lists(element, list_of_lists):
-        for i in xrange(len(list_of_lists)):
+        for i in range(len(list_of_lists)):
             if element in list_of_lists[i]:
                 return True
         return False

@@ -1,4 +1,6 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import range
 import numpy as np
 from gpkit.small_scripts import mag
 from gpkit.exceptions import InvalidGPConstraint
@@ -264,7 +266,7 @@ def filter_gamma_result_dict(dict, tupInd1, tupVal1, tupInd2, tupVal2):
     with 2 out of 3 keys.
     """
     filteredResult = {}
-    for i in sorted(dict.iterkeys()):
+    for i in sorted(dict.keys()):
         if i[tupInd1] == tupVal1 and i[tupInd2] == tupVal2:
             filteredResult[i] = dict[i]
     return filteredResult
@@ -356,25 +358,25 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
     try:
         nominal_solution = model.solve(verbosity=0)
         nominal_solve_time = nominal_solution['soltime']
-        for i in xrange(number_of_time_average_solves-1):
+        for i in range(number_of_time_average_solves-1):
             nominal_solve_time += model.solve(verbosity=0)['soltime']
     except InvalidGPConstraint:
         nominal_solution = model.localsolve(verbosity=0)
         nominal_solve_time = nominal_solution['soltime']
-        for i in xrange(number_of_time_average_solves-1):
+        for i in range(number_of_time_average_solves-1):
             nominal_solve_time += model.localsolve(verbosity=0)['soltime']
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
     if distribution == 'normal' or 'Gaussian':
         directly_uncertain_vars_subs = [{k: stats.truncnorm.rvs(-3. , 3. , loc=v, scale=(v*k.key.pr/300.))
-                                         for k, v in model.substitutions.items()
+                                         for k, v in list(model.substitutions.items())
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
-                                    for _ in xrange(number_of_iterations)]
+                                    for _ in range(number_of_iterations)]
     else:
         directly_uncertain_vars_subs = [{k: np.random.uniform(v - k.key.pr * v / 100.0, v + k.key.pr * v / 100.0)
-                                     for k, v in model.substitutions.items()
+                                     for k, v in list(model.substitutions.items())
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
-                                    for _ in xrange(number_of_iterations)]
+                                    for _ in range(number_of_iterations)]
     nominal_number_of_constraints = len([cs for cs in model.flat(constraintsets=False)])
 
     return nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs

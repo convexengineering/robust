@@ -68,9 +68,9 @@ def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2
     y.key.descr[str2] = val2
     RM = RobustModel(m, type_of_uncertainty_set, linearizationTolerance=1e-4)
     RMsol = RM.robustsolve(verbosity=0, minNumOfLinearSections=20, maxNumOfLinearSections=40)
-    print("nominal: ", {k: v for k, v in sol["freevariables"].items()
+    print("nominal: ", {k: v for k, v in list(sol["freevariables"].items())
                         if k in m.varkeys and k.key.fix is True})
-    print("robust: ", {k: v for k, v in RMsol["freevariables"].items()
+    print("robust: ", {k: v for k, v in list(RMsol["freevariables"].items())
                        if k in m.varkeys and k.key.fix is True})
     print('cost', RMsol['cost'])
     plot_feasibilities(x, y, m, RM, numberofsweeps=120, design_feasibility=design_feasibility, skipfailures=True)

@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import map
+from builtins import range
 import numpy as np
 from gpkit import Model, Variable, ConstraintSet, GPCOLORS, GPBLU
 from gpkit.small_scripts import mag
@@ -27,10 +30,10 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
             additional_constraints = []
             slacks = []
             thetas = []
-            for count in xrange((len(interesting_vars) - 1)):
+            for count in range((len(interesting_vars) - 1)):
                 th = Variable("\\theta_%s" % count, np.linspace(0, 2 * np.pi, numberofsweeps), "-")
                 thetas += [th]
-            for i_set in xrange(len(interesting_vars)):
+            for i_set in range(len(interesting_vars)):
                 if rob:
                     eta_min_x, eta_max_x = RobustGPTools.generate_etas(interesting_vars[i_set])
                 else:
@@ -41,7 +44,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
 
                 def f(c, index=i_set, x_val=x_center):
                     product = 1
-                    for j in xrange(index):
+                    for j in range(index):
                         product *= np.cos(c[thetas[j]])
                     if index != len(interesting_vars) - 1:
                         product *= np.sin(c[thetas[index]])
@@ -49,7 +52,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                 if rmtype == 'box':
                     def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_max_x):
                         product = 1
-                        for j in xrange(index):
+                        for j in range(index):
                             product *= np.cos(c[thetas[j]])
                         if index != len(interesting_vars) - 1:
                             product *= np.sin(c[thetas[index]])
@@ -57,7 +60,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                 else:
                     def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_max_x):
                         product = 1
-                        for j in xrange(index):
+                        for j in range(index):
                             product *= np.cos(c[thetas[j]])
                         if index != len(interesting_vars) - 1:
                             product *= np.sin(c[thetas[index]])
@@ -81,10 +84,10 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
             self.cost = sum([sl ** 2 for sl in slacks]) * m.cost / cost_ref
             feas_slack = ConstraintSet(additional_constraints)
             if design_feasibility:
-                return [m, feas_slack], {k: v for k, v in sol["freevariables"].items()
+                return [m, feas_slack], {k: v for k, v in list(sol["freevariables"].items())
                                          if k in m.varkeys and k.key.fix is True}
             else:
-                return [m, feas_slack], {k: v for k, v in sol["freevariables"].items()
+                return [m, feas_slack], {k: v for k, v in list(sol["freevariables"].items())
                                          if k in m.varkeys}
     # plot original feasibility set
     # plot boundary of uncertainty set
@@ -102,7 +105,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
     fig, axes = plt.subplots(2)
 
     def plot_uncertainty_set(ax):
-        xo, yo = map(mag, map(m.solution, [x, y]))
+        xo, yo = list(map(mag, list(map(m.solution, [x, y]))))
         ax.plot(xo, yo, "k.")
         if rm:
             eta_min_x, eta_max_x = RobustGPTools.generate_etas(x)
@@ -124,13 +127,13 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                     True, edgecolor="black", facecolor="none", linestyle="dashed")
                 ax.add_patch(p)
 
-    orig_a, orig_b = map(mag, map(origfeas, [x, y]))
+    orig_a, orig_b = list(map(mag, list(map(origfeas, [x, y]))))
     a_i, b_i, a, b = [None] * 4
     if rm:
         x_index = interesting_vars.index(x)
         y_index = interesting_vars.index(y)
 
-        a_i, b_i, a, b = map(mag, map(sol, ["x_%s" % x_index, "x_%s" % y_index, x, y]))
+        a_i, b_i, a, b = list(map(mag, list(map(sol, ["x_%s" % x_index, "x_%s" % y_index, x, y]))))
 
         for i in range(len(a)):
             axes[0].loglog([a_i[i], a[i]], [b_i[i], b[i]], color=GPCOLORS[1], linewidth=0.2)
