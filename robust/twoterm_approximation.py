@@ -115,18 +115,6 @@ class TwoTermApproximation(object):
         """
         if permutation in permutations:
             return True
-        if len(permutation) == 1:
-            return False
-        true_or_false = [1] * len(permutations)
-        for i in range(int(np.floor(len(permutation)/2))):
-            for j in range(len(true_or_false)):
-                if true_or_false[j] == 1:
-                    ind_one = permutations[j].index(permutation[2 * i])
-                    ind_two = permutations[j].index(permutation[2 * i + 1])
-                    if np.floor(ind_one / 2) != np.floor(ind_two / 2):
-                        true_or_false[j] = 0
-        if 1 in true_or_false:
-            return True
         else:
             return False
 
