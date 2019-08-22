@@ -8,6 +8,7 @@ from robust.twoterm_approximation import TwoTermApproximation
 
 
 def test_check_if_permutation_exists():
+    np.random.seed(1675550990)
     for _ in range(10):
         number_of_monomials = int(np.random.rand()*15) + 3
         number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
@@ -40,7 +41,7 @@ def test_check_if_permutation_exists():
                 _, data_constraints = TwoTermApproximation.two_term_equivalent_posynomial(p, 1, temp, False)
                 data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
                                    for i, constraint in enumerate(data_constraints)]
-                list_of_posynomials.append(set(data_posynomial))
+                list_of_posynomials.append(list(data_posynomial))
                 counter += 1
 
         counter = 0
@@ -53,10 +54,9 @@ def test_check_if_permutation_exists():
             _, data_constraints = TwoTermApproximation.two_term_equivalent_posynomial(p, 1, temp, False)
             data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
                                for i, constraint in enumerate(data_constraints)]
-            flag_two = set(data_posynomial) in list_of_posynomials
+            flag_two = list(data_posynomial) in list_of_posynomials
 
             assert (flag_one == flag_two)
-
             counter += 1
 
 
@@ -78,7 +78,8 @@ def test_bad_relations():
                 x = Variable('x_%s' % i)
                 m[j] *= x**(np.random.rand()*10 - 5)
 
-        number_of_elements_in_relation = min(number_of_monomials, int(number_of_monomials*np.random.rand()+2))
+        number_of_elements_in_relation = min(number_of_monomials,
+                                             int(number_of_monomials*np.random.rand()+2))
         all_elements = []
 
         for dummy_one in range(number_of_elements_in_relation):
@@ -88,7 +89,8 @@ def test_bad_relations():
             all_elements.append(element)
 
             element_map = {}
-            number_of_element_map_elements = min(number_of_monomials - 1, int(number_of_monomials*np.random.rand()+2))
+            number_of_element_map_elements = min(number_of_monomials - 1,
+                                                 int(number_of_monomials*np.random.rand()+2))
             for dummy_two in range(number_of_element_map_elements):
                 element_map_element = int(np.random.rand()*number_of_monomials)
                 while element_map_element in element_map or element_map_element == element:

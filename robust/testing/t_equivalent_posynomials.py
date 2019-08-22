@@ -94,7 +94,7 @@ def test_correlated_monomials():
             theoretical_posynomials.append(sum([m[i] for i in theo_list]))
             actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in act_list]))
 
-        assert (set(actual_posynomials) == set(theoretical_posynomials))
+        assert (list(actual_posynomials) == list(theoretical_posynomials))
 
         # dependent uncertainties
         temp = []
@@ -111,7 +111,7 @@ def test_correlated_monomials():
 
         theoretical_posynomials.append(sum([m[i] for i in theoretical_partition]))
         actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in actual_partition[0]]))
-        assert (set(actual_posynomials) == set(theoretical_posynomials))
+        assert (list(actual_posynomials) == list(theoretical_posynomials))
 
     return
 
