@@ -5,10 +5,8 @@ import numpy as np
 
 from robust.equivalent_posynomials import EquivalentPosynomials
 
-
 def test_merge_intersected_lists():
-
-    for _ in range(10000):
+    for _ in range(100):
         number_of_lists = int(10*np.random.random()) + 1
         list_of_lists = []
         for l in range(number_of_lists):
@@ -20,9 +18,8 @@ def test_merge_intersected_lists():
         for from_list in list_of_lists:
             assert(any(set(from_list) <= set(from_partition) for from_partition in partition))
 
-
 def test_same_sign():
-    for _ in range(100):
+    for _ in range(20):
         number_of_elements = int(50*np.random.random()) + 1
         a = [int(20*np.random.random()) for _ in range(number_of_elements)]
         assert(EquivalentPosynomials.same_sign(a))
@@ -45,9 +42,8 @@ def test_same_sign():
         else:
             assert(EquivalentPosynomials.same_sign(a))
 
-
 def test_correlated_monomials():
-    for _ in range(100):
+    for _ in range(20):
         number_of_monomials = int(50*np.random.random())+1
         number_of_gp_variables = int(np.random.rand()*20) + 1
         number_of_uncertain_variables = int(np.random.rand()*5) + 1
@@ -58,11 +54,13 @@ def test_correlated_monomials():
         correlations = []
         dependent_theoretical_partition = []
 
+        # Generating random monomials
         for j in range(number_of_monomials):
             for i in range(number_of_gp_variables):
                 x = Variable('x_%s' % i)
                 m[j] *= x**(np.random.rand()*10 - 5)
 
+        # Generating random uncertain variables to merge with monomials
         for i in range(number_of_uncertain_variables):
             u = Variable('u_%s' % i, np.random.random(), pr=100*np.random.random())
             p_uncertain_vars.append(u.key)
@@ -78,6 +76,7 @@ def test_correlated_monomials():
                 if neg_pos_neutral_powers[j] != 0:
                     dependent_theoretical_partition.append(j)
 
+        # Merging intersections of correlations gives the theoretical partition of monomials.
         theoretical_partition = EquivalentPosynomials.merge_intersected_lists(correlations)
 
         p = sum(m)
@@ -112,9 +111,8 @@ def test_correlated_monomials():
         actual_posynomials.append(sum([monomials[j] for j in actual_partition[0]]))
         assert (list(actual_posynomials) == list(theoretical_posynomials))
 
-
 def test_check_if_in_list_of_lists():
-    for _ in range(100):
+    for _ in range(20):
         number_of_lists = int(10*np.random.random()) + 1
         list_of_lists = []
         number_of_elements = []
@@ -128,7 +126,6 @@ def test_check_if_in_list_of_lists():
 
         assert (EquivalentPosynomials.check_if_in_list_of_lists(element, list_of_lists))
         assert (not EquivalentPosynomials.check_if_in_list_of_lists(non_element, list_of_lists))
-
 
 def test():
     test_same_sign()

@@ -61,21 +61,23 @@ class EquivalentPosynomials(object):
 
         uncertain_vars_exps = []
         uncertain_vars_exps_mons = []
+
+        # Determines the exponents and the location of exponents
+        # of uncertain variables
         for i in range(len(p.exps)):
             m_uncertain_vars_exps = {}
-
             only_uncertain_vars_monomial_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(p.exps[i])
 
             for var in list(only_uncertain_vars_monomial_exps.keys()):
                 if RobustGPTools.is_directly_uncertain(var):
                     m_uncertain_vars_exps[var] = only_uncertain_vars_monomial_exps[var]
-            if m_uncertain_vars_exps in uncertain_vars_exps:
+            if m_uncertain_vars_exps in uncertain_vars_exps: # if a given exponent on a variable exists
                 index = uncertain_vars_exps.index(m_uncertain_vars_exps)
                 uncertain_vars_exps_mons[index].append(i)
             else:
-                uncertain_vars_exps.append(m_uncertain_vars_exps)
-                uncertain_vars_exps_mons.append([i])
+                uncertain_vars_exps.append(m_uncertain_vars_exps) # exponents
+                uncertain_vars_exps_mons.append([i]) # locations
 
         all_data_mons = []
         monomials = p.chop()
@@ -85,12 +87,14 @@ class EquivalentPosynomials(object):
                 for j in mon_list:
                     new_no_data_posynomial += monomials[j]/Monomial(uncertain_vars_exps[i])
                 com_variable = Variable('com_%s^%s' % (m, i))
+                # Add to no_data_constraints the constraints with zero uncertain variables
                 self.no_data_constraints += [new_no_data_posynomial <= com_variable]
                 all_data_mons.append(Monomial(uncertain_vars_exps[i])*com_variable)
             else:
                 temp = sum([monomials[mon_ind] for mon_ind in mon_list])
                 all_data_mons.append(temp)
 
+        # Redefine main_p and chop
         self.main_p = sum(all_data_mons)
 
         if len(self.main_p.exps) == 1:
@@ -120,6 +124,7 @@ class EquivalentPosynomials(object):
 
         super_script = 0
         for i in singleton_monomials:
+
             if RobustGPTools.\
                     check_if_no_data(self.p_uncertain_vars + self.p_indirect_uncertain_vars, self.main_p.exps[i]):
                 ts.append(main_monomials[i])

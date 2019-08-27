@@ -8,6 +8,7 @@ from robust.twoterm_approximation import TwoTermApproximation
 
 
 def test_check_if_permutation_exists():
+    # Passes...
     np.random.seed(1675550990)
     for _ in range(10):
         number_of_monomials = int(np.random.rand()*15) + 3
@@ -61,8 +62,9 @@ def test_check_if_permutation_exists():
 
 
 def test_bad_relations():
-    for _ in range(100):
-        number_of_monomials = int(20*np.random.random()) + 3
+    # Passes...
+    for _ in range(30):
+        number_of_monomials = int(10*np.random.random()) + 3
         number_of_gp_variables = int(np.random.rand()*10) + 1
         number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
         vector_to_choose_from_pos_only = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
@@ -82,7 +84,7 @@ def test_bad_relations():
                                              int(number_of_monomials*np.random.rand()+2))
         all_elements = []
 
-        for dummy_one in range(number_of_elements_in_relation):
+        for _ in range(number_of_elements_in_relation):
             element = np.random.choice(list(range(0, number_of_monomials)))
             while element in all_elements:
                 element = np.random.choice(list(range(0, number_of_monomials)))
@@ -91,7 +93,7 @@ def test_bad_relations():
             element_map = {}
             number_of_element_map_elements = min(number_of_monomials - 1,
                                                  int(number_of_monomials*np.random.rand()+2))
-            for dummy_two in range(number_of_element_map_elements):
+            for _ in range(number_of_element_map_elements):
                 element_map_element = int(np.random.rand()*number_of_monomials)
                 while element_map_element in element_map or element_map_element == element:
                     element_map_element = int(np.random.rand()*number_of_monomials)
@@ -156,6 +158,7 @@ def test_bad_relations():
         actual_relations, actual_sizes = TwoTermApproximation.bad_relations(p)
 
         keys = list(actual_relations.keys())
+
         actual_relations_mons = {}
         actual_sizes_mons = {}
         for key in keys:

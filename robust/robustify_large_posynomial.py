@@ -6,6 +6,7 @@ from builtins import range
 from builtins import object
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled
+from gpkit.nomials import NomialMap
 
 from .robust_gp_tools import RobustGPTools
 
@@ -191,10 +192,11 @@ class RobustifyLargePosynomial(object):
         separates the monomials in a posynomial into a list of monomials
         :return: The list of monomials
         """
-        monomials = []
-        for i in range(len(self.p.exps)):
-            monomials.append(Monomial(self.p.exps[i], self.p.cs[i]))
-        return monomials
+        monmaps = [NomialMap({exp: 1.}) for exp, c in self.hmap.items()]
+        for monmap in monmaps:
+            monmap.units = self.p.hmap.units
+        mons = [Monomial(monmap) for monmap in monmaps]
+        return mons
 
     @staticmethod
     def generate_robust_constraints(gamma, type_of_uncertainty_set,

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from builtins import range
 from builtins import object
-from gpkit import Model, Monomial, Variable, SignomialsEnabled
+from gpkit import Model, Variable, SignomialsEnabled
 from gpkit.nomials import SignomialInequality, MonomialEquality
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.nomials import SingleSignomialEquality
@@ -332,13 +332,12 @@ class RobustModel(object):
         intercepts = self.robust_solve_properties['intercepts']
         values = []
 
+        mons = two_term_approximation.chop()
+
         for i in range(number_of_two_terms):
             monomials = []
-
-            first_monomial = Monomial(two_term_approximation.p.exps[permutation[2 * i]],
-                                      two_term_approximation.p.cs[permutation[2 * i]])
-            second_monomial = Monomial(two_term_approximation.p.exps[permutation[2 * i + 1]],
-                                       two_term_approximation.p.cs[permutation[2 * i + 1]])
+            first_monomial = mons[2*i]
+            second_monomial = mons[2*i+1]
 
             monomials += [first_monomial]
             for j in range(num_of_linear_sections - 2):
@@ -354,8 +353,7 @@ class RobustModel(object):
                 subs_monomials.append(monomials[j].cs[0])
             values.append(max(subs_monomials))
         if number_of_two_terms % 2 != 0:
-            monomial = Monomial(two_term_approximation.p.exps[permutation[len(permutation) - 1]],
-                                    two_term_approximation.p.cs[permutation[len(permutation) - 1]])
+            monomial = mons[len(permutation) - 1]
             robust_monomial = self.robustify_monomial(monomial)
             monomial = robust_monomial.sub(solution['variables'])
             values.append(monomial.cs[0])

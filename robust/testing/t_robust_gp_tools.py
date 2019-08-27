@@ -6,10 +6,11 @@ from robust.robust_gp_tools import RobustGPTools
 
 
 def test_check_if_no_data():
-    for _ in range(100):
-        number_of_monomials = int(50*np.random.random())+1
-        number_of_gp_variables = int(np.random.rand()*20) + 1
-        number_of_uncertain_variables = int(np.random.rand()*5) + 1
+    # Passes...
+    for _ in range(20):
+        number_of_monomials = int(30*np.random.random())+1
+        number_of_gp_variables = int(np.random.rand()*15) + 1
+        number_of_uncertain_variables = int(np.random.rand()*4) + 1
         vector_to_choose_from = [0, 0, 0, 0, 0, 0, 0, 0, 1, -1]
 
         m = number_of_monomials*[1]

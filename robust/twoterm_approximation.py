@@ -23,7 +23,6 @@ class TwoTermApproximation(object):
     def __init__(self, p, setting):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
-
         self.list_of_permutations = []
 
         if not setting.get('boyd'):
@@ -64,22 +63,21 @@ class TwoTermApproximation(object):
         :param permutation: the permutation to be used for two term approximation
         :return: the no data constraints and the data constraints
         """
-        number_of_monomials = len(p.exps)
+        monomials = p.chop()
+        number_of_monomials = len(monomials)
         if number_of_monomials <= 2:
             return [[]], [[p <= 1]]
 
         data_constraints, no_data_constraints = [], []
 
-        monomials = p.chop()
-
         if boyd:
             z_1 = Variable("z^1_(%s)" % m)
-            data_constraints += [Monomial(p.exps[0], p.cs[0]) + z_1 <= 1]
+            data_constraints += [monomials[0] + z_1 <= 1]
             for i in range(number_of_monomials - 3):
                 if i > 0:
                     z_1 = Variable("z^%s_(%s)" % (i + 1, m))
                 z_2 = Variable("z^%s_(%s)" % (i + 2, m))
-                data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1])/z_1 + z_2 / z_1 <= 1]
+                data_constraints += [monomials[i+1]/z_1 + z_2 / z_1 <= 1]
             z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
             data_constraints += [
                 (monomials[number_of_monomials - 2]
