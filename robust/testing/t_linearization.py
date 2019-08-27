@@ -159,3 +159,6 @@ def test():
     test_iterate_two_term_posynomial_linearization_coeff()
     test_two_term_posynomial_linearization_coeff()
     test_linearize_two_term_posynomial()
+
+if __name__ == "__main__":
+    test()
