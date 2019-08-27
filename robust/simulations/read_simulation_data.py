@@ -1,3 +1,4 @@
+from builtins import next
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools
@@ -141,7 +142,7 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
     plt.figure()
     marker = itertools.cycle(('s', '*', 'o', '.', ','))
     for method in method_performance_dictionary:
-        plt.plot(numbers_of_linear_sections, method_performance_dictionary[method], marker=marker.next(),
+        plt.plot(numbers_of_linear_sections, method_performance_dictionary[method], marker=next(marker),
                  linestyle='', label=method)
     plt.xlabel("Number of Piecewise-linear Sections", fontsize=18)
     plt.ylabel(objective_name + '(' + objective_units + ')', fontsize=18)
@@ -153,10 +154,10 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
 def generate_variable_gamma_plots(variable_gamma_file_path_name):
     dictionary_gamma, properties_gamma = read_simulation_data(variable_gamma_file_path_name)
 
-    gammas = dictionary_gamma.keys()
+    gammas = list(dictionary_gamma.keys())
     gammas.sort()
-    methods = dictionary_gamma.values()[0].keys()
-    uncertainty_sets = dictionary_gamma.values()[0].values()[0].keys()
+    methods = list(dictionary_gamma.values())[0].keys()
+    uncertainty_sets = list(dictionary_gamma.values())[0].values()[0].keys()
     min_obj = min([dictionary_gamma[gamma][method][uncertainty_set]['Average performance']
                        for gamma in gammas
                        for method in methods
@@ -192,10 +193,10 @@ def generate_variable_gamma_plots(variable_gamma_file_path_name):
 
 def generate_variable_pwl_plots(variable_pwl_file_path_name):
     dictionary_pwl, properties_pwl = read_simulation_data(variable_pwl_file_path_name)
-    numbers_of_linear_sections = dictionary_pwl.keys()
+    numbers_of_linear_sections = list(dictionary_pwl.keys())
     numbers_of_linear_sections.sort()
-    methods = dictionary_pwl.values()[0].keys()
-    uncertainty_sets = dictionary_pwl.values()[0].values()[0].keys()
+    methods = list(dictionary_pwl.values())[0].keys()
+    uncertainty_sets = list(dictionary_pwl.values())[0].values()[0].keys()
     for uncertainty_set in uncertainty_sets:
         method_average_objective_dictionary = \
             {method: [dictionary_pwl[number_of_linear_sections][method][uncertainty_set]['Average performance']

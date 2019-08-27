@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import range
 import numpy as np
 from gpkit import Variable, Model
 
@@ -5,31 +7,31 @@ from gpkit import Variable, Model
 def synthetic_model(number_of_constraints):
     constraints = []
     obj = 1
-    number_of_gp_variables = number_of_constraints/2 + int(number_of_constraints*np.random.rand()) + 1
+    number_of_gp_variables = int(number_of_constraints/2) + int(number_of_constraints*np.random.rand()) + 1
     gp_variables = []
     s = []  # Variable('s_relax_sm')
-    for i in xrange(number_of_gp_variables):
+    for i in range(number_of_gp_variables):
         x = Variable('x_sm_%s' % i)
         gp_variables.append(x)
         constraints.append(x >= 0.01)
     number_of_uncertain_variables = int(50*np.random.rand()) + 1
     uncertain_variables = []
-    for i in xrange(number_of_uncertain_variables):
+    for i in range(number_of_uncertain_variables):
         uncertain_variables.append(Variable('u_sm_%s' % i, 2*np.random.random(), pr=50*np.random.random()))
 
-    for counter in xrange(number_of_constraints):
+    for counter in range(number_of_constraints):
         number_of_monomials = int(15*np.random.random())+1
         vector_to_choose_from = [0, 0, 0, 1, -1]  # , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
         m = number_of_monomials*[1]
 
-        for j in xrange(number_of_monomials):
-            for _ in xrange(int(number_of_gp_variables*np.random.rand()/2) + 1):
+        for j in range(number_of_monomials):
+            for _ in range(int(number_of_gp_variables*np.random.rand()/2) + 1):
                 m[j] *= (np.random.choice(gp_variables))**(10*np.random.random())  # -5)
 
-        for i in xrange(number_of_uncertain_variables):
-            neg_pos_neutral_powers = [vector_to_choose_from[int(len(vector_to_choose_from)*np.random.rand())] for _ in xrange(number_of_monomials)]
-            for j in xrange(number_of_monomials):
+        for i in range(number_of_uncertain_variables):
+            neg_pos_neutral_powers = [vector_to_choose_from[int(len(vector_to_choose_from)*np.random.rand())] for _ in range(number_of_monomials)]
+            for j in range(number_of_monomials):
                 m[j] *= uncertain_variables[i]**(np.random.rand()*2*(neg_pos_neutral_powers[j]))
         s.append(Variable('s_relax_sm_%s' % counter))
         constraints.append(sum(m) <= s[counter])

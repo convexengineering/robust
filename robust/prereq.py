@@ -1,6 +1,7 @@
-from signomial_simple_wing.models import simple_wing_sp
-from robust_gp_tools import RobustGPTools
-from simulations.simulate import generate_model_properties
+from __future__ import absolute_import
+from .signomial_simple_wing.models import simple_wing_sp
+from .robust_gp_tools import RobustGPTools
+from .simulations.simulate import generate_model_properties
 
 simp = simple_wing_sp()
 _, _, _, uncertain_vars = generate_model_properties(simp, 1, 1)

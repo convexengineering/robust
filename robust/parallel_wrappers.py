@@ -1,6 +1,8 @@
 """
 This module contains functions and wrappers for running code in parallel.
 """
+from __future__ import print_function
+from builtins import range
 from multiprocessing import Pool, cpu_count
 import math
 
@@ -52,7 +54,7 @@ def parfor(func, args = None, kwargs = None, num_processes=None, chunksize=16, m
     if args and kwargs:
         num_jobs = len(args)
         if num_jobs != len(kwargs):
-            print "Warning: Different numbers of args and kwargs for function. "
+            print("Warning: Different numbers of args and kwargs for function. ")
     elif args:
         num_jobs = len(args)
         kwargs = [None for _ in args]

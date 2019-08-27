@@ -15,7 +15,7 @@ for var in free_vars:
     string = ''
     for item in var.key.models:
         string = string + item + "-"
-    if string not in model_freevars.keys():
+    if string not in list(model_freevars.keys()):
         model_freevars[string] = {var: free_vars[var]}
     else:
         model_freevars[string].update({var: free_vars[var]})
@@ -24,7 +24,7 @@ for var in subs_vars:
     string = ''
     for item in var.key.models:
         string = string + item + "-"
-    if string not in model_subsvars.keys():
+    if string not in list(model_subsvars.keys()):
         model_subsvars[string] = {var: subs_vars[var]}
     else:
         model_subsvars[string].update({var: subs_vars[var]})

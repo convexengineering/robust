@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
 import numpy as np
 from gpkit import Variable, Model
 import scipy.optimize as op
@@ -10,7 +13,7 @@ def convex_function(x):
 
 
 def test_tangent_point_func():
-    for _ in xrange(1000):
+    for _ in range(1000):
 
         eps = np.random.rand() * 0.2
 
@@ -40,7 +43,7 @@ def test_tangent_point_func():
 
 
 def test_intersection_point_function():
-    for _ in xrange(1000):
+    for _ in range(1000):
 
         eps = np.random.rand() * 0.2
 
@@ -64,7 +67,7 @@ def test_intersection_point_function():
 
 
 def test_iterate_two_term_posynomial_linearization_coeff():
-    for _ in xrange(10):
+    for _ in range(10):
 
         eps = np.random.rand() * np.log(2)
         r = int(np.ceil(np.random.rand()*18)) + 1
@@ -112,7 +115,7 @@ def test_two_term_posynomial_linearization_coeff():
 
 def test_linearize_two_term_posynomial():
 
-    for _ in xrange(100):
+    for _ in range(100):
 
         tol = np.random.rand()*0.001
         number_of_gp_variables = int(np.random.rand()*20) + 1
@@ -120,7 +123,7 @@ def test_linearize_two_term_posynomial():
         m_1 = np.random.rand()*10
         m_2 = np.random.rand()*10
         subs = {}
-        for i in xrange(number_of_gp_variables):
+        for i in range(number_of_gp_variables):
             x = Variable('x_%s' % i)
             m_1 *= x**(np.random.rand()*10 - 5)
             m_2 *= x**(np.random.rand()*10 - 5)
