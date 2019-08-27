@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import division
+from builtins import range
+from builtins import object
 from gpkit import Model, nomials
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint
@@ -7,7 +11,7 @@ from copy import copy
 
 import multiprocessing as mp
 
-class RobustGPTools:
+class RobustGPTools(object):
     def __init__(self):
         pass
 
@@ -66,7 +70,7 @@ class RobustGPTools:
 
     @staticmethod
     def only_uncertain_vars_monomial(original_monomial_exps):
-        indirect_monomial_uncertain_vars = [var for var in original_monomial_exps.keys() if
+        indirect_monomial_uncertain_vars = [var for var in list(original_monomial_exps.keys()) if
                                             RobustGPTools.is_indirectly_uncertain(var)]
         new_monomial_exps = copy(original_monomial_exps)
         for var in indirect_monomial_uncertain_vars:
@@ -117,7 +121,7 @@ class RobustGPTools:
             results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
 
         costs = [0 if i is None else mag(i) for i in results]
-        print costs
+        print(costs)
         if np.sum(costs) > 0:
             inds = list(np.nonzero(costs)[0])
             nonzero_costs = [costs[i] for i in inds]
@@ -131,7 +135,7 @@ class RobustGPTools:
 
     class DesignedModel(Model):
         def setup(self, model, solution, directly_uncertain_vars_subs):
-            subs = {k: v for k, v in solution["freevariables"].items()
+            subs = {k: v for k, v in list(solution["freevariables"].items())
                     if k in model.varkeys and k.key.fix is True}
             subs.update(model.substitutions)
             subs.update(directly_uncertain_vars_subs)

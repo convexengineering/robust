@@ -1,25 +1,28 @@
+from __future__ import absolute_import
+from __future__ import division
+from builtins import range
+from builtins import object
 import numpy as np
 from gpkit import Variable, Monomial, Posynomial
 import random
 import math
 from copy import copy
 
-from robust_gp_tools import RobustGPTools
+from .robust_gp_tools import RobustGPTools
 
 
-class TwoTermApproximation:
+class TwoTermApproximation(object):
     """
     replaces a large posynomial by a data-deprived large posynomial and a set of two term posynomials
     """
 
-    p = Posynomial()
+    p = None
     number_of_monomials = None
     list_of_permutations = []
 
     def __init__(self, p, setting):
         self.p = p
         self.number_of_monomials = len(self.p.exps)
-
         self.list_of_permutations = []
 
         if not setting.get('boyd'):
@@ -29,7 +32,7 @@ class TwoTermApproximation:
                     choose_convenient_couples(bad_relations, sizes, self.number_of_monomials)
             else:
                 list_of_couples = []
-                new_list_to_permute = range(0, self.number_of_monomials)
+                new_list_to_permute = list(range(0, self.number_of_monomials))
 
             first_elements = []
             for couple in list_of_couples:
@@ -60,7 +63,8 @@ class TwoTermApproximation:
         :param permutation: the permutation to be used for two term approximation
         :return: the no data constraints and the data constraints
         """
-        number_of_monomials = len(p.exps)
+        monomials = p.chop()
+        number_of_monomials = len(monomials)
         if number_of_monomials <= 2:
             return [[]], [[p <= 1]]
 
@@ -68,16 +72,16 @@ class TwoTermApproximation:
 
         if boyd:
             z_1 = Variable("z^1_(%s)" % m)
-            data_constraints += [Monomial(p.exps[0], p.cs[0]) + z_1 <= 1]
-            for i in xrange(number_of_monomials - 3):
+            data_constraints += [monomials[0] + z_1 <= 1]
+            for i in range(number_of_monomials - 3):
                 if i > 0:
                     z_1 = Variable("z^%s_(%s)" % (i + 1, m))
                 z_2 = Variable("z^%s_(%s)" % (i + 2, m))
-                data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1])/z_1 + z_2 / z_1 <= 1]
+                data_constraints += [monomials[i+1]/z_1 + z_2 / z_1 <= 1]
             z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
             data_constraints += [
-                Monomial(p.exps[number_of_monomials - 2], p.cs[number_of_monomials - 2]) / z_2 +
-                Monomial(p.exps[number_of_monomials - 1], p.cs[number_of_monomials - 1]) / z_2 <= 1]
+                (monomials[number_of_monomials - 2]
+                 + monomials[number_of_monomials - 1]) / z_2 <= 1]
             return [], data_constraints
 
         length_of_permutation = len(permutation)
@@ -85,17 +89,15 @@ class TwoTermApproximation:
 
         zs = []
 
-        for j in xrange(number_of_iterations):
+        for j in range(number_of_iterations):
             z = Variable("z^%s_%s" % (j, m))
             zs.append(z)
-            data_constraints += [Monomial(p.exps[permutation[2 * j]], p.cs[permutation[2 * j]]) +
-                                 Monomial(p.exps[permutation[2 * j + 1]], p.cs[permutation[2 * j + 1]]) <= z]
+            data_constraints += [monomials[2*j] + monomials[2*j + 1] <= z]
 
         if length_of_permutation % 2 == 1:
             z = Variable("z^%s_%s" % (number_of_iterations, m))
             zs.append(z)
-            data_constraints += [Monomial(p.exps[permutation[length_of_permutation - 1]],
-                                          p.cs[permutation[length_of_permutation - 1]]) <= z]
+            data_constraints += [monomials[permutation[length_of_permutation - 1]] <= z]
 
         no_data_constraints.append([sum(zs) <= 1])
 
@@ -110,18 +112,6 @@ class TwoTermApproximation:
         :return: True or false
         """
         if permutation in permutations:
-            return True
-        if len(permutation) == 1:
-            return False
-        true_or_false = [1] * len(permutations)
-        for i in xrange(int(len(permutation) / 2)):
-            for j in xrange(len(true_or_false)):
-                if true_or_false[j] == 1:
-                    ind_one = permutations[j].index(permutation[2 * i])
-                    ind_two = permutations[j].index(permutation[2 * i + 1])
-                    if np.floor(ind_one / 2) != np.floor(ind_two / 2):
-                        true_or_false[j] = 0
-        if 1 in true_or_false:
             return True
         else:
             return False
@@ -164,11 +154,11 @@ class TwoTermApproximation:
         number_of_monomials = len(p.exps)
         inverse_relations = {}
         sizes = {}
-        for i in xrange(number_of_monomials):
+        for i in range(number_of_monomials):
             direct_vars_only_monomial_ith_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(p.exps[i])
             ith_monomial_exps = direct_vars_only_monomial_ith_exps
-            m_uncertain_vars = [var for var in ith_monomial_exps.keys()
+            m_uncertain_vars = [var for var in list(ith_monomial_exps.keys())
                                 if RobustGPTools.is_directly_uncertain(var)]
             for j in range(0, number_of_monomials):
                 direct_vars_only_monomial_jth_exps = RobustGPTools.\
@@ -197,7 +187,7 @@ class TwoTermApproximation:
         :return:the list of couples and the remaining monomials that need to be dealt with
         """
         list_of_couples = []
-        to_permute = range(0, number_of_monomials)
+        to_permute = list(range(0, number_of_monomials))
         while len(relations) > 0:
             vals_sizes = list(sizes.values())
             keys_sizes = list(sizes.keys())
@@ -218,7 +208,7 @@ class TwoTermApproximation:
             del sizes[minimum_value_key]
             del sizes[maximum_of_min_value_key]
 
-            for key in relations.keys():
+            for key in list(relations.keys()):
                 if minimum_value_key in relations[key]:
                     del relations[key][minimum_value_key]
                     sizes[key] -= 1

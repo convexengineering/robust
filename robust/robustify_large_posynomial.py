@@ -1,10 +1,17 @@
+from __future__ import absolute_import
+from __future__ import division
+from builtins import map
+from builtins import zip
+from builtins import range
+from builtins import object
 import numpy as np
 from gpkit import Variable, Monomial, SignomialsEnabled
+from gpkit.nomials import NomialMap
 
-from robust_gp_tools import RobustGPTools
+from .robust_gp_tools import RobustGPTools
 
 
-class RobustifyLargePosynomial:
+class RobustifyLargePosynomial(object):
 
     def __init__(self, p, type_of_uncertainty_set, number_of_stds, setting):
         self.p = p
@@ -25,7 +32,7 @@ class RobustifyLargePosynomial:
             return [array]
         else:
             output = []
-            for i in xrange(len(array)):
+            for i in range(len(array)):
                 output = output + RobustifyLargePosynomial. \
                     merge_mesh_grid(array[i], n / (len(array) + 0.0))
             return output
@@ -49,29 +56,29 @@ class RobustifyLargePosynomial:
             else:
                 x = np.meshgrid(*[np.linspace(-1, 1, number_of_regression_points)] * dim)
 
-            for _ in xrange(number_of_regression_points ** dim):
+            for _ in range(number_of_regression_points ** dim):
                 input_list.append([])
 
-            for i in xrange(dim):
+            for i in range(dim):
                 temp = RobustifyLargePosynomial.merge_mesh_grid(x[i], number_of_regression_points ** dim)
-                for j in xrange(number_of_regression_points ** dim):
+                for j in range(number_of_regression_points ** dim):
                     input_list[j].append(temp[j])
 
         else:
             theta_mesh_grid = np.meshgrid(*[np.linspace(0, 2*np.pi - 2*np.pi/number_of_regression_points,
                                                         number_of_regression_points)] * (dim - 1))
             thetas_list = []
-            for _ in xrange(number_of_regression_points ** (dim - 1)):
+            for _ in range(number_of_regression_points ** (dim - 1)):
                 thetas_list.append([])
-            for i in xrange(dim - 1):
+            for i in range(dim - 1):
                 temp = RobustifyLargePosynomial.merge_mesh_grid(theta_mesh_grid[i], number_of_regression_points ** (dim - 1))
-                for j in xrange(number_of_regression_points ** (dim - 1)):
+                for j in range(number_of_regression_points ** (dim - 1)):
                     thetas_list[j].append(temp[j])
-            for i in xrange(number_of_regression_points ** (dim - 1)):
+            for i in range(number_of_regression_points ** (dim - 1)):
                 an_input_list = []
-                for j in xrange(dim):
+                for j in range(dim):
                     product = 1
-                    for k in xrange(j):
+                    for k in range(j):
                         product *= np.cos(thetas_list[i][k])
                     if j != dim - 1:
                         product *= np.sin(thetas_list[i][j])
@@ -79,9 +86,9 @@ class RobustifyLargePosynomial:
                 input_list.append(an_input_list)
 
         num_of_inputs = len(input_list)
-        for i in xrange(num_of_inputs):
+        for i in range(num_of_inputs):
             output = 1
-            for j in xrange(dim):
+            for j in range(dim):
                 if perturbation_vector[j] != 0:
                     output = output * perturbation_vector[j] ** input_list[i][j]
             result.append(output)
@@ -103,12 +110,12 @@ class RobustifyLargePosynomial:
         b = []
         y_m_i = input_list[min_index][the_index] - input_list[max_index][the_index]
         back_count = 0
-        for k in xrange(num_of_inputs):
+        for k in range(num_of_inputs):
             if k != max_index and k != min_index:
                 capital_a.append([])
                 y_ratio = (input_list[k][the_index] - input_list[max_index][the_index])/y_m_i
                 b.append(result[k] + max_value*(y_ratio - 1) - min_value*y_ratio)
-                for l in xrange(dim):
+                for l in range(dim):
                     if l != the_index:
                         y_k_l = input_list[k][l] - input_list[max_index][l]
                         y_m_l = input_list[min_index][l] - input_list[max_index][l]
@@ -116,7 +123,7 @@ class RobustifyLargePosynomial:
             else:
                 back_count += 1
 
-        capital_a_trans = map(list, zip(*capital_a))
+        capital_a_trans = list(map(list, list(zip(*capital_a))))
         capital_b = np.dot(capital_a_trans, capital_a)
         r_h_s = np.dot(capital_a_trans, b)
 
@@ -134,7 +141,7 @@ class RobustifyLargePosynomial:
             a_i = (min_value - max_value - the_sum)/y_m_i
             coeff = solution[0:the_index] + [a_i] + solution[the_index:len(solution)]
             the_sum = 0
-            for l in xrange(dim):
+            for l in range(dim):
                 the_sum += coeff[l]*input_list[max_index][l]
             intercept = max_value - the_sum
         except np.linalg.LinAlgError:
@@ -153,13 +160,13 @@ class RobustifyLargePosynomial:
         mean_vector = []
         coeff, intercept = [], []
 
-        for i in xrange(len(p_uncertain_vars)):
+        for i in range(len(p_uncertain_vars)):
             eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i])
             center.append((eta_min + eta_max) / 2.0)
             scale.append(eta_max - center[i])
 
         perturbation_matrix = []
-        for i in xrange(len(self.p.exps)):
+        for i in range(len(self.p.exps)):
             only_uncertain_vars_monomial_exps = RobustGPTools.\
                 only_uncertain_vars_monomial(self.p.exps[i])
             perturbation_matrix.append([])
@@ -185,10 +192,11 @@ class RobustifyLargePosynomial:
         separates the monomials in a posynomial into a list of monomials
         :return: The list of monomials
         """
-        monomials = []
-        for i in xrange(len(self.p.exps)):
-            monomials.append(Monomial(self.p.exps[i], self.p.cs[i]))
-        return monomials
+        monmaps = [NomialMap({exp: 1.}) for exp, c in self.hmap.items()]
+        for monmap in monmaps:
+            monmap.units = self.p.hmap.units
+        mons = [Monomial(monmap) for monmap in monmaps]
+        return mons
 
     @staticmethod
     def generate_robust_constraints(gamma, type_of_uncertainty_set,
@@ -219,7 +227,7 @@ class RobustifyLargePosynomial:
                                       zip(mean_vector, intercept)], monomials)]) + gamma * s_main ** 0.5 <= 1]
         ss = []
 
-        for i in xrange(len(perturbation_matrix[0])):
+        for i in range(len(perturbation_matrix[0])):
             positive_pert, negative_pert = [], []
             positive_monomials, negative_monomials = [], []
 
@@ -229,7 +237,7 @@ class RobustifyLargePosynomial:
                 ss.append(s)
             else:
                 s = s_main
-            for j in xrange(len(perturbation_matrix)):
+            for j in range(len(perturbation_matrix)):
                 if perturbation_matrix[j][i] > 0:
                     positive_pert.append(mean_vector[j] * perturbation_matrix[j][i])
                     positive_monomials.append(monomials[j])
@@ -299,8 +307,8 @@ class RobustifyLargePosynomial:
 
         new_direct_uncertain_vars = []
         for var in p_indirect_uncertain_vars:
-            new_direct_uncertain_vars += RobustGPTools.\
-                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys()
+            new_direct_uncertain_vars += list(RobustGPTools.\
+                replace_indirect_uncertain_variable_by_equivalent(var.key.rel, 1).keys())
         new_direct_uncertain_vars = [var for var in new_direct_uncertain_vars
                                      if RobustGPTools.is_directly_uncertain(var)]
         p_uncertain_vars = list(set(p_direct_uncertain_vars) | set(new_direct_uncertain_vars))

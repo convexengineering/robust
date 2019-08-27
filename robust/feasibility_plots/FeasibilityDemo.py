@@ -1,8 +1,10 @@
+from __future__ import print_function
+from __future__ import absolute_import
 from gpkit import Variable, Model
 import numpy as np
 
 from robust.robust import RobustModel
-from plot_feasibilities import plot_feasibilities
+from .plot_feasibilities import plot_feasibilities
 
 k = Variable("k", 1.17, "-", "form factor")
 e = Variable("e", 0.92, "-", "Oswald efficiency factor")
@@ -66,11 +68,11 @@ def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2
     y.key.descr[str2] = val2
     RM = RobustModel(m, type_of_uncertainty_set, linearizationTolerance=1e-4)
     RMsol = RM.robustsolve(verbosity=0, minNumOfLinearSections=20, maxNumOfLinearSections=40)
-    print "nominal: ", {k: v for k, v in sol["freevariables"].items()
-                        if k in m.varkeys and k.key.fix is True}
-    print "robust: ", {k: v for k, v in RMsol["freevariables"].items()
-                       if k in m.varkeys and k.key.fix is True}
-    print 'cost', RMsol['cost']
+    print("nominal: ", {k: v for k, v in list(sol["freevariables"].items())
+                        if k in m.varkeys and k.key.fix is True})
+    print("robust: ", {k: v for k, v in list(RMsol["freevariables"].items())
+                       if k in m.varkeys and k.key.fix is True})
+    print('cost', RMsol['cost'])
     plot_feasibilities(x, y, m, RM, numberofsweeps=120, design_feasibility=design_feasibility, skipfailures=True)
     del x.key.descr[str1]
     del y.key.descr[str2]

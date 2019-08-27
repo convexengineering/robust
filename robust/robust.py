@@ -1,4 +1,9 @@
-from gpkit import Model, Monomial, Variable, SignomialsEnabled
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
+from builtins import range
+from builtins import object
+from gpkit import Model, Variable, SignomialsEnabled
 from gpkit.nomials import SignomialInequality, MonomialEquality
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.nomials import SingleSignomialEquality
@@ -7,15 +12,15 @@ from time import time
 import warnings
 from scipy.stats import norm
 
-from robust_gp_tools import RobustGPTools
-from equivalent_posynomials import EquivalentPosynomials
-from equivalent_models import TwoTermBoydModel
-from twoterm_approximation import TwoTermApproximation
-from robustify_large_posynomial import RobustifyLargePosynomial
-from linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
+from .robust_gp_tools import RobustGPTools
+from .equivalent_posynomials import EquivalentPosynomials
+from .equivalent_models import TwoTermBoydModel
+from .twoterm_approximation import TwoTermApproximation
+from .robustify_large_posynomial import RobustifyLargePosynomial
+from .linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 
-class RobustnessSetting:
+class RobustnessSetting(object):
     def __init__(self, **options):
         self._options = {
             'gamma': 1,
@@ -37,7 +42,7 @@ class RobustnessSetting:
             'probabilityOfSuccess': 0.9,
             'lognormal': True
         }
-        for key, value in options.iteritems():
+        for key, value in options.items():
             self._options[key] = value
 
         if self._options['twoTerm']:
@@ -54,7 +59,7 @@ class RobustnessSetting:
         self._options[option_name] = value
 
 
-class RobustModel:
+class RobustModel(object):
     """
     RobustModel extends gpkit.Model through the robust counterpart.
     It uses the nominal solution of the GP or SP to
@@ -156,7 +161,7 @@ class RobustModel:
             warnings.warn('equality constraints will not be robustified')
 
     def setup(self, verbosity=0, **options):
-        for option, key in options.iteritems():
+        for option, key in options.items():
             self.setting.set(option, key)
 
         start_time = time()
@@ -164,9 +169,9 @@ class RobustModel:
         old_solution = self.nominal_solve
         reached_feasibility = 0
 
-        for count in xrange(self.setting.get('iterationLimit')):
+        for count in range(self.setting.get('iterationLimit')):
             if verbosity > 0:
-                print "iteration %s" % (count + 1)
+                print("iteration %s" % (count + 1))
             ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomials = self. \
                 approximate_and_classify_sp_constraints(old_solution, self.number_of_gp_posynomials)
 
@@ -203,10 +208,10 @@ class RobustModel:
             rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
             if verbosity > 0:
                 if not reached_feasibility:
-                    print "feasibility is not reached yet"
+                    print("feasibility is not reached yet")
                 elif reached_feasibility == 1:
-                    print "feasibility is reached"
-                print "relative tolerance = %s" % rel_tol
+                    print("feasibility is reached")
+                print("relative tolerance = %s" % rel_tol)
             if reached_feasibility <= 1 and two_term_data_posynomials:
                 self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], _, _, _ = \
                     LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(
@@ -284,7 +289,7 @@ class RobustModel:
     def robustify_monomial(self, monomial):
         new_monomial_exps = RobustGPTools. \
             only_uncertain_vars_monomial(monomial.exps[0])
-        m_direct_uncertain_vars = [var for var in new_monomial_exps.keys() if RobustGPTools.is_uncertain(var)]
+        m_direct_uncertain_vars = [var for var in list(new_monomial_exps.keys()) if RobustGPTools.is_uncertain(var)]
 
         l_norm = 0
         for var in m_direct_uncertain_vars:
@@ -327,21 +332,20 @@ class RobustModel:
         intercepts = self.robust_solve_properties['intercepts']
         values = []
 
-        for i in xrange(number_of_two_terms):
-            monomials = []
+        mons = two_term_approximation.chop()
 
-            first_monomial = Monomial(two_term_approximation.p.exps[permutation[2 * i]],
-                                      two_term_approximation.p.cs[permutation[2 * i]])
-            second_monomial = Monomial(two_term_approximation.p.exps[permutation[2 * i + 1]],
-                                       two_term_approximation.p.cs[permutation[2 * i + 1]])
+        for i in range(number_of_two_terms):
+            monomials = []
+            first_monomial = mons[2*i]
+            second_monomial = mons[2*i+1]
 
             monomials += [first_monomial]
-            for j in xrange(num_of_linear_sections - 2):
+            for j in range(num_of_linear_sections - 2):
                 monomials += [first_monomial ** slopes[num_of_linear_sections - 3 - j] *
                               second_monomial ** slopes[j] * np.exp(intercepts[j])]
             monomials += [second_monomial]
             subs_monomials = []
-            for j in xrange(len(monomials)):
+            for j in range(len(monomials)):
                 # st3 = time()
                 robust_monomial = self.robustify_monomial(monomials[j])
                 monomials[j] = robust_monomial.sub(solution['variables'])
@@ -349,8 +353,7 @@ class RobustModel:
                 subs_monomials.append(monomials[j].cs[0])
             values.append(max(subs_monomials))
         if number_of_two_terms % 2 != 0:
-            monomial = Monomial(two_term_approximation.p.exps[permutation[len(permutation) - 1]],
-                                    two_term_approximation.p.cs[permutation[len(permutation) - 1]])
+            monomial = mons[len(permutation) - 1]
             robust_monomial = self.robustify_monomial(monomial)
             monomial = robust_monomial.sub(solution['variables'])
             values.append(monomial.cs[0])
@@ -359,7 +362,7 @@ class RobustModel:
     def find_permutation_with_minimum_value(self, two_term_approximation, solution):
         minimum_value = np.inf
         minimum_index = len(two_term_approximation.list_of_permutations)
-        for i in xrange(len(two_term_approximation.list_of_permutations)):
+        for i in range(len(two_term_approximation.list_of_permutations)):
             temp_value = self. \
                 calculate_value_of_two_term_approximated_posynomial(two_term_approximation, i, solution)
             if temp_value < minimum_value:

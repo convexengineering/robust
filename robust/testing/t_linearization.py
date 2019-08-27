@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import zip
+from builtins import range
 import numpy as np
 from gpkit import Variable, Model
 import scipy.optimize as op
@@ -10,13 +13,12 @@ def convex_function(x):
 
 
 def test_tangent_point_func():
-    for _ in xrange(1000):
+    # Passes...
+    for _ in range(100):
 
         eps = np.random.rand() * 0.2
-
         x_old = - np.random.rand() * np.log(np.exp(0.2) - 1)
         y_old = convex_function(x_old) - eps
-
         x_tangent = op.newton(LinearizeTwoTermPosynomials.tangent_point_func, x_old + 1, args=(x_old, eps))
         y_tangent = convex_function(x_tangent)
 
@@ -28,10 +30,8 @@ def test_tangent_point_func():
         assert (convex_function(x_tangent) - tangent_line(x_tangent) < 0.0001)
 
         trial_points = list(np.arange(0, 20, 0.01))
-
         function_points = [convex_function(i) for i in trial_points]
         tangent_points = [tangent_line(i) for i in trial_points]
-
         difference = [a - b for a, b in zip(function_points, tangent_points)]
 
         assert (all(i >= 0 for i in difference))
@@ -40,7 +40,8 @@ def test_tangent_point_func():
 
 
 def test_intersection_point_function():
-    for _ in xrange(1000):
+    # Passes...
+    for _ in range(100):
 
         eps = np.random.rand() * 0.2
 
@@ -64,7 +65,8 @@ def test_intersection_point_function():
 
 
 def test_iterate_two_term_posynomial_linearization_coeff():
-    for _ in xrange(10):
+    # Passes...
+    for _ in range(10):
 
         eps = np.random.rand() * np.log(2)
         r = int(np.ceil(np.random.rand()*18)) + 1
@@ -87,6 +89,7 @@ def test_iterate_two_term_posynomial_linearization_coeff():
 
 
 def test_two_term_posynomial_linearization_coeff():
+    # Passes...
     for r in range(3, 21):
 
         slopes, intercepts, x_tangent, x_intersection, eps = LinearizeTwoTermPosynomials.\
@@ -111,16 +114,15 @@ def test_two_term_posynomial_linearization_coeff():
 
 
 def test_linearize_two_term_posynomial():
-
-    for _ in xrange(100):
-
+    # Passes...
+    for _ in range(20):
         tol = np.random.rand()*0.001
         number_of_gp_variables = int(np.random.rand()*20) + 1
 
         m_1 = np.random.rand()*10
         m_2 = np.random.rand()*10
         subs = {}
-        for i in xrange(number_of_gp_variables):
+        for i in range(number_of_gp_variables):
             x = Variable('x_%s' % i)
             m_1 *= x**(np.random.rand()*10 - 5)
             m_2 *= x**(np.random.rand()*10 - 5)
