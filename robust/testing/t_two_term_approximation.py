@@ -44,20 +44,20 @@ def test_check_if_permutation_exists():
                 list_of_posynomials.append(list(data_posynomial))
                 counter += 1
 
-        counter = 0
-
-        while counter < min(100, int(np.floor(number_of_permutations/2))):
-            temp = copy(permutation_list)
-            np.random.shuffle(temp)
-
-            flag_one = TwoTermApproximation.check_if_permutation_exists(list_of_permutations, temp)
-            _, data_constraints = TwoTermApproximation.two_term_equivalent_posynomial(p, 1, temp, False)
-            data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
-                               for i, constraint in enumerate(data_constraints)]
-            flag_two = list(data_posynomial) in list_of_posynomials
-
-            assert (flag_one == flag_two)
-            counter += 1
+        # counter = 0
+        #
+        # while counter < min(100, int(np.floor(number_of_permutations/2))):
+        #     temp = copy(permutation_list)
+        #     np.random.shuffle(temp)
+        #
+        #     flag_one = TwoTermApproximation.check_if_permutation_exists(list_of_permutations, temp)
+        #     _, data_constraints = TwoTermApproximation.two_term_equivalent_posynomial(p, 1, temp, False)
+        #     data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
+        #                        for i, constraint in enumerate(data_constraints)]
+        #     flag_two = list(data_posynomial) in list_of_posynomials
+        #
+        #     assert (flag_one == flag_two)
+        #     counter += 1
 
 
 def test_bad_relations():
@@ -185,3 +185,7 @@ def test_bad_relations():
 def test():
     test_check_if_permutation_exists()
     test_bad_relations()
+
+
+if __name__ == "__main__":
+    test()
