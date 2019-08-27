@@ -151,6 +151,7 @@ def test_bad_relations():
                 m[j] *= u**(np.random.rand()*5*neg_pos_neutral_powers[i][j])
 
         p = sum(m)
+        monomials = p.chop()
 
         actual_relations, actual_sizes = TwoTermApproximation.bad_relations(p)
 
@@ -162,9 +163,9 @@ def test_bad_relations():
             map_keys = list(internal_map.keys())
             map_mons = {}
             for map_key in map_keys:
-                map_mons[Monomial(p.exps[map_key], p.cs[map_key])] = internal_map[map_key]
-            actual_relations_mons[Monomial(p.exps[key], p.cs[key])] = map_mons
-            actual_sizes_mons[Monomial(p.exps[key], p.cs[key])] = actual_sizes[key]
+                map_mons[monomials[map_key]] = internal_map[map_key]
+            actual_relations_mons[monomials[key]] = map_mons
+            actual_sizes_mons[monomials[key]] = actual_sizes[key]
 
         keys = list(relations.keys())
         relations_mons = {}
