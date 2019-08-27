@@ -9,7 +9,7 @@ class EquivalentPosynomials:
     replaces a posynomial by an equivalent set of posynomials
     """
 
-    main_p = Posynomial()
+    main_p = None
     p_uncertain_vars = []
     p_indirect_uncertain_vars = []
     m = None
@@ -74,16 +74,17 @@ class EquivalentPosynomials:
                 uncertain_vars_exps_mons.append([i])
 
         all_data_mons = []
+        monomials = p.chop()
         for i, mon_list in enumerate(uncertain_vars_exps_mons):
             if len(mon_list) > 1 and uncertain_vars_exps[i]:
                 new_no_data_posynomial = 0
                 for j in mon_list:
-                    new_no_data_posynomial += Monomial(p.exps[j], p.cs[j])/Monomial(uncertain_vars_exps[i])
+                    new_no_data_posynomial += monomials[j]/Monomial(uncertain_vars_exps[i])
                 com_variable = Variable('com_%s^%s' % (m, i))
                 self.no_data_constraints += [new_no_data_posynomial <= com_variable]
                 all_data_mons.append(Monomial(uncertain_vars_exps[i])*com_variable)
             else:
-                temp = sum([Monomial(p.exps[mon_ind], p.cs[mon_ind]) for mon_ind in mon_list])
+                temp = sum([monomials[mon_ind] for mon_ind in mon_list])
                 all_data_mons.append(temp)
 
         self.main_p = sum(all_data_mons)
@@ -111,18 +112,18 @@ class EquivalentPosynomials:
         singleton_monomials = [element for element in elements if
                                not EquivalentPosynomials.check_if_in_list_of_lists(element,
                                                                                    coupled_monomial_partitions)]
+        main_monomials = self.main_p.chop()
 
         super_script = 0
         for i in singleton_monomials:
-
             if RobustGPTools.\
                     check_if_no_data(self.p_uncertain_vars + self.p_indirect_uncertain_vars, self.main_p.exps[i]):
-                ts.append(Monomial(self.main_p.exps[i], self.main_p.cs[i]))
+                ts.append(main_monomials[i])
             else:
                 t = Variable('t_%s^%s' % (m, super_script))
                 super_script += 1
                 ts.append(t)
-                self.data_constraints += [Monomial(self.main_p.exps[i], self.main_p.cs[i]) <= t]
+                self.data_constraints += [main_monomials[i] <= t]
 
         for i in xrange(len(coupled_monomial_partitions)):
             if coupled_monomial_partitions[i]:
@@ -131,7 +132,7 @@ class EquivalentPosynomials:
                 super_script += 1
                 ts.append(t)
                 for j in coupled_monomial_partitions[i]:
-                    posynomial += Monomial(self.main_p.exps[j], self.main_p.cs[j])
+                    posynomial += main_monomials[j]
                 self.data_constraints += [posynomial <= t]
 
         self.no_data_constraints += [sum(ts) <= 1]

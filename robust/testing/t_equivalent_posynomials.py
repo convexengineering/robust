@@ -88,9 +88,10 @@ def test_correlated_monomials():
         theoretical_posynomials = []
         actual_posynomials = []
 
+        monomials = p.chop()
         for theo_list, act_list in zip(theoretical_partition, actual_partition):
             theoretical_posynomials.append(sum([m[i] for i in theo_list]))
-            actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in act_list]))
+            actual_posynomials.append(sum([monomials[j] for j in act_list]))
 
         assert (set(actual_posynomials) == set(theoretical_posynomials))
 
@@ -108,7 +109,7 @@ def test_correlated_monomials():
         actual_posynomials = []
 
         theoretical_posynomials.append(sum([m[i] for i in theoretical_partition]))
-        actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in actual_partition[0]]))
+        actual_posynomials.append(sum([monomials[j] for j in actual_partition[0]]))
         assert (set(actual_posynomials) == set(theoretical_posynomials))
 
     return
