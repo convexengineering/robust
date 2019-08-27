@@ -40,6 +40,8 @@ def test_check_if_no_data():
                 # noinspection PyUnresolvedReferences
                 assert (RobustGPTools.check_if_no_data(p_uncertain_vars, m[i].exps[0]))
 
-
 def test():
     test_check_if_no_data()
+
+if __name__ == "__main__":
+    test()

@@ -8,9 +8,7 @@ from robust.twoterm_approximation import TwoTermApproximation
 
 
 def test_check_if_permutation_exists():
-    # Passes...
-    np.random.seed(1675550990)
-    for _ in range(10):
+    for _ in xrange(10):
         number_of_monomials = int(np.random.rand()*15) + 3
         number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
 
@@ -62,9 +60,8 @@ def test_check_if_permutation_exists():
 
 
 def test_bad_relations():
-    # Passes...
-    for _ in range(30):
-        number_of_monomials = int(10*np.random.random()) + 3
+    for _ in xrange(30):
+        number_of_monomials = int(20*np.random.random()) + 3
         number_of_gp_variables = int(np.random.rand()*10) + 1
         number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
         vector_to_choose_from_pos_only = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
@@ -189,7 +186,6 @@ def test_bad_relations():
 def test():
     test_check_if_permutation_exists()
     test_bad_relations()
-
 
 if __name__ == "__main__":
     test()
