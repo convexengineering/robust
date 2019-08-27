@@ -16,7 +16,7 @@ class TwoTermApproximation(object):
     replaces a large posynomial by a data-deprived large posynomial and a set of two term posynomials
     """
 
-    p = Posynomial()
+    p = None
     number_of_monomials = None
     list_of_permutations = []
 
@@ -70,6 +70,8 @@ class TwoTermApproximation(object):
 
         data_constraints, no_data_constraints = [], []
 
+        monomials = p.chop()
+
         if boyd:
             z_1 = Variable("z^1_(%s)" % m)
             data_constraints += [Monomial(p.exps[0], p.cs[0]) + z_1 <= 1]
@@ -80,8 +82,8 @@ class TwoTermApproximation(object):
                 data_constraints += [Monomial(p.exps[i + 1], p.cs[i + 1])/z_1 + z_2 / z_1 <= 1]
             z_2 = Variable("z^%s_(%s)" % (number_of_monomials - 2, m))
             data_constraints += [
-                Monomial(p.exps[number_of_monomials - 2], p.cs[number_of_monomials - 2]) / z_2 +
-                Monomial(p.exps[number_of_monomials - 1], p.cs[number_of_monomials - 1]) / z_2 <= 1]
+                (monomials[number_of_monomials - 2]
+                 + monomials[number_of_monomials - 1]) / z_2 <= 1]
             return [], data_constraints
 
         length_of_permutation = len(permutation)
@@ -92,14 +94,12 @@ class TwoTermApproximation(object):
         for j in range(number_of_iterations):
             z = Variable("z^%s_%s" % (j, m))
             zs.append(z)
-            data_constraints += [Monomial(p.exps[permutation[2 * j]], p.cs[permutation[2 * j]]) +
-                                 Monomial(p.exps[permutation[2 * j + 1]], p.cs[permutation[2 * j + 1]]) <= z]
+            data_constraints += [monomials[2*j] + monomials[2*j + 1] <= z]
 
         if length_of_permutation % 2 == 1:
             z = Variable("z^%s_%s" % (number_of_iterations, m))
             zs.append(z)
-            data_constraints += [Monomial(p.exps[permutation[length_of_permutation - 1]],
-                                          p.cs[permutation[length_of_permutation - 1]]) <= z]
+            data_constraints += [monomials[permutation[length_of_permutation - 1]] <= z]
 
         no_data_constraints.append([sum(zs) <= 1])
 

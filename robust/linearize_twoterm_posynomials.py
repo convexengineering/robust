@@ -173,8 +173,7 @@ class LinearizeTwoTermPosynomials(object):
         no_data_constraints_upper = [w * np.exp(eps) <= 1]
         no_data_constraints_lower = [w <= 1]
 
-        first_monomial = Monomial(self.p.exps[0], self.p.cs[0])
-        second_monomial = Monomial(self.p.exps[1], self.p.cs[1])
+        first_monomial, second_monomial = self.p.chop()
         data_constraints += [first_monomial <= w]
 
         for i in range(r - 2):

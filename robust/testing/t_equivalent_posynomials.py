@@ -19,7 +19,6 @@ def test_merge_intersected_lists():
             assert (all(not (set(partition[i]) & set(partition[j])) for j in range(i+1, len(partition))))
         for from_list in list_of_lists:
             assert(any(set(from_list) <= set(from_partition) for from_partition in partition))
-    return
 
 
 def test_same_sign():
@@ -45,7 +44,6 @@ def test_same_sign():
             assert(not EquivalentPosynomials.same_sign(a))
         else:
             assert(EquivalentPosynomials.same_sign(a))
-    return
 
 
 def test_correlated_monomials():
@@ -90,11 +88,12 @@ def test_correlated_monomials():
         theoretical_posynomials = []
         actual_posynomials = []
 
+        monomials = p.chop()
         for theo_list, act_list in zip(theoretical_partition, actual_partition):
             theoretical_posynomials.append(sum([m[i] for i in theo_list]))
-            actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in act_list]))
+            actual_posynomials.append(sum([monomials[j] for j in act_list]))
 
-        assert (list(actual_posynomials) == list(theoretical_posynomials))
+        assert (set(actual_posynomials) == set(theoretical_posynomials))
 
         # dependent uncertainties
         temp = []
@@ -110,10 +109,8 @@ def test_correlated_monomials():
         actual_posynomials = []
 
         theoretical_posynomials.append(sum([m[i] for i in theoretical_partition]))
-        actual_posynomials.append(sum([Monomial(p.exps[j], p.cs[j]) for j in actual_partition[0]]))
+        actual_posynomials.append(sum([monomials[j] for j in actual_partition[0]]))
         assert (list(actual_posynomials) == list(theoretical_posynomials))
-
-    return
 
 
 def test_check_if_in_list_of_lists():
@@ -132,10 +129,13 @@ def test_check_if_in_list_of_lists():
         assert (EquivalentPosynomials.check_if_in_list_of_lists(element, list_of_lists))
         assert (not EquivalentPosynomials.check_if_in_list_of_lists(non_element, list_of_lists))
 
-    return
 
 def test():
     test_same_sign()
     test_merge_intersected_lists()
     test_correlated_monomials()
     test_check_if_in_list_of_lists()
+
+
+if __name__ == "__main__":
+    test()
