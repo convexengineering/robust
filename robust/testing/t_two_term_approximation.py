@@ -1,11 +1,19 @@
 from __future__ import division
 from builtins import range
 import numpy as np
-from gpkit import Variable, Monomial
+from gpkit import Variable, Model
 from copy import copy
 
 from robust.twoterm_approximation import TwoTermApproximation
+from robust.testing.models import gp_test_model
 
+def test_equivalent_twoterm_model():
+    gpmodel = gp_test_model()
+    equivalent_constraints = []
+    for c in gpmodel.flat(constraintsets=False):
+        equivalent_constraints += TwoTermApproximation.two_term_equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
+    twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
+    assert(gpmodel.solve()['cost'] == twoterm_gpmodel.solve()['cost'])
 
 def test_check_if_permutation_exists():
     for _ in xrange(10):
@@ -184,6 +192,7 @@ def test_bad_relations():
 
 
 def test():
+    test_equivalent_twoterm_model()
     test_check_if_permutation_exists()
     test_bad_relations()
 
