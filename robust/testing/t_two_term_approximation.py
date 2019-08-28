@@ -16,7 +16,7 @@ def test_equivalent_twoterm_model():
     assert(gpmodel.solve()['cost'] == twoterm_gpmodel.solve()['cost'])
 
 def test_check_if_permutation_exists():
-    for _ in xrange(10):
+    for _ in range(10):
         number_of_monomials = int(np.random.rand()*15) + 3
         number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
 
@@ -68,7 +68,7 @@ def test_check_if_permutation_exists():
 
 
 def test_bad_relations():
-    for _ in xrange(30):
+    for _ in range(30):
         number_of_monomials = int(20*np.random.random()) + 3
         number_of_gp_variables = int(np.random.rand()*10) + 1
         number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
