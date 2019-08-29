@@ -24,7 +24,7 @@ def test_conservativeness():
     sem = RobustModel(m, 'elliptical').robustsolve(verbosity=0)
     smm = MarginModel(m).localsolve(verbosity=0)
     sbm = RobustModel(m, 'box').robustsolve(verbosity=0)
-    assert(sm <= sem <= smm <= sbm)
+    assert(sm['cost'] <= sem['cost'] <= smm['cost'] <= sbm['cost'])
 
 # def test_robustify_monomial():
 #     """ Testing whether monomials are robustified correctly"""

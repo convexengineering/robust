@@ -5,6 +5,7 @@ from builtins import object
 import numpy as np
 from gpkit import Variable, Monomial
 from gpkit.nomials import NomialMap
+from gpkit.small_classes import HashVector
 
 from robust.robust_gp_tools import RobustGPTools
 
@@ -84,10 +85,15 @@ class EquivalentPosynomials(object):
         monomials = p.chop()
         for i, mon_list in enumerate(uncertain_vars_exps_mons):
             if len(mon_list) > 1 and uncertain_vars_exps[i]:
+                # Really clunky way of creating monomials from exponents...
+                # Should streamline/speed up in the future.
                 new_no_data_posynomial = 0
-                hmap = NomialMap(uncertain_vars_exps[i])
+                hmap = NomialMap({HashVector(uncertain_vars_exps[i]): 1.0})
                 unitarr = [k.units**v for k, v in uncertain_vars_exps[i].items() if k.units is not None]
-                hmap.units = np.prod(unitarr)
+                try:
+                    hmap.units = np.prod(unitarr)
+                except:
+                    hmap.units = unitarr[0].units
                 uncertain_monomial = Monomial(hmap)
                 for j in mon_list:
                     new_no_data_posynomial += monomials[j]/uncertain_monomial
