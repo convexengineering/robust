@@ -19,10 +19,10 @@ def test_MarginModel():
 
 def test_conservativeness():
     """ Testing conservativeness of solution methods"""
-    m = sp_test_model()
-    sm = m.localsolve(verbosity=0)
+    m = gp_test_model()
+    sm = m.solve(verbosity=0)
     sem = RobustModel(m, 'elliptical').robustsolve(verbosity=0)
-    smm = MarginModel(m).localsolve(verbosity=0)
+    smm = MarginModel(m).solve(verbosity=0)
     sbm = RobustModel(m, 'box').robustsolve(verbosity=0)
     assert(sm['cost'] <= sem['cost'] <= smm['cost'] <= sbm['cost'])
 
