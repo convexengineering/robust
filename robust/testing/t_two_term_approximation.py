@@ -13,7 +13,7 @@ def test_equivalent_twoterm_model():
     for c in gpmodel.flat(constraintsets=False):
         equivalent_constraints += TwoTermApproximation.two_term_equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
     twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
-    assert(gpmodel.solve()['cost'] == twoterm_gpmodel.solve()['cost'])
+    np.testing.assert_almost_equal(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
 
 def test_check_if_permutation_exists():
     for _ in range(10):

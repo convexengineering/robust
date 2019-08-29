@@ -3,9 +3,10 @@ from __future__ import division
 from builtins import range
 from builtins import object
 import numpy as np
-from gpkit import Variable, Monomial, Posynomial
+from gpkit import Variable, Monomial
+from gpkit.nomials import NomialMap
 
-from .robust_gp_tools import RobustGPTools
+from robust.robust_gp_tools import RobustGPTools
 
 
 class EquivalentPosynomials(object):
@@ -84,12 +85,16 @@ class EquivalentPosynomials(object):
         for i, mon_list in enumerate(uncertain_vars_exps_mons):
             if len(mon_list) > 1 and uncertain_vars_exps[i]:
                 new_no_data_posynomial = 0
+                hmap = NomialMap(uncertain_vars_exps[i])
+                unitarr = [k.units**v for k, v in uncertain_vars_exps[i].items() if k.units is not None]
+                hmap.units = np.prod(unitarr)
+                uncertain_monomial = Monomial(hmap)
                 for j in mon_list:
-                    new_no_data_posynomial += monomials[j]/Monomial(uncertain_vars_exps[i])
+                    new_no_data_posynomial += monomials[j]/uncertain_monomial
                 com_variable = Variable('com_%s^%s' % (m, i))
                 # Add to no_data_constraints the constraints with zero uncertain variables
                 self.no_data_constraints += [new_no_data_posynomial <= com_variable]
-                all_data_mons.append(Monomial(uncertain_vars_exps[i])*com_variable)
+                all_data_mons.append(uncertain_monomial*com_variable)
             else:
                 temp = sum([monomials[mon_ind] for mon_ind in mon_list])
                 all_data_mons.append(temp)
