@@ -1,8 +1,9 @@
-from robust.robust_gp_tools import RobustGPTools
-from robust.margin import MarginModel
-from models import sp_test_model
 import unittest
 from gpkit.tests.helpers import run_tests
+
+from robust.robust_gp_tools import RobustGPTools
+from robust.margin import MarginModel
+from robust.testing.models import sp_test_model
 
 class TestPrimitives(unittest.TestCase):
     def test_MarginModel(self):
