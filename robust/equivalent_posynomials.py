@@ -89,7 +89,7 @@ class EquivalentPosynomials(object):
                 # Should streamline/speed up in the future.
                 new_no_data_posynomial = 0
                 hmap = NomialMap({HashVector(uncertain_vars_exps[i]): 1.0})
-                unitarr = [k.units**v for k, v in uncertain_vars_exps[i].items() if k.units is not None]
+                unitarr = [k.units**v for k, v in uncertain_vars_exps[i].items() if k.units]
                 try:
                     hmap.units = np.prod(unitarr)
                 except:
