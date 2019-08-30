@@ -7,6 +7,7 @@ import scipy.optimize as op
 
 from robust.linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
+np.warnings.filterwarnings('ignore')
 
 def convex_function(x):
     return np.log(1 + np.exp(x))

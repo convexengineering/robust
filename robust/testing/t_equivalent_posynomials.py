@@ -1,6 +1,6 @@
 from builtins import zip
 from builtins import range
-from gpkit import Variable, Monomial
+from gpkit import Variable, Monomial, Model
 import numpy as np
 
 from robust.equivalent_posynomials import EquivalentPosynomials

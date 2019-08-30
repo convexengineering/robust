@@ -1,14 +1,22 @@
 from __future__ import division
 from builtins import range
 import numpy as np
-from gpkit import Variable, Monomial
+from gpkit import Variable, Model
 from copy import copy
 
 from robust.twoterm_approximation import TwoTermApproximation
+from robust.testing.models import gp_test_model
 
+def test_equivalent_twoterm_model():
+    gpmodel = gp_test_model()
+    equivalent_constraints = []
+    for c in gpmodel.flat(constraintsets=False):
+        equivalent_constraints += TwoTermApproximation.two_term_equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
+    twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
+    np.testing.assert_almost_equal(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
 
 def test_check_if_permutation_exists():
-    for _ in xrange(10):
+    for _ in range(10):
         number_of_monomials = int(np.random.rand()*15) + 3
         number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
 
@@ -60,7 +68,7 @@ def test_check_if_permutation_exists():
 
 
 def test_bad_relations():
-    for _ in xrange(30):
+    for _ in range(30):
         number_of_monomials = int(20*np.random.random()) + 3
         number_of_gp_variables = int(np.random.rand()*10) + 1
         number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
@@ -184,6 +192,7 @@ def test_bad_relations():
 
 
 def test():
+    test_equivalent_twoterm_model()
     test_check_if_permutation_exists()
     test_bad_relations()
 

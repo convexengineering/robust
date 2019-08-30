@@ -310,7 +310,7 @@ class RobustModel(object):
             l_norm = np.sqrt(l_norm)
         g = self.setting.get('gamma')
         # Fifth order Taylor approx of the e**gamma, so that gamma can be a variable
-        robust_monomial =  monomial * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)**l_norm
+        robust_monomial = monomial * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)**l_norm
         return robust_monomial
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
