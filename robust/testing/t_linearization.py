@@ -10,6 +10,8 @@ from gpkit.tests.helpers import run_tests
 
 from robust.linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
+np.warnings.filterwarnings('ignore')
+
 def convex_function(x):
     return np.log(1 + np.exp(x))
 

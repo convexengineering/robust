@@ -1,6 +1,6 @@
 from builtins import zip
 from builtins import range
-from gpkit import Variable, Monomial
+from gpkit import Variable
 import numpy as np
 
 import unittest

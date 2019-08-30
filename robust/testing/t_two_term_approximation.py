@@ -1,15 +1,24 @@
 from __future__ import division
 from builtins import range
 import numpy as np
-from gpkit import Variable, Monomial
+from gpkit import Variable, Model
 from copy import copy
 
 import unittest
 from gpkit.tests.helpers import run_tests
 
 from robust.twoterm_approximation import TwoTermApproximation
+from robust.testing.models import gp_test_model
 
 class TestTwoTermApproximation(unittest.TestCase):
+    def test_equivalent_twoterm_model(self):
+        gpmodel = gp_test_model()
+        equivalent_constraints = []
+        for c in gpmodel.flat(constraintsets=False):
+            equivalent_constraints += TwoTermApproximation.two_term_equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
+        twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
+        self.assertAlmostEqual(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
+
     def test_check_if_permutation_exists(self):
         for _ in xrange(10):
             number_of_monomials = int(np.random.rand()*15) + 3
