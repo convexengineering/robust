@@ -1,1 +1,1 @@
-python -c "from gpkit.tests.from_paths import run; run()"
+python run_tests.py
