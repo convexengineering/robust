@@ -1,1 +1,1 @@
-python -c "run_tests.py"
+python run_tests.py
