@@ -20,7 +20,7 @@ class TestTwoTermApproximation(unittest.TestCase):
         self.assertAlmostEqual(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
 
     def test_check_if_permutation_exists(self):
-        for _ in xrange(10):
+        for _ in range(10):
             number_of_monomials = int(np.random.rand()*15) + 3
             number_of_permutations = TwoTermApproximation.total_number_of_permutations(number_of_monomials)
 
@@ -72,7 +72,7 @@ class TestTwoTermApproximation(unittest.TestCase):
 
 
     def test_bad_relations(self):
-        for _ in xrange(30):
+        for _ in range(30):
             number_of_monomials = int(20*np.random.random()) + 3
             number_of_gp_variables = int(np.random.rand()*10) + 1
             number_of_additional_uncertain_variables = int(np.random.rand()*5) + 1
