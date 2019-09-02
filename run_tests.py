@@ -22,5 +22,8 @@ def import_tests():
 
     return tests
 
-if __name__ == '__main__':
+def test():
     run(tests=import_tests())
+
+if __name__ == '__main__':
+    test()
