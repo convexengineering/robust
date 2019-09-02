@@ -194,8 +194,10 @@ class TestTwoTermApproximation(unittest.TestCase):
             self.assertEqual(actual_relations_mons, relations_mons)
             self.assertEqual(sizes_mons, actual_sizes_mons)
 
-
 TESTS = [TestTwoTermApproximation]
 
-if __name__ == "__main__":
+def test():
     run_tests(TESTS)
+
+if __name__ == "__main__":
+    test()

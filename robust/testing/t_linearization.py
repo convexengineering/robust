@@ -146,5 +146,8 @@ class TestLinearization(unittest.TestCase):
 
 TESTS = [TestLinearization]
 
-if __name__ == "__main__":
+def test():
     run_tests(TESTS)
+
+if __name__ == "__main__":
+    test()

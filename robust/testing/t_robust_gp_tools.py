@@ -44,5 +44,8 @@ class TestRobustGPTools(unittest.TestCase):
 
 TESTS = [TestRobustGPTools]
 
-if __name__ == "__main__":
+def test():
     run_tests(TESTS)
+
+if __name__ == "__main__":
+    test()
