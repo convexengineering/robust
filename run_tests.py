@@ -20,6 +20,9 @@ def import_tests():
     from robust.testing import t_two_term_approximation
     tests += t_two_term_approximation.TESTS
 
+    from robust.testing import t_simulation
+    tests += t_simulation.TESTS
+
     return tests
 
 def test():
