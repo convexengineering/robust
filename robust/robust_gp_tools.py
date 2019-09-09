@@ -121,7 +121,8 @@ class RobustGPTools(object):
             results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
 
         costs = [0 if i is None else mag(i) for i in results]
-        print(costs)
+        if verbosity > 0:
+            print(costs)
         if np.sum(costs) > 0:
             inds = list(np.nonzero(costs)[0])
             nonzero_costs = [costs[i] for i in inds]

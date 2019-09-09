@@ -72,11 +72,12 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
     """
     Simulates a robust model given uncertain outcomes.
     """
-    print(
-        method[
-            'name'] + ' under ' + uncertainty_set + ' uncertainty set: \n' + '\t' + 'gamma = %s\n' % gamma
-        + '\t' + 'minimum number of piecewise-linear sections = %s\n' % min_num_of_linear_sections
-        + '\t' + 'maximum number of piecewise-linear sections = %s\n' % max_num_of_linear_sections)
+    if verbosity > 0:
+        print(
+            method[
+                'name'] + ' under ' + uncertainty_set + ' uncertainty set: \n' + '\t' + 'gamma = %s\n' % gamma
+            + '\t' + 'minimum number of piecewise-linear sections = %s\n' % min_num_of_linear_sections
+            + '\t' + 'maximum number of piecewise-linear sections = %s\n' % max_num_of_linear_sections)
 
     robust_model = RobustModel(model, uncertainty_set, gamma=gamma, twoTerm=method['twoTerm'],
                                    boyd=method['boyd'], simpleModel=method['simpleModel'],
@@ -95,7 +96,7 @@ def simulate_robust_model(model, method, uncertainty_set, gamma, directly_uncert
     simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
-                                                                  verbosity=0, parallel=parallel)
+                                                                  verbosity=verbosity, parallel=parallel)
 
     return robust_model, robust_model_solution, robust_model_solve_time, simulation_results
 
@@ -246,7 +247,7 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                 simulation_results = RobustGPTools.probability_of_failure(model, robust_model_solution,
                                                                   directly_uncertain_vars_subs,
                                                                   number_of_iterations,
-                                                                  verbosity=0, parallel=parallel)
+                                                                  verbosity=verbosity, parallel=parallel)
                 try:
                     nconstraints = \
                         len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model().flat(constraintsets=False)])
