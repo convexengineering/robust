@@ -41,13 +41,3 @@ def synthetic_model(number_of_constraints):
     obj += sum([i**0.2 for i in s])
     m = Model(obj, constraints)
     return m
-
-
-def test_synthetic_model():
-    a = Variable("a", 1.17, "-", "form factor", pr=10)
-    x = Variable('x')
-
-    constraints = []
-    constraints += [a*x + x/a + x**2/a**2 + a**3*x**1.3<= 1]
-
-    return Model(1/x, constraints)
