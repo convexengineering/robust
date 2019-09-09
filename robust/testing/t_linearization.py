@@ -4,10 +4,12 @@ from builtins import range
 import numpy as np
 from gpkit import Variable, Model
 import scipy.optimize as op
+import os
 
 import unittest
 from gpkit.tests.helpers import run_tests
 
+from robust.data.construct_linearization_data import construct_linearization_data
 from robust.linearize_twoterm_posynomials import LinearizeTwoTermPosynomials
 
 np.warnings.filterwarnings('ignore')
@@ -16,6 +18,11 @@ def convex_function(x):
     return np.log(1 + np.exp(x))
 
 class TestLinearization(unittest.TestCase):
+    def test_construct_linearization_data(self):
+        file = os.path.dirname(__file__) + "/linearization_data.txt"
+        construct_linearization_data(10, file)
+        os.remove(file)
+
     def test_tangent_point_func(self):
         for _ in range(100):
             eps = np.random.rand() * 0.2
