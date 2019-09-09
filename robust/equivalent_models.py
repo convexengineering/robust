@@ -58,7 +58,7 @@ class TwoTermBoydModel(Model):
                 data_constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
                 _, data = TwoTermApproximation. \
-                    two_term_equivalent_posynomial(cs.as_posyslt1()[0], i, [], True)
+                    equivalent_posynomial(cs.as_posyslt1()[0], i, [], True)
                 data_constraints += data
                 del data
             else:

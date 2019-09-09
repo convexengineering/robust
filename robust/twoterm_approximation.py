@@ -54,7 +54,7 @@ class TwoTermApproximation(object):
                     counter += 1
 
     @staticmethod
-    def two_term_equivalent_posynomial(p, m, permutation, boyd):
+    def equivalent_posynomial(p, m, permutation, boyd):
         """
         returns a two term posynomial equivalent to the original large posynomial
         :param p: the posynomial

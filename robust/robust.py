@@ -186,7 +186,7 @@ class RobustModel(object):
             for i, two_term_approximation in enumerate(large_posynomials):
                 permutation = two_term_approximation.list_of_permutations[permutation_indices[i]]
                 no_data, data = TwoTermApproximation. \
-                    two_term_equivalent_posynomial(two_term_approximation.p, i, permutation, False)
+                    equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 ready_constraints += no_data
                 two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
             two_term_data_posynomials += to_linearize_posynomials
@@ -332,7 +332,7 @@ class RobustModel(object):
         intercepts = self.robust_solve_properties['intercepts']
         values = []
 
-        mons = two_term_approximation.chop()
+        mons = two_term_approximation.p.chop()
 
         for i in range(number_of_two_terms):
             monomials = []
