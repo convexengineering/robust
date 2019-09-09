@@ -40,7 +40,7 @@ class LinearizeTwoTermPosynomials(object):
         return a * x + b - np.log(1 + np.exp(x)) + eps
 
     @staticmethod
-    def iterate_two_term_posynomial_linearization_coeff(r, eps):
+    def iterate_linearization_coeff(r, eps):
         """
         Finds the appropriate slopes, intercepts, tangency points, and intersection points for a given linearization
         error and number of piecewise linear sections
@@ -79,7 +79,7 @@ class LinearizeTwoTermPosynomials(object):
         return r, a, b, x_tangent, x_intersection
 
     @staticmethod
-    def compute_two_term_posynomial_linearization_coeff(r, tol):
+    def compute_linearization_coeff(r, tol):
         """
         Calculates the slopes, intercepts, tangency points, intersection points, and linearization error for a given
         number of piecewise-linear sections
@@ -104,7 +104,7 @@ class LinearizeTwoTermPosynomials(object):
             eps = (eps_max + eps_min) / 2
             x_final_theoretical = -np.log(np.exp(eps) - 1)
             number_of_actual_r, a, b, x_tangent, x_intersection = \
-                LinearizeTwoTermPosynomials.iterate_two_term_posynomial_linearization_coeff(r, eps)
+                LinearizeTwoTermPosynomials.iterate_linearization_coeff(r, eps)
 
             x_final_actual = x_intersection[-1]
 
@@ -116,7 +116,7 @@ class LinearizeTwoTermPosynomials(object):
         return a, b, x_tangent, x_intersection, eps
 
     @staticmethod
-    def two_term_posynomial_linearization_coeff(r):
+    def linearization_coeff(r):
         """
         Reads the slopes, intercepts, tangency points, intersection points, and linearization error for a given number
         of piecewise-linear sections from a text file
@@ -146,14 +146,14 @@ class LinearizeTwoTermPosynomials(object):
 
             return slopes, intercepts, x_tangent, x_intersection, eps
         else:
-            return LinearizeTwoTermPosynomials.compute_two_term_posynomial_linearization_coeff(r, 2*np.finfo(float).eps)
+            return LinearizeTwoTermPosynomials.compute_linearization_coeff(r, 2*np.finfo(float).eps)
 
-    def linearize_two_term_posynomial(self, m, r):
+    def linearize(self, m, r):
         """
         Approximates a two term posynomial constraint by upper and lower piecewise-linear constraints
 
         :param m: the index of the constraint
-        :param r: the number of piecewise-linear sections
+        :param r: the number of piecewise-linear sections`
         :return: the deprived of data upper and lower constraints and the common data containing constraints
         """
         if r < 2:
@@ -165,7 +165,7 @@ class LinearizeTwoTermPosynomials(object):
         if len(self.p.exps) < 2:
             return [], [], [self.p <= 1]
 
-        a, b, _, _, eps = LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(r)
+        a, b, _, _, eps = LinearizeTwoTermPosynomials.linearization_coeff(r)
 
         data_constraints = []
 

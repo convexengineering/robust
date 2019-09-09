@@ -10,7 +10,7 @@ def construct_linearization_data(max_num_of_linear_sections, the_file_path):
     the_file = open(the_file_path, "w")
     for i in range(2, max_num_of_linear_sections):
         print(i)
-        a = LinearizeTwoTermPosynomials.compute_two_term_posynomial_linearization_coeff(i, 2*np.finfo(float).eps)
+        a = LinearizeTwoTermPosynomials.compute_linearization_coeff(i, 2*np.finfo(float).eps)
         for j in range(4):
             for item in a[j]:
                 the_file.write("%s, " % item)

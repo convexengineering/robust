@@ -70,7 +70,7 @@ class TestLinearization(unittest.TestCase):
             eps = np.random.rand() * np.log(2)
             r = int(np.ceil(np.random.rand()*18)) + 1
 
-            number_of_actual_r, a, b, x_tangent, x_intersection = LinearizeTwoTermPosynomials.iterate_two_term_posynomial_linearization_coeff(r, eps)
+            number_of_actual_r, a, b, x_tangent, x_intersection = LinearizeTwoTermPosynomials.iterate_linearization_coeff(r, eps)
 
             def piece_wise_linear_function(x):
                 evaluations = [a_i*x + b_i for a_i, b_i in zip(a, b)]
@@ -89,7 +89,7 @@ class TestLinearization(unittest.TestCase):
         for r in range(3, 21):
 
             slopes, intercepts, x_tangent, x_intersection, eps = LinearizeTwoTermPosynomials.\
-                two_term_posynomial_linearization_coeff(r)
+                linearization_coeff(r)
 
             self.assertTrue(all(np.abs(slopes[i] + slopes[r - i - 3] - 1) <= 0.0001 for i in range(0, r-2)))
             self.assertTrue(all(np.abs(intercepts[i] - intercepts[r - i - 3]) <= 0.001 for i in range(0, r-2)))
@@ -124,7 +124,7 @@ class TestLinearization(unittest.TestCase):
 
             r = int(np.random.rand()*18) + 2
             linearized_p = LinearizeTwoTermPosynomials(p)
-            no_data_upper, no_data_lower, data = linearized_p.linearize_two_term_posynomial(1, r)
+            no_data_upper, no_data_lower, data = linearized_p.linearize(1, r)
 
             self.assertEqual(len(data), r)
             self.assertEqual(len(no_data_upper), 1)

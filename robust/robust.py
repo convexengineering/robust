@@ -71,7 +71,7 @@ class RobustModel(object):
 
         self.setting = RobustnessSetting(**options)
         slopes_intercepts = LinearizeTwoTermPosynomials. \
-            two_term_posynomial_linearization_coeff(self.setting.get('minNumOfLinearSections'))
+            linearization_coeff(self.setting.get('minNumOfLinearSections'))
         self.robust_solve_properties = {'setuptime': 0,
                                         'numoflinearsections': self.setting.get('minNumOfLinearSections'),
                                         'slopes': slopes_intercepts[0],
@@ -214,7 +214,7 @@ class RobustModel(object):
                 print("relative tolerance = %s" % rel_tol)
             if reached_feasibility <= 1 and two_term_data_posynomials:
                 self.robust_solve_properties['slopes'], self.robust_solve_properties['intercepts'], _, _, _ = \
-                    LinearizeTwoTermPosynomials.two_term_posynomial_linearization_coeff(
+                    LinearizeTwoTermPosynomials.linearization_coeff(
                         self.robust_solve_properties['numoflinearsections'])
 
             self._sequence_of_rgps.append(self._robust_model)
@@ -378,7 +378,7 @@ class RobustModel(object):
         for i, two_term_p in enumerate(two_term_data_posynomials):
             linearize_p = LinearizeTwoTermPosynomials(two_term_p)
             no_data_upper, no_data_lower, data = linearize_p. \
-                linearize_two_term_posynomial(i, r)
+                linearize(i, r)
             no_data_upper_constraints += no_data_upper
             no_data_lower_constraints += no_data_lower
             data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
