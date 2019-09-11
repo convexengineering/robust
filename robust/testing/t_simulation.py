@@ -3,15 +3,14 @@ import unittest
 from gpkit.tests.helpers import run_tests
 
 from robust.simulations import simulate
-from robust.simple_wing.models import simple_wing
-from robust.testing.models import primitive_model
+from robust.testing.models import simple_wing
 
 class TestSimulation(unittest.TestCase):
     def test_simulate(self):
         model = simple_wing()
         number_of_time_average_solves = 3
         number_of_iterations = 20
-        uncertainty_sets = ['box']
+        uncertainty_sets = ['elliptical']
         methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False}]
         nGammas = 3
         gammas = np.linspace(0, 1.0, nGammas)

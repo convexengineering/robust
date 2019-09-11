@@ -6,6 +6,7 @@ from gpkit.tests.helpers import run_tests
 from robust.robust_gp_tools import RobustGPTools
 from robust.robust import RobustModel
 from robust.margin import MarginModel
+from robust.testing.models import simple_wing
 from robust.testing.models import sp_test_model, gp_test_model
 
 class TestPrimitives(unittest.TestCase):
@@ -39,7 +40,7 @@ class TestPrimitives(unittest.TestCase):
     #     rm = RobustModel(m, 'elliptical')
 
     def test_methods(self):
-        m = gp_test_model()
+        m = simple_wing()
         nominal_solution = m.solve(verbosity=0)
         methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                    {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
