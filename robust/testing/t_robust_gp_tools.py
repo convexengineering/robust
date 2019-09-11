@@ -49,8 +49,8 @@ class TestRobustGPTools(unittest.TestCase):
         constraints = [i for i in mtest.flat(constraintsets=False)]
         for constraint in constraints:
             # Just testing LHS of constraints
-            exps = [i.exps for i in constraint.left.chop()]
-            cs = [i.cs for i in constraint.left.chop()]
+            exps = [i.exps[0] for i in constraint.left.chop()]
+            cs = [i.cs[0] for i in constraint.left.chop()]
             new_monos = RobustGPTools.monomials_from_data(exps, cs)
             self.assertIsInstance(sum(new_monos), Posynomial)
             self.assertEqual([i.exps for i in new_monos],
