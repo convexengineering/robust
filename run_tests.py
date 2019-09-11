@@ -23,6 +23,9 @@ def import_tests():
     from robust.testing import t_simulation
     tests += t_simulation.TESTS
 
+    from robust.testing import t_legacy
+    tests += t_legacy.TESTS
+
     return tests
 
 
