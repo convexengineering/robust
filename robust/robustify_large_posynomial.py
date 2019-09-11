@@ -190,9 +190,10 @@ class RobustifyLargePosynomial(object):
     def no_coefficient_monomials(self):
         """
         separates the monomials in a posynomial into a list of monomials
+        with no coefficients
         :return: The list of monomials
         """
-        monmaps = [NomialMap({exp: 1.}) for exp, c in self.hmap.items()]
+        monmaps = [NomialMap({exp: 1.}) for exp, c in self.p.hmap.items()]
         for monmap in monmaps:
             monmap.units = self.p.hmap.units
         mons = [Monomial(monmap) for monmap in monmaps]
