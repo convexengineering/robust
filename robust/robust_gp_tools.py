@@ -2,8 +2,9 @@ from __future__ import print_function
 from __future__ import division
 from builtins import range
 from builtins import object
-from gpkit import Model, nomials
-from gpkit.nomials import MonomialEquality, PosynomialInequality
+from gpkit import Model, Variable, Monomial
+from gpkit.nomials import (MonomialEquality, PosynomialInequality,
+                           NomialMap)
 from gpkit.exceptions import InvalidGPConstraint
 from gpkit.small_scripts import mag
 import numpy as np
@@ -60,7 +61,7 @@ class RobustGPTools(object):
 
     @staticmethod
     def from_nomial_array_to_variables(model, the_vars, nomial_array):
-        if isinstance(nomial_array, nomials.variables.Variable):
+        if isinstance(nomial_array, Variable):
             the_vars.append(nomial_array.key)
             return
 
@@ -79,6 +80,20 @@ class RobustGPTools(object):
             del new_monomial_exps[var]
             new_monomial_exps.update(new_vars_exps)
         return new_monomial_exps
+
+    @staticmethod
+    def monomials_from_data(exps, cs):
+        """
+        creation of monomials from selected exps and cs
+        :return: The list of monomials
+        """
+        if len(exps) != len(cs):
+            raise Exception('Dict size mismatch in monomial creation.')
+        monmaps = [NomialMap({exps[i][0]: cs[i][0]}) for i in range(len(exps))]
+        for monmap in monmaps:
+            monmap.units = [k.units**v for k, v in exps[i][0].items() if k.units]
+        mons = [Monomial(monmap) for monmap in monmaps]
+        return mons
 
     @staticmethod
     def replace_indirect_uncertain_variable_by_equivalent(monomial, exps):
