@@ -1,5 +1,7 @@
 import numpy as np
-from gpkit import Variable, Model, SignomialsEnabled
+from gpkit import Variable, Model, SignomialsEnabled, units
+from gpkitmodels.SP.SimPleAC.SimPleAC_mission import SimPleAC, Mission
+from gpkitmodels.SP.SimPleAC.SimPleAC import SimPleAC as simpleWingSP
 
 def simple_wing():
     # Uncertain parameters
@@ -12,8 +14,8 @@ def simple_wing():
     V_min = Variable("V_{min}", 25, "m/s", "takeoff speed", pr=20)
     C_Lmax = Variable("C_{L,max}", 1.6, "-", "max CL with flaps down", pr=25)
     S_wetratio = Variable("(\\frac{S}{S_{wet}})", 2.075, "-", "wetted area ratio", pr=3.6144578)
-    W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m", "Wing Weight Coefficent 1", pr=60)
-    W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa", "Wing Weight Coefficent 2", pr=66)
+    W_W_coeff1 = Variable("W_{W_{coeff1}}", 12e-5, "1/m", "Wing Weight Coefficient 1", pr=60)
+    W_W_coeff2 = Variable("W_{W_{coeff2}}", 60, "Pa", "Wing Weight Coefficient 2", pr=66)
     CDA0 = Variable("(CDA0)", 0.035, "m^2", "fuselage drag area", pr=42.857142)
     W_0 = Variable("W_0", 6250, "N", "aircraft weight excluding wing", pr=60)
 
@@ -74,5 +76,36 @@ def sp_test_model():
         constraints = [a * b * x + a * b * y <= 1 + a*x**2 + 0.5*b*x*y,
                        b * x / y + b * x * y + a*b**2 * x ** 2 <= 1]
     return Model((x * y) ** -1, constraints)
+
+def primitive_sp():
+    x = Variable('x')
+    y = Variable('y')
+    a = Variable('a', 1, pr=10)
+    b = Variable('b', 1, pr=10)
+    constraints = []
+    with SignomialsEnabled():
+        constraints = constraints + [x >= 1 - a * y, b * y <= 0.1]
+    return Model(x, constraints)
+
+def simple_wing_sp():
+    m = simpleWingSP()
+    m.cost = m['W_f']
+    return m
+
+
+def simple_ac():
+    m = Mission(SimPleAC(), 4)
+    m.substitutions.update({
+        'h_{cruise_m}': 5000 * units('m'),
+        'Range_m': 3000 * units('km'),
+        'W_{p_m}': 6250 * units('N'),
+        '\\rho_{p_m}' : 1500*units('kg/m^3'),
+        'C_m': 120 * units('1/hr'),
+        'V_{min_m}': 25 * units('m/s'),
+        'T/O factor_m': 2,
+    })
+    c = Variable('c', '-', 'model cost')
+    m = Model(c, [m, c >= m['W_{f_m}'] * units('1/N') + m['C_m'] * m['t_m']])
+    return m
 
 
