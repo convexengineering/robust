@@ -17,7 +17,7 @@ class TestLegacy(unittest.TestCase):
         nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
             simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
         model_name = 'Simple Wing'
-        gammas = np.linspace(0, 1, 3)
+        gammas = np.linspace(0, 0.75, 3)
         min_num_of_linear_sections = 3
         max_num_of_linear_sections = 99
         linearization_tolerance = 1e-4
