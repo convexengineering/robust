@@ -1,0 +1,541 @@
+Simple_Wing Results: variable piecewise-linear sections
+----------------------------------------------------------
+Objective: D [n] 
+Units: 1 newton
+----------------------------------------------------------
+Number of iterations: 10
+gamma: 1.0
+Linearization tolerance: 0.0001
+----------------------------------------------------------
+Nominal cost: 405.4397 newton
+Average nominal solve time: 0.114333311717
+Nominal number of constraints: 28
+----------------------------------------------------------
+number of piecewise-linear sections = 12:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.459000110626
+			Relative setup time: 4.01457898607
+			Solve time: 0.1313333511352539
+			Relative solve time: 1.148688419527806
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 700.32943
+			Relative average performance: 1.7273331397985938
+			Worst-case performance: 714.2556
+			Relative worst-case performance: 1.76168145349
+			Number of constraints: 57
+			Relative number of constraints: 2.03571428571
+			Setup time: 0.578000068665
+			Relative setup time: 5.05539514238
+			Solve time: 0.12999995549519858
+			Relative solve time: 1.1370260647859167
+			Number of linear sections: 12
+			Upper lower relative error: 0.0134000443523
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.625
+			Relative setup time: 5.46647333673
+			Solve time: 0.13533329963684082
+			Relative solve time: 1.1836733984593846
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 653.3438299999999
+			Relative average performance: 1.611445129818318
+			Worst-case performance: 3087.002
+			Relative worst-case performance: 7.61396084301
+			Number of constraints: 52
+			Relative number of constraints: 1.85714285714
+			Setup time: 0.960999965668
+			Relative setup time: 8.40524910228
+			Solve time: 0.2763332525889079
+			Relative solve time: 2.416909371728695
+			Number of linear sections: 12
+			Upper lower relative error: 0.00823637461036
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1128.20746
+			Relative average performance: 2.78267633879958
+			Worst-case performance: 3805.523
+			Relative worst-case performance: 9.38616272654
+			Number of constraints: 79
+			Relative number of constraints: 2.82142857143
+			Setup time: 0.344000101089
+			Relative setup time: 3.0087478087
+			Solve time: 0.12633331616719565
+			Relative solve time: 1.1049563269907956
+			Number of linear sections: 12
+			Upper lower relative error: 0.0470784884521
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 654.7814
+			Relative average performance: 1.6149908358752236
+			Worst-case performance: 1853.301
+			Relative worst-case performance: 4.57108911633
+			Number of constraints: 79
+			Relative number of constraints: 2.82142857143
+			Setup time: 0.334000110626
+			Relative setup time: 2.92128431873
+			Solve time: 0.11466670036315918
+			Relative solve time: 1.002915936234487
+			Number of linear sections: 12
+			Upper lower relative error: 0.0369486544797
+number of piecewise-linear sections = 20:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.389999866486
+			Relative setup time: 3.41107819436
+			Solve time: 0.11999996503194173
+			Relative solve time: 1.0495625748099253
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 653.1812900000001
+			Relative average performance: 1.6110442317316238
+			Worst-case performance: 1839.86
+			Relative worst-case performance: 4.53793745408
+			Number of constraints: 73
+			Relative number of constraints: 2.60714285714
+			Setup time: 0.672000169754
+			Relative setup time: 5.87755361639
+			Solve time: 0.13033334414164224
+			Relative solve time: 1.1399420010204038
+			Number of linear sections: 20
+			Upper lower relative error: 0.00442581505258
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.398999929428
+			Relative setup time: 3.48979596092
+			Solve time: 0.10566671689351399
+			Relative solve time: 0.9241988647658979
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 653.1812900000001
+			Relative average performance: 1.6110442317316238
+			Worst-case performance: 3075.785
+			Relative worst-case performance: 7.58629458339
+			Number of constraints: 60
+			Relative number of constraints: 2.14285714286
+			Setup time: 1.53700017929
+			Relative setup time: 13.4431527978
+			Solve time: 0.2656666437784831
+			Relative solve time: 2.3236153994797886
+			Number of linear sections: 20
+			Upper lower relative error: 0.00274208492346
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1143.4404200000001
+			Relative average performance: 2.820247795171514
+			Worst-case performance: 3751.015
+			Relative worst-case performance: 9.25172103275
+			Number of constraints: 111
+			Relative number of constraints: 3.96428571429
+			Setup time: 0.406000137329
+			Relative setup time: 3.55102228067
+			Solve time: 0.12900002797444662
+			Relative solve time: 1.1282803413765443
+			Number of linear sections: 20
+			Upper lower relative error: 0.0162419247561
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 654.34683
+			Relative average performance: 1.6139189872131414
+			Worst-case performance: 1845.984
+			Relative worst-case performance: 4.553042043
+			Number of constraints: 111
+			Relative number of constraints: 3.96428571429
+			Setup time: 0.386999845505
+			Relative setup time: 3.38483893884
+			Solve time: 0.1359999974568685
+			Relative solve time: 1.1895045758303293
+			Number of linear sections: 20
+			Upper lower relative error: 0.0132325141777
+number of piecewise-linear sections = 30:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.406000137329
+			Relative setup time: 3.55102228067
+			Solve time: 0.12033335367838542
+			Relative solve time: 1.0524785110444126
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 701.95236
+			Relative average performance: 1.7313360285142279
+			Worst-case performance: 710.2027
+			Relative worst-case performance: 1.75168514578
+			Number of constraints: 93
+			Relative number of constraints: 3.32142857143
+			Setup time: 1.70300006866
+			Relative setup time: 14.8950471485
+			Solve time: 0.20800010363260904
+			Relative solve time: 1.8192432328731318
+			Number of linear sections: 30
+			Upper lower relative error: 0.00201375499206
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.561999797821
+			Relative setup time: 4.91545105606
+			Solve time: 0.16233340899149576
+			Relative solve time: 1.4198260030612115
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.8886399999999
+			Relative average performance: 1.6103224227918476
+			Worst-case performance: 3073.32
+			Relative worst-case performance: 7.58021476437
+			Number of constraints: 70
+			Relative number of constraints: 2.5
+			Setup time: 0.994999885559
+			Relative setup time: 8.70262455114
+			Solve time: 0.2993333339691162
+			Relative solve time: 2.6180763023009135
+			Number of linear sections: 30
+			Upper lower relative error: 0.00119524988346
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1148.03215
+			Relative average performance: 2.831573104459183
+			Worst-case performance: 3753.106
+			Relative worst-case performance: 9.25687839647
+			Number of constraints: 151
+			Relative number of constraints: 5.39285714286
+			Setup time: 0.569999933243
+			Relative setup time: 4.98542309922
+			Solve time: 0.1293332576751709
+			Relative solve time: 1.131194887414972
+			Number of linear sections: 30
+			Upper lower relative error: 0.0071667024474
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 653.5153499999999
+			Relative average performance: 1.611868176698039
+			Worst-case performance: 1839.048
+			Relative worst-case performance: 4.53593469016
+			Number of constraints: 151
+			Relative number of constraints: 5.39285714286
+			Setup time: 0.550999879837
+			Relative setup time: 4.81924184268
+			Solve time: 0.1506666342417399
+			Relative solve time: 1.3177842221088438
+			Number of linear sections: 30
+			Upper lower relative error: 0.00589353996914
+number of piecewise-linear sections = 44:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.405999898911
+			Relative setup time: 3.55102019538
+			Solve time: 0.11533339818318684
+			Relative solve time: 1.0087471136054318
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 702.109
+			Relative average performance: 1.7317223744986
+			Worst-case performance: 719.6924
+			Relative worst-case performance: 1.77509109246
+			Number of constraints: 121
+			Relative number of constraints: 4.32142857143
+			Setup time: 1.04699993134
+			Relative setup time: 9.15743553313
+			Solve time: 0.12466661135355632
+			Relative solve time: 1.0903787311124489
+			Number of linear sections: 44
+			Upper lower relative error: 0.000924582032734
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.391000032425
+			Relative setup time: 3.41982600306
+			Solve time: 0.11966673533121745
+			Relative solve time: 1.0466480287714977
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.85682
+			Relative average performance: 1.6102439400976272
+			Worst-case performance: 3073.056
+			Relative worst-case performance: 7.57956361945
+			Number of constraints: 84
+			Relative number of constraints: 3.0
+			Setup time: 3.94400000572
+			Relative setup time: 34.4956333942
+			Solve time: 0.5096666812896729
+			Relative solve time: 4.457726918227277
+			Number of linear sections: 44
+			Upper lower relative error: 0.00054894070073
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1127.1068200000002
+			Relative average performance: 2.77996165644361
+			Worst-case performance: 3739.9
+			Relative worst-case performance: 9.22430635184
+			Number of constraints: 207
+			Relative number of constraints: 7.39285714286
+			Setup time: 0.601000070572
+			Relative setup time: 5.25656137785
+			Solve time: 0.13533337910970053
+			Relative solve time: 1.1836740935574144
+			Number of linear sections: 44
+			Upper lower relative error: 0.00333550907359
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 654.05109
+			Relative average performance: 1.6131895569180819
+			Worst-case performance: 1833.205
+			Relative worst-case performance: 4.52152317595
+			Number of constraints: 207
+			Relative number of constraints: 7.39285714286
+			Setup time: 0.59299993515
+			Relative setup time: 5.18658933469
+			Solve time: 0.13033334414164224
+			Relative solve time: 1.1399420010204038
+			Number of linear sections: 44
+			Upper lower relative error: 0.00272011429622
+number of piecewise-linear sections = 60:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.389999866486
+			Relative setup time: 3.41107819436
+			Solve time: 0.10933335622151692
+			Relative solve time: 0.9562686025610191
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.6940400000001
+			Relative average performance: 1.609842450061008
+			Worst-case performance: 1834.663
+			Relative worst-case performance: 4.52511927174
+			Number of constraints: 153
+			Relative number of constraints: 5.46428571429
+			Setup time: 1.1210000515
+			Relative setup time: 9.80466702719
+			Solve time: 0.16700005531311035
+			Relative solve time: 1.460642159363735
+			Number of linear sections: 60
+			Upper lower relative error: 0.000472244201512
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.421000003815
+			Relative setup time: 3.68221647299
+			Solve time: 0.1143333117167155
+			Relative solve time: 1.0
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.6940400000001
+			Relative average performance: 1.609842450061008
+			Worst-case performance: 3071.891
+			Relative worst-case performance: 7.57669019585
+			Number of constraints: 100
+			Relative number of constraints: 3.57142857143
+			Setup time: 1.12300014496
+			Relative setup time: 9.8221605593
+			Solve time: 0.3489999771118164
+			Relative solve time: 3.0524785110444124
+			Number of linear sections: 60
+			Upper lower relative error: 0.000293065007354
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1143.7199500000002
+			Relative average performance: 2.8209372441820575
+			Worst-case performance: 3735.559
+			Relative worst-case performance: 9.21359945758
+			Number of constraints: 271
+			Relative number of constraints: 9.67857142857
+			Setup time: 0.831000089645
+			Relative setup time: 7.26822373259
+			Solve time: 0.1446667512257894
+			Relative solve time: 1.2653071012604908
+			Number of linear sections: 60
+			Upper lower relative error: 0.00178282613878
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 653.3126
+			Relative average performance: 1.6113681023343298
+			Worst-case performance: 1831.227
+			Relative worst-case performance: 4.51664452198
+			Number of constraints: 271
+			Relative number of constraints: 9.67857142857
+			Setup time: 0.78200006485
+			Relative setup time: 6.83965200612
+			Solve time: 0.13533337910970053
+			Relative solve time: 1.1836740935574144
+			Number of linear sections: 60
+			Upper lower relative error: 0.00145469102308
+number of piecewise-linear sections = 80:
+	Best Pairs:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.405999898911
+			Relative setup time: 3.55102019538
+			Solve time: 0.1096666653951009
+			Relative solve time: 0.9591838436974766
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 702.2026400000001
+			Relative average performance: 1.7319533336276642
+			Worst-case performance: 709.6358
+			Relative worst-case performance: 1.75028691073
+			Number of constraints: 193
+			Relative number of constraints: 6.89285714286
+			Setup time: 1.48399996758
+			Relative setup time: 12.9795940071
+			Solve time: 0.13533329963684082
+			Relative solve time: 1.1836733984593846
+			Number of linear sections: 80
+			Upper lower relative error: 0.000277402285468
+	Linear. Perts.:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1133.2528100000002
+			Relative average performance: 2.7951204827746277
+			Worst-case performance: 3731.136
+			Relative worst-case performance: 9.20269031375
+			Number of constraints: 36
+			Relative number of constraints: 1.28571428571
+			Setup time: 0.421999931335
+			Relative setup time: 3.6909621964
+			Solve time: 0.1270000139872233
+			Relative solve time: 1.1107875043617401
+			Number of linear sections: 0
+			Upper lower relative error: 0
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.6598900000001
+			Relative average performance: 1.609758220519599
+			Worst-case performance: 3071.692
+			Relative worst-case performance: 7.57619937071
+			Number of constraints: 120
+			Relative number of constraints: 4.28571428571
+			Setup time: 1.72299981117
+			Relative setup time: 15.0699720432
+			Solve time: 0.4439999262491862
+			Relative solve time: 3.883382013365345
+			Number of linear sections: 80
+			Upper lower relative error: 0.000164105876944
+	Two Term:
+		box:
+			Probability of failure: 0.0
+			Average performance: 1130.5406500000001
+			Relative average performance: 2.78843105398904
+			Worst-case performance: 3733.527
+			Relative worst-case performance: 9.20858761488
+			Number of constraints: 351
+			Relative number of constraints: 12.5357142857
+			Setup time: 1.26200008392
+			Relative setup time: 11.0379036956
+			Solve time: 0.4973333676656087
+			Relative solve time: 4.349855350100024
+			Number of linear sections: 80
+			Upper lower relative error: 0.000994955247122
+		elliptical:
+			Probability of failure: 0.0
+			Average performance: 652.6975600000001
+			Relative average performance: 1.609851131993241
+			Worst-case performance: 1830.981
+			Relative worst-case performance: 4.51603777331
+			Number of constraints: 351
+			Relative number of constraints: 12.5357142857
+			Setup time: 5.01800012589
+			Relative setup time: 43.889222227
+			Solve time: 1.225333293279012
+			Relative solve time: 10.717202842116823
+			Number of linear sections: 80
+			Upper lower relative error: 0.000799664173842
