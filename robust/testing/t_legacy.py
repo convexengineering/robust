@@ -1,6 +1,7 @@
 """Testing legacy code"""
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 import unittest
 from gpkit import Model
@@ -13,7 +14,7 @@ from robust.simulations import read_simulation_data
 
 class TestLegacy(unittest.TestCase):
     def test_simple_wing(self):
-        model = Model(simple_wing().cost, Bounded(simple_wing()), simple_wing().substitutions)
+        model = Model(simple_wing().cost, simple_wing(), simple_wing().substitutions, allow_missingbounds=True)
         number_of_time_average_solves = 3
         number_of_iterations = 10
         nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
@@ -59,6 +60,7 @@ class TestLegacy(unittest.TestCase):
 
         read_simulation_data.generate_all_plots(variable_gamma_file_name,
                                                 variable_pwl_file_name)
+        plt.close()
 
 TESTS = [TestLegacy]
 
