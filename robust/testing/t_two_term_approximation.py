@@ -8,7 +8,8 @@ import unittest
 from gpkit.tests.helpers import run_tests
 
 from robust.twoterm_approximation import TwoTermApproximation
-from robust.testing.models import gp_test_model
+from robust.testing.models import gp_test_model, sp_test_model
+from robust.twoterm_approximation import TwoTermApproximation
 
 class TestTwoTermApproximation(unittest.TestCase):
     def test_equivalent_twoterm_model(self):
@@ -18,6 +19,13 @@ class TestTwoTermApproximation(unittest.TestCase):
             equivalent_constraints += TwoTermApproximation.equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
         twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
         self.assertAlmostEqual(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
+
+    # def test_two_term_approx(self):
+    #     m = gp_test_model()
+    #     settings = {}
+    #     tta = [TwoTermApproximation(i.as_posyslt1()[0], {}) for i in m.flat(constraintsets=False)]
+    #     tta_smart = [TwoTermApproximation(i.as_posyslt1()[0],
+    #                                       {'smartTwoTermChoose': True}) for i in m.flat(constraintsets=False)]
 
     def test_check_if_permutation_exists(self):
         for _ in range(10):

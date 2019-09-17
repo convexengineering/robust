@@ -169,4 +169,4 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
     axes[1].set_ylabel(y)
 
     fig.suptitle("%s vs %s feasibility space" % (x, y))
-    plt.show()
+    plt.show(block=False)
