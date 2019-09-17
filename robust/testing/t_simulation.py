@@ -1,6 +1,8 @@
 import numpy as np
 import unittest
 from gpkit.tests.helpers import run_tests
+from gpkit import Model
+from gpkit.constraints.bounded import Bounded
 
 from robust.simulations import simulate
 from robust.testing.models import simple_wing
@@ -8,6 +10,7 @@ from robust.testing.models import simple_wing
 class TestSimulation(unittest.TestCase):
     def test_simulate(self):
         model = simple_wing()
+        model = Model(model.cost, Bounded(model), model.substitutions)
         number_of_time_average_solves = 3
         number_of_iterations = 20
         uncertainty_sets = ['elliptical']
