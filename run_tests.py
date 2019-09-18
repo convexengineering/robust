@@ -1,5 +1,6 @@
 """Script for running all gpkit unit tests"""
 from gpkit.tests.run_tests import run
+from gpkit.tests.test_repo import git_clone, pip_install
 
 def import_tests():
     """Get a list of all robust unit test TestCases"""
@@ -30,8 +31,12 @@ def import_tests():
 
 
 def test():
+    try:
+        import gpkitmodels
+    except:
+        git_clone("gplibrary")
+        pip_install("gplibrary", local=True)
     run(tests=import_tests())
-
 
 if __name__ == '__main__':
     test()
