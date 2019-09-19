@@ -39,7 +39,6 @@ class RobustnessSetting(object):
             'maxNumOfLinearSections': 20,
             'iterationsRelativeTolerance': 1e-4,
             'iterationLimit': 10,
-            'probabilityOfSuccess': 0.9,
             'lognormal': True
         }
         for key, value in options.items():
@@ -77,8 +76,6 @@ class RobustModel(object):
                                         'slopes': slopes_intercepts[0],
                                         'intercepts': slopes_intercepts[1]
                                         }
-
-        self.number_of_stds = norm.ppf(self.setting.get("probabilityOfSuccess") / 2.0 + 0.5)
 
         if 'nominalsolve' in options:
             self.nominal_solve = options['nominalsolve']
@@ -279,8 +276,7 @@ class RobustModel(object):
                     two_term_approximation = TwoTermApproximation(p, self.setting)
                     large_gp_posynomials.append(two_term_approximation)
                 else:
-                    robust_large_p = RobustifyLargePosynomial(p, self.type_of_uncertainty_set,
-                                                              self.number_of_stds, self.setting)
+                    robust_large_p = RobustifyLargePosynomial(p, self.type_of_uncertainty_set, self.setting)
                     ready_gp_constraints += robust_large_p. \
                         robustify_large_posynomial(self.type_of_uncertainty_set, i + offset, self.setting)
 

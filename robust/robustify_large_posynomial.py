@@ -13,10 +13,9 @@ from .robust_gp_tools import RobustGPTools
 
 class RobustifyLargePosynomial(object):
 
-    def __init__(self, p, type_of_uncertainty_set, number_of_stds, setting):
+    def __init__(self, p, type_of_uncertainty_set, setting):
         self.p = p
         self.type_of_uncertainty_set = type_of_uncertainty_set
-        self.number_of_stds = number_of_stds
         self.setting = setting
 
     @staticmethod
