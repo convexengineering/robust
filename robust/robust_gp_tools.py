@@ -40,9 +40,7 @@ class RobustGPTools(object):
             r = np.sqrt((100+var.key.pr)/(100-var.key.pr))
         except:
             r = var.key.r
-        eta_max = np.log(r)
-        eta_min = - np.log(r)
-        return eta_min, eta_max
+        return np.log(r)
 
     @staticmethod
     def is_directly_uncertain(variable):

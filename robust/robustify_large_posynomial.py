@@ -155,14 +155,12 @@ class RobustifyLargePosynomial(object):
         :param number_of_regression_points: The number of regression points per dimension
         :return: The linear regression of all the exponential functions, and the mean vector
         """
-        center, scale = [], []
-        mean_vector = []
+        etas = []
+        mean_vector = [] #TODO: remove mean vector, full of ones
         coeff, intercept = [], []
 
         for i in range(len(p_uncertain_vars)):
-            eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i])
-            center.append((eta_min + eta_max) / 2.0)
-            scale.append(eta_max - center[i])
+            etas.append(RobustGPTools.generate_etas(p_uncertain_vars[i]))
 
         perturbation_matrix = []
         for i in range(len(self.p.exps)):
@@ -174,8 +172,7 @@ class RobustifyLargePosynomial(object):
             mean = 1
             for j, var in enumerate(p_uncertain_vars):
                 if var.key in mon_uncertain_vars:
-                    mean = mean * np.exp(center[j]*only_uncertain_vars_monomial_exps.get(var.key))
-                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial_exps.get(var.key) * scale[j]))
+                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial_exps.get(var.key) * etas[j]))
                 else:
                     perturbation_matrix[i].append(0)
             coeff.append([])

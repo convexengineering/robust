@@ -35,12 +35,11 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                 thetas += [th]
             for i_set in range(len(interesting_vars)):
                 if rob:
-                    eta_min_x, eta_max_x = RobustGPTools.generate_etas(interesting_vars[i_set])
+                    eta_x = RobustGPTools.generate_etas(interesting_vars[i_set])
                 else:
-                    eta_min_x, eta_max_x = 0, 0
-                center_x = (eta_min_x + eta_max_x) / 2.0
+                    eta_x = 0
                 xo = mag(m.solution(interesting_vars[i_set]))
-                x_center = np.log(xo) + center_x
+                x_center = np.log(xo)
 
                 def f(c, index=i_set, x_val=x_center):
                     product = 1
@@ -50,7 +49,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                         product *= np.sin(c[thetas[index]])
                     return np.exp(x_val) * np.exp(r * product)
                 if rmtype == 'box':
-                    def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_max_x):
+                    def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_x):
                         product = 1
                         for j in range(index):
                             product *= np.cos(c[thetas[j]])
@@ -58,7 +57,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
                             product *= np.sin(c[thetas[index]])
                         return np.exp(max(r*np.abs(product) - (np.log(x_nom) + eta - x_val), 0))
                 else:
-                    def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_max_x):
+                    def g(c, index=i_set, x_val=x_center, x_nom=xo, eta=eta_x):
                         product = 1
                         for j in range(index):
                             product *= np.cos(c[thetas[j]])
@@ -108,22 +107,20 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
         xo, yo = list(map(mag, list(map(m.solution, [x, y]))))
         ax.plot(xo, yo, "k.")
         if rm:
-            eta_min_x, eta_max_x = RobustGPTools.generate_etas(x)
-            eta_min_y, eta_max_y = RobustGPTools.generate_etas(y)
-            center_x = (eta_min_x + eta_max_x) / 2.0
-            center_y = (eta_min_y + eta_max_y) / 2.0
-            x_center = np.log(xo) + center_x
-            y_center = np.log(yo) + center_y
+            eta_x = RobustGPTools.generate_etas(x)
+            eta_y = RobustGPTools.generate_etas(y)
+            x_center = np.log(xo)
+            y_center = np.log(yo)
             ax.plot(np.exp(x_center), np.exp(y_center), "kx")
             if rmtype == "elliptical":
                 th = np.linspace(0, 2 * np.pi, 50)
-                ax.plot(np.exp(x_center) * np.exp(np.cos(th)) ** (np.log(xo) + eta_max_x - x_center),
-                        np.exp(y_center) * np.exp(np.sin(th)) ** (np.log(yo) + eta_max_y - y_center), "k",
+                ax.plot(np.exp(x_center) * np.exp(np.cos(th)) ** (np.log(xo) + eta_x - x_center),
+                        np.exp(y_center) * np.exp(np.sin(th)) ** (np.log(yo) + eta_y - y_center), "k",
                         linewidth=1)
             elif rmtype:
                 p = Polygon(
-                    np.array([[xo * np.exp(eta_min_x)] + [xo * np.exp(eta_max_x)] * 2 + [xo * np.exp(eta_min_x)],
-                              [yo * np.exp(eta_min_y)] * 2 + [yo * np.exp(eta_max_y)] * 2]).T,
+                    np.array([[xo * np.exp(-1*eta_x)] + [xo * np.exp(eta_x)] * 2 + [xo * np.exp(-1*eta_x)],
+                              [yo * np.exp(-1*eta_y)] * 2 + [yo * np.exp(eta_y)] * 2]).T,
                     True, edgecolor="black", facecolor="none", linestyle="dashed")
                 ax.add_patch(p)
 

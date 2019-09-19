@@ -109,7 +109,7 @@ class RobustModel(object):
             try:
                 safe_model = TwoTermBoydModel(model)
             except InvalidGPConstraint:
-                raise Exception("boyd's formulation is not supported for sp models")
+                raise Exception("Boyd's formulation is not supported for SP models.")
             safe_model_constraints = safe_model.flat(constraintsets=False)
             del safe_model
             for cs in safe_model_constraints:
@@ -289,10 +289,9 @@ class RobustModel(object):
 
         l_norm = 0
         for var in m_direct_uncertain_vars:
-            eta_min, eta_max = RobustGPTools.generate_etas(var)
-            scale = eta_max
+            eta = RobustGPTools.generate_etas(var)
             exponent = -new_monomial_exps.get(var.key)
-            pert = exponent * scale
+            pert = exponent * eta
 
             if self.type_of_uncertainty_set == 'box':
                 l_norm += np.abs(pert)
