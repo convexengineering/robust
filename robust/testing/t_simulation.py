@@ -83,7 +83,10 @@ class TestSimulation(unittest.TestCase):
                 a = [mag(np.sum(s(i))) for s in soltab]
             else:
                 a = [mag(s(i))  for s in soltab]
-            f.write(''.join([" & " + str(round_sig(j,2)) for j in a]))
+            for j in range(len(a)):
+                if a[j] <= 1e-5:
+                    a[j] = 0.
+            f.write(''.join([" & " + str(np.format_float_scientific(j, precision=1)) for j in a]))
             f.write('\n')
         f.write('cost ')
         f.write(' '.join(["& " + str(i['cost']) for i in soltab]))
