@@ -61,7 +61,6 @@ class RobustnessSetting(object):
 class RobustModel(object):
     """
     RobustModel extends gpkit.Model through the robust counterpart.
-    It uses the nominal solution of the GP or SP to
     """
     def __init__(self, model, type_of_uncertainty_set, **options):
         self.nominal_model = model
@@ -69,12 +68,12 @@ class RobustModel(object):
         self.type_of_uncertainty_set = type_of_uncertainty_set
 
         self.setting = RobustnessSetting(**options)
-        slopes_intercepts = LinearizeTwoTermPosynomials. \
+        slopes, intercepts, _, _, _ = LinearizeTwoTermPosynomials. \
             linearization_coeff(self.setting.get('minNumOfLinearSections'))
         self.robust_solve_properties = {'setuptime': 0,
                                         'numoflinearsections': self.setting.get('minNumOfLinearSections'),
-                                        'slopes': slopes_intercepts[0],
-                                        'intercepts': slopes_intercepts[1]
+                                        'slopes': slopes,
+                                        'intercepts': intercepts
                                         }
 
         if 'nominalsolve' in options:
@@ -97,8 +96,8 @@ class RobustModel(object):
                 self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsElliptical'))
 
         self.ready_gp_constraints = []
-        self.to_linearize_gp_posynomials = []
-        self.large_gp_posynomials = []
+        self.to_linearize_gp_posynomials = [] # two-term posynomials
+        self.large_gp_posynomials = [] # posynomials that need to be broken up
         self.sp_constraints = []
         self.sp_equality_constraints = []
 
@@ -148,14 +147,13 @@ class RobustModel(object):
 
         self.number_of_gp_posynomials = len(gp_posynomials)
 
-        constraints_posynomials_tuple = self.classify_gp_constraints(gp_posynomials)
-
-        self.ready_gp_constraints += constraints_posynomials_tuple[0]
-        self.to_linearize_gp_posynomials = constraints_posynomials_tuple[1]
-        self.large_gp_posynomials = constraints_posynomials_tuple[2]
+        # Classifying GP-compatible constraints.
+        ready_gp_constraints, self.to_linearize_gp_posynomials, \
+        self.large_gp_posynomials = self.classify_gp_constraints(gp_posynomials)
+        self.ready_gp_constraints += ready_gp_constraints
 
         if equality_constraints:
-            warnings.warn('equality constraints will not be robustified')
+            warnings.warn('Equality constraints will not be robustified.')
 
     def setup(self, verbosity=0, **options):
         for option, key in options.items():
@@ -410,11 +408,11 @@ class RobustModel(object):
             upper_model_infeasible = 0
             try:
                 sol_upper = RobustModel.internalsolve(model_upper, verbosity=0)
-            except RuntimeWarning:
+            except (RuntimeWarning, ValueError):
                 upper_model_infeasible = 1
             try:
                 sol_lower = RobustModel.internalsolve(model_lower, verbosity=0)
-            except RuntimeWarning:
+            except (RuntimeWarning, ValueError):
                 raise Exception("The model is infeasible")
             if not two_term_data_posynomials:
                 self.robust_solve_properties['upperLowerRelError'] = 0

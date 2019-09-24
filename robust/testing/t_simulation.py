@@ -69,8 +69,8 @@ class TestSimulation(unittest.TestCase):
 
         soltab = [sol, msol, bsol, esol]
 
-        origfilename = os.path.dirname(__file__) + '/' + 'test_table.txt'
-        filename = os.path.dirname(__file__) + '/' + 'test_table_diff.txt'
+        origfilename = os.path.dirname(__file__) + '/' + 'diffs/test_table.txt'
+        filename = os.path.dirname(__file__) + '/' + 'diffs/test_table_diff.txt'
         f = open(filename, 'w+')
 
         for i in ['L/D', 'A', 'Re', 'S', 'V', 't_s', 'W_w', 'W_{w_{strc}}', 'W_{w_{surf}}',

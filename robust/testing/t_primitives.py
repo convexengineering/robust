@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 import unittest
 from gpkit.tests.helpers import run_tests
@@ -40,11 +41,12 @@ class TestPrimitives(unittest.TestCase):
     #     rm = RobustModel(m, 'elliptical')
 
     def test_methods(self):
-        m = simple_wing()
+        m = gp_test_model()
         nominal_solution = m.solve(verbosity=0)
-        methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
-                   {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
-                   {'name': 'Simple Conservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True}
+        methods = [{'name': 'BestPairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
+                   {'name': 'LinearizedPerturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
+                   {'name': 'SimpleConservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
+                   {'name': 'TwoTerm', 'twoTerm': False, 'boyd': True, 'simpleModel': False}
                    ]
         uncertainty_sets = ['box', 'elliptical']
         for method in methods:
@@ -53,7 +55,11 @@ class TestPrimitives(unittest.TestCase):
                 rm = RobustModel(m, uncertainty_set, gamma=gamma, twoTerm=method['twoTerm'],
                                            boyd=method['boyd'], simpleModel=method['simpleModel'],
                                            nominalsolve=nominal_solution)
-                _ = rm.robustsolve(verbosity=0)
+                sol = rm.robustsolve(verbosity=0)
+                # print os.path.dirname(__file__)
+                # self.assertIsNone(sol.diff(os.path.dirname(__file__) +
+                #                            'diffs/test_methods_' +
+                #                            method['name'] + '_' + uncertainty_set))
 
 TESTS = [TestPrimitives]
 
