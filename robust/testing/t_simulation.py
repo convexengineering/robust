@@ -17,7 +17,7 @@ class TestSimulation(unittest.TestCase):
         model = simple_ac()
         model.cost = model['c']
         number_of_time_average_solves = 3
-        number_of_iterations = 20
+        number_of_iterations = 10
         uncertainty_sets = ['elliptical']
         methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False}]
         nGammas = 3
@@ -56,15 +56,16 @@ class TestSimulation(unittest.TestCase):
         m = simple_ac()
         m.cost = m['c']
         sol = m.localsolve(verbosity=0)
+        gamma = 0.5
 
         # Model with margins
-        mm = MarginModel(m) 
+        mm = MarginModel(m, gamma=gamma)
         msol = mm.localsolve(verbosity=0)
         # Model with box uncertainty
-        bm = RobustModel(m, 'box', twoTerm = True, boyd = False, simpleModel = False)
+        bm = RobustModel(m, 'box', gamma=gamma, twoTerm = True, boyd = False, simpleModel = False)
         bsol = bm.robustsolve(verbosity=0)
         # Model with elliptical uncertainty
-        em = RobustModel(m, 'elliptical', twoTerm = True, boyd = False, simpleModel = False)
+        em = RobustModel(m, 'elliptical', gamma=gamma, twoTerm = True, boyd = False, simpleModel = False)
         esol = em.robustsolve(verbosity=0)
 
         soltab = [sol, msol, bsol, esol]
@@ -82,10 +83,10 @@ class TestSimulation(unittest.TestCase):
                 a = [mag(np.sum(s(i))) for s in soltab]
             else:
                 a = [mag(s(i))  for s in soltab]
-            f.write(''.join([" & " + str(round_sig(j,3)) for j in a]))
+            f.write(''.join([" & " + str(round_sig(j,2)) for j in a]))
             f.write('\n')
-        f.write('cost')
-        f.write(' '.join([" & " + str(i['cost']) for i in soltab]))
+        f.write('cost ')
+        f.write(' '.join(["& " + str(i['cost']) for i in soltab]))
         f.write('\n')
         f.close()
 
