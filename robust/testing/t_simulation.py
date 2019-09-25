@@ -9,9 +9,6 @@ from robust.robust import RobustModel
 from robust.simulations import simulate
 from robust.testing.models import simple_ac
 
-def round_sig(x, sig=2):
-    return np.round(x, sig-int(np.floor(np.log10(np.abs(x))))-1)
-
 class TestSimulation(unittest.TestCase):
     def test_simulate(self):
         model = simple_ac()
@@ -86,10 +83,10 @@ class TestSimulation(unittest.TestCase):
             for j in range(len(a)):
                 if a[j] <= 1e-5:
                     a[j] = 0.
-            f.write(''.join([" & " + str(np.format_float_scientific(j, precision=1)) for j in a]))
+            f.write(''.join([" & " + str(np.format_float_scientific(j, precision=2)) for j in a]))
             f.write('\n')
         f.write('cost ')
-        f.write(' '.join(["& " + str(i['cost']) for i in soltab]))
+        f.write(' '.join(["& " + str(np.format_float_scientific(i['cost'], precision=2)) for i in soltab]))
         f.write('\n')
         f.close()
 
