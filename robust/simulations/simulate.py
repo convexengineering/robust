@@ -362,10 +362,10 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
         for i in range(number_of_time_average_solves-1):
             nominal_solve_time += model.solve(verbosity=0)['soltime']
     except InvalidGPConstraint:
-        nominal_solution = model.localsolve(verbosity=0)
+        nominal_solution = model.localsolve(verbosity=0, iteration_limit=100)
         nominal_solve_time = nominal_solution['soltime']
         for i in range(number_of_time_average_solves-1):
-            nominal_solve_time += model.localsolve(verbosity=0)['soltime']
+            nominal_solve_time += model.localsolve(verbosity=0, iteration_limit=100)['soltime']
     nominal_solve_time = nominal_solve_time / number_of_time_average_solves
 
     if distribution == 'normal' or 'Gaussian':
