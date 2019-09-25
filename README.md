@@ -3,7 +3,4 @@ robust is a tool for designing engineering systems under uncertainty using geome
 
 Documentation for robust is pending. In the short term, if you are interested in robustifying your GP models, please contact Berk Ozturk (bozturk@mit.edu) and Ali Saab (alikassemsaab@gmail.com). 
 
-[![Build Status](https://acdl.mit.edu/csi/buildStatus/icon?job=robust_Push)](https://acdl.mit.edu/csi/job/robust_Push/) Unit tests
-
-
-[![Build Status](https://acdl.mit.edu/csi/buildStatus/icon?job=robust_Push_Depends)](https://acdl.mit.edu/csi/job/robust_Push_Depends/) Dependencies
+[![Build Status](https://acdl.mit.edu/csi/buildStatus/icon?job=gpkit_ResearchModel_robust_Push)](https://acdl.mit.edu/csi/view/convexengineering/job/gpkit_ResearchModel_robust_Push/) 
