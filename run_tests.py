@@ -1,4 +1,5 @@
 """Script for running all gpkit unit tests"""
+import gpkit
 from gpkit.tests.run_tests import run
 from gpkit.tests.test_repo import git_clone, pip_install
 
@@ -29,14 +30,22 @@ def import_tests():
 
     return tests
 
-
 def test():
     try:
         import gpkitmodels
     except:
         git_clone("gplibrary")
         pip_install("gplibrary", local=True)
-    run(tests=import_tests())
+    alltests = import_tests()
+    TESTS = []
+    for testcase in alltests:
+        for solver in gpkit.settings["installed_solvers"]:
+            if solver:
+                test = type(str(testcase.__name__+"_"+solver),
+                            (testcase,), {})
+                setattr(test, "solver", solver)
+                TESTS.append(test)
+    run(tests=TESTS)
 
 if __name__ == '__main__':
     test()
