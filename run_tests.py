@@ -1,4 +1,4 @@
-"""Script for running all gpkit unit tests"""
+"""Script for running all unit tests"""
 import gpkit
 from gpkit.tests.run_tests import run
 from gpkit.tests.test_repo import git_clone, pip_install
@@ -45,7 +45,7 @@ def test():
                             (testcase,), {})
                 setattr(test, "solver", solver)
                 TESTS.append(test)
-    run(tests=TESTS)
+    run(tests=TESTS, xmloutput=True)
 
 if __name__ == '__main__':
     test()
