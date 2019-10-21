@@ -17,7 +17,7 @@ class TestSimulation(unittest.TestCase):
             model.cost = model['c']
             number_of_time_average_solves = 3
             number_of_iterations = 10
-            uncertainty_sets = ['elliptical']
+            uncertainty_sets = ['box']
             methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False}]
             nGammas = 3
             gammas = np.linspace(0, 1.0, nGammas)
