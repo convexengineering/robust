@@ -2,41 +2,7 @@ from gpkit import Variable, Model, SignomialsEnabled, units
 from robust.simulations import simulate, read_simulation_data
 import os
 
-from gpkitmodels.SP.SimPleAC.SimPleAC_mission import SimPleAC, Mission
-from gpkitmodels.SP.SimPleAC.SimPleAC import SimPleAC as simpleWingSP
-
-
-def example_sp():
-    x = Variable('x')
-    y = Variable('y')
-    a = Variable('a', 1, pr=10)
-    b = Variable('b', 1, pr=10)
-    constraints = []
-    with SignomialsEnabled():
-        constraints = constraints + [x >= 1 - a * y, b * y <= 0.1]
-    return Model(x, constraints)
-
-
-def simple_wing_sp():
-    the_model = simpleWingSP()
-    the_model.cost = the_model['W_f']
-    return the_model
-
-
-def simple_ac():
-    the_model = Mission(SimPleAC(), 4)
-    the_model.substitutions.update({
-        'h_{cruise_m}': 5000 * units('m'),
-        'Range_m': 3000 * units('km'),
-        'W_{p_m}': 6250 * units('N'),
-        'C_m': 120 * units('1/hr'),
-        'V_{min_m}': 25 * units('m/s'),
-        'T/O factor_m': 2,
-    })
-    c = Variable('c', '-', 'model cost')
-    the_model = Model(c, [the_model, c >= the_model['W_{f_m}'] * units('1/N') + the_model['C_m'] * the_model['t_m']])
-    return the_model
-
+from robust.testing.models import simple_ac
 
 if __name__ == '__main__':
     model = simple_ac()
@@ -45,7 +11,7 @@ if __name__ == '__main__':
     nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
         simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
     model_name = 'Signomial Simple Flight'
-    gammas = [0.6, 1]  # [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    gammas = [0.3, 1]  # [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
     min_num_of_linear_sections = 3
     max_num_of_linear_sections = 99
     linearization_tolerance = 1e-3

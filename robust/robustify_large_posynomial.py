@@ -13,10 +13,9 @@ from .robust_gp_tools import RobustGPTools
 
 class RobustifyLargePosynomial(object):
 
-    def __init__(self, p, type_of_uncertainty_set, number_of_stds, setting):
+    def __init__(self, p, type_of_uncertainty_set, setting):
         self.p = p
         self.type_of_uncertainty_set = type_of_uncertainty_set
-        self.number_of_stds = number_of_stds
         self.setting = setting
 
     @staticmethod
@@ -156,14 +155,12 @@ class RobustifyLargePosynomial(object):
         :param number_of_regression_points: The number of regression points per dimension
         :return: The linear regression of all the exponential functions, and the mean vector
         """
-        center, scale = [], []
-        mean_vector = []
+        etas = []
+        mean_vector = [] #TODO: remove mean vector, full of ones
         coeff, intercept = [], []
 
         for i in range(len(p_uncertain_vars)):
-            eta_min, eta_max = RobustGPTools.generate_etas(p_uncertain_vars[i])
-            center.append((eta_min + eta_max) / 2.0)
-            scale.append(eta_max - center[i])
+            etas.append(RobustGPTools.generate_etas(p_uncertain_vars[i]))
 
         perturbation_matrix = []
         for i in range(len(self.p.exps)):
@@ -175,8 +172,7 @@ class RobustifyLargePosynomial(object):
             mean = 1
             for j, var in enumerate(p_uncertain_vars):
                 if var.key in mon_uncertain_vars:
-                    mean = mean * np.exp(center[j]*only_uncertain_vars_monomial_exps.get(var.key))
-                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial_exps.get(var.key) * scale[j]))
+                    perturbation_matrix[i].append(np.exp(only_uncertain_vars_monomial_exps.get(var.key) * etas[j]))
                 else:
                     perturbation_matrix[i].append(0)
             coeff.append([])
@@ -190,9 +186,10 @@ class RobustifyLargePosynomial(object):
     def no_coefficient_monomials(self):
         """
         separates the monomials in a posynomial into a list of monomials
+        with no coefficients
         :return: The list of monomials
         """
-        monmaps = [NomialMap({exp: 1.}) for exp, c in self.hmap.items()]
+        monmaps = [NomialMap({exp: 1.}) for exp, c in self.p.hmap.items()]
         for monmap in monmaps:
             monmap.units = self.p.hmap.units
         mons = [Monomial(monmap) for monmap in monmaps]

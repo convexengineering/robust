@@ -1,7 +1,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
-from . import models
+from robust.synthetic_model import models
 
 from robust.robust import RobustModel
 

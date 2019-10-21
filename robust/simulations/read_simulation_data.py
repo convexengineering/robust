@@ -86,7 +86,7 @@ def objective_proboffailure_vs_gamma(gammas, objective_values, objective_name, o
     lines = lines1 + lines2
     labs = [l.get_label() for l in lines]
     ax1.legend(lines, labs, loc="upper center", fontsize=18, numpoints=1)
-    plt.show()
+    plt.show(block=False)
 
 
 def generate_comparison_plots(relative_objective_values, objective_name, relative_number_of_constraints,
@@ -112,7 +112,7 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
     leg.remove()
     ax2.add_artist(leg)
-    plt.show()
+    plt.show(block=False)
 
     fig, ax1 = plt.subplots()
     ax2 = ax1.twinx()
@@ -133,7 +133,7 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     leg = ax1.legend(lines, labs, loc="lower right", ncol=1)
     leg.remove()
     ax2.add_artist(leg)
-    plt.show()
+    plt.show(block=False)
 
 
 def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_performance_dictionary,
@@ -149,7 +149,7 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
     plt.title('The ' + worst_case_or_average + ' Performance: ' + uncertainty_set.capitalize() + ' Uncertainty Set',
               fontsize=18)
     plt.legend(loc=0, numpoints=1)
-    plt.show()
+    plt.show(block=False)
 
 def generate_variable_gamma_plots(variable_gamma_file_path_name):
     dictionary_gamma, properties_gamma = read_simulation_data(variable_gamma_file_path_name)

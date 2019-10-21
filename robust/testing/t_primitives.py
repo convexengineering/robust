@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 import unittest
 from gpkit.tests.helpers import run_tests
@@ -6,21 +7,10 @@ from gpkit.tests.helpers import run_tests
 from robust.robust_gp_tools import RobustGPTools
 from robust.robust import RobustModel
 from robust.margin import MarginModel
+from robust.testing.models import simple_wing
 from robust.testing.models import sp_test_model, gp_test_model
 
 class TestPrimitives(unittest.TestCase):
-    def test_MarginModel(self):
-        """ Tests creation and solution of MarginModel"""
-        m = sp_test_model()
-        mm = MarginModel(m, gamma = 0.5)
-        margin_solution = mm.localsolve(verbosity=0)
-        uncertain_varkeys = [k for k in m.varkeys if RobustGPTools.is_directly_uncertain(k)]
-        # Checking margin allocation
-        for key in list(uncertain_varkeys):
-            assert(mm.substitutions.get(key) == m.substitutions.get(key) *
-                                                (1.+mm.setting.get("gamma")*key.pr/100.))
-        self.assertGreater(margin_solution['cost'], mm.nominal_cost)
-
     def test_MarginModel(self):
         """ Tests creation and solution of MarginModel"""
         m = sp_test_model()
@@ -53,9 +43,10 @@ class TestPrimitives(unittest.TestCase):
     def test_methods(self):
         m = gp_test_model()
         nominal_solution = m.solve(verbosity=0)
-        methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
-                   {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
-                   {'name': 'Simple Conservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True}
+        methods = [{'name': 'BestPairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
+                   {'name': 'LinearizedPerturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
+                   {'name': 'SimpleConservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
+                   {'name': 'TwoTerm', 'twoTerm': False, 'boyd': True, 'simpleModel': False}
                    ]
         uncertainty_sets = ['box', 'elliptical']
         for method in methods:
@@ -64,7 +55,11 @@ class TestPrimitives(unittest.TestCase):
                 rm = RobustModel(m, uncertainty_set, gamma=gamma, twoTerm=method['twoTerm'],
                                            boyd=method['boyd'], simpleModel=method['simpleModel'],
                                            nominalsolve=nominal_solution)
-                _ = rm.robustsolve(verbosity=0)
+                sol = rm.robustsolve(verbosity=0)
+                # print os.path.dirname(__file__)
+                # self.assertIsNone(sol.diff(os.path.dirname(__file__) +
+                #                            'diffs/test_methods_' +
+                #                            method['name'] + '_' + uncertainty_set))
 
 TESTS = [TestPrimitives]
 
