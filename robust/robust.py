@@ -118,7 +118,7 @@ class RobustModel(object):
                 else:
                     p = cs.as_posyslt1()[0]
                     if len(p.exps) == 1:
-                        robust_monomial = self.robustify_monomial(p)
+                        robust_monomial, _ = self.robustify_monomial(p)
                         self.ready_gp_constraints += [robust_monomial <= 1]
                     else:
                         self.to_linearize_gp_posynomials += [p]
@@ -133,6 +133,7 @@ class RobustModel(object):
 
         gp_posynomials = []
 
+        # Classifying all constraints
         for cs in all_constraints:
             if isinstance(cs, SingleSignomialEquality):
                 self.sp_equality_constraints.append(cs)
@@ -200,7 +201,13 @@ class RobustModel(object):
                     self.robust_solve_properties['numoflinearsections'], new_solution, self._robust_model = self. \
                         find_number_of_piece_wise_linearization(two_term_data_posynomials, ready_constraints,
                                                                 feasible=True)
-            rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
+            try:
+                rel_tol = np.abs((new_solution['cost'] - old_solution['cost']) / old_solution['cost'])
+            except:
+                # Triggers when nominal solution to goal problem is the nominal problem.
+                if verbosity > 0:
+                    print("Goal program proceeding...")
+                rel_tol = 1
             if verbosity > 0:
                 if not reached_feasibility:
                     print("feasibility is not reached yet")
@@ -265,7 +272,7 @@ class RobustModel(object):
         large_gp_posynomials = []
         for i, p in enumerate(data_gp_posynomials):
             if len(p.exps) == 1:
-                robust_monomial = self.robustify_monomial(p)
+                robust_monomial, _ = self.robustify_monomial(p)
                 ready_gp_constraints += [robust_monomial <= 1]
             elif len(p.exps) == 2 and self.setting.get('linearizeTwoTerm'):
                 to_linearize_gp_posynomials += [p]
@@ -303,20 +310,21 @@ class RobustModel(object):
             l_norm = np.sqrt(l_norm)
         g = self.setting.get('gamma')
         # Fifth order Taylor approx of the e**gamma, so that gamma can be a variable
-        robust_monomial = monomial * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)**l_norm
-        return robust_monomial
+        robust_monomial = monomial**(1/l_norm) * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)
+        return robust_monomial, l_norm
 
     def robustify_set_of_monomials(self, set_of_monomials, feasible=False):
         robust_set_of_monomial_constraints = []
         slackvar = Variable()
         for monomial in set_of_monomials:
-            robust_monomial = self.robustify_monomial(monomial)
-            robust_set_of_monomial_constraints += [robust_monomial <= slackvar ** feasible]
+            robust_monomial, l_norm = self.robustify_monomial(monomial)
+            robust_set_of_monomial_constraints += [robust_monomial <= slackvar ** (feasible/l_norm)]
         robust_set_of_monomial_constraints += [slackvar >= 1, slackvar <= 1000]
         return robust_set_of_monomial_constraints, slackvar
 
     def calculate_value_of_two_term_approximated_posynomial(self, two_term_approximation, index_of_permutation,
                                                             solution):
+        """... for a given index among all permutations, and a solution to the model. """
         permutation = two_term_approximation.list_of_permutations[index_of_permutation]
 
         number_of_two_terms = int(len(permutation) / 2)
@@ -340,19 +348,20 @@ class RobustModel(object):
             subs_monomials = []
             for j in range(len(monomials)):
                 # st3 = time()
-                robust_monomial = self.robustify_monomial(monomials[j])
+                robust_monomial, _ = self.robustify_monomial(monomials[j])
                 monomials[j] = robust_monomial.sub(solution['variables'])
                 # print "subs for a monomial is taking too much time", time()-st3
                 subs_monomials.append(monomials[j].cs[0])
             values.append(max(subs_monomials))
         if number_of_two_terms % 2 != 0:
             monomial = mons[len(permutation) - 1]
-            robust_monomial = self.robustify_monomial(monomial)
+            robust_monomial, _ = self.robustify_monomial(monomial)
             monomial = robust_monomial.sub(solution['variables'])
             values.append(monomial.cs[0])
         return sum(values)
 
     def find_permutation_with_minimum_value(self, two_term_approximation, solution):
+        """ ... to be able to find the least conservative two term approximation. """
         minimum_value = np.inf
         minimum_index = len(two_term_approximation.list_of_permutations)
         for i in range(len(two_term_approximation.list_of_permutations)):
@@ -393,16 +402,15 @@ class RobustModel(object):
 
     def find_number_of_piece_wise_linearization(self, two_term_data_posynomials, ready_constraints, feasible=False):
 
-        the_min_r = self.setting.get('minNumOfLinearSections')
-        the_max_r = self.setting.get('maxNumOfLinearSections')
+        min_r = self.setting.get('minNumOfLinearSections')
+        max_r = self.setting.get('maxNumOfLinearSections')
         r = None
         error = None
         sol_upper = None
-
         model_upper = None
 
-        while the_min_r <= the_max_r:
-            r = int((the_min_r + the_max_r) / 2.0)
+        while min_r <= max_r:
+            r = int((min_r + max_r) / 2.0)
             model_upper, model_lower = self. \
                 linearize_and_return_upper_lower_models(two_term_data_posynomials, r, ready_constraints, feasible)
             upper_model_infeasible = 0
@@ -420,17 +428,17 @@ class RobustModel(object):
             if upper_model_infeasible != 1:
                 error = (sol_upper.get('cost') - sol_lower.get('cost')) / sol_lower.get('cost')
                 if error <= self.setting.get('linearizationTolerance'):
-                    the_max_r = r
+                    max_r = r
                 else:
-                    the_min_r = r + 1
+                    min_r = r + 1
             elif r == self.setting.get('maxNumOfLinearSections'):
                 self.lower_approximation_is_feasible = True
                 raise Exception("The model is infeasible. The lower approximation of the model is feasible, try "
                                 "increasing the maximum number of linear sections")
             else:
-                the_min_r = r + 1
+                min_r = r + 1
             del model_lower, sol_lower
-            if the_max_r == the_min_r and r == the_max_r:
+            if max_r == min_r and r == max_r:
                 break
         self.robust_solve_properties['upperLowerRelError'] = error
         return r, sol_upper, model_upper
