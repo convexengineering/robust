@@ -11,7 +11,7 @@ if __name__ == '__main__':
     nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs = \
         simulate.generate_model_properties(model, number_of_time_average_solves, number_of_iterations)
     model_name = 'Signomial Simple Flight'
-    gammas = [0.3, 1]  # [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    gammas = [0.0, 0.3, 1]  # [0, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
     min_num_of_linear_sections = 3
     max_num_of_linear_sections = 99
     linearization_tolerance = 1e-3
