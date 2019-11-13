@@ -77,10 +77,10 @@ class TestPrimitives(unittest.TestCase):
                                            nominalsolve=nominal_solution)
                 sol = rm.robustsolve(verbosity=0)
                 #sol.save(os.path.dirname(__file__) +
-                #                            'diffs/test_methods_' +
+                #                            '/diffs/test_methods_' +
                 #                            method['name'] + '_' + uncertainty_set)
                 self.assertTrue(sol.almost_equal(pickle.load(open(os.path.dirname(__file__) +
-                                           'diffs/test_methods/' +
+                                           '/diffs/test_methods/' +
                                            method['name'] + '_' + uncertainty_set)), reltol=1e-5))
 
 TESTS = [TestPrimitives]
