@@ -76,12 +76,12 @@ class TestPrimitives(unittest.TestCase):
                                            boyd=method['boyd'], simpleModel=method['simpleModel'],
                                            nominalsolve=nominal_solution)
                 sol = rm.robustsolve(verbosity=0)
-                #sol.save(os.path.dirname(__file__) +
-                #                            '/diffs/test_methods_' +
+                # sol.save(os.path.dirname(__file__) +
+                #                            'diffs/test_methods/' +
                 #                            method['name'] + '_' + uncertainty_set)
                 self.assertTrue(sol.almost_equal(pickle.load(open(os.path.dirname(__file__) +
-                                           '/diffs/test_methods/' +
-                                           method['name'] + '_' + uncertainty_set)), reltol=1e-3))
+                                           'diffs/test_methods/' +
+                                           method['name'] + '_' + uncertainty_set)), reltol=1e-4))
 
 TESTS = [TestPrimitives]
 
