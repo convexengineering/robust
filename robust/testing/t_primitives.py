@@ -4,6 +4,7 @@ import pickle
 
 import unittest
 from gpkit.tests.helpers import run_tests
+from gpkit import Variable, Model
 
 from robust.robust_gp_tools import RobustGPTools
 from robust.twoterm_approximation import TwoTermApproximation
@@ -24,6 +25,36 @@ class TestPrimitives(unittest.TestCase):
             assert(mm.substitutions.get(key) == m.substitutions.get(key) *
                                                 (1.+mm.setting.get("gamma")*key.pr/100.))
         self.assertGreater(margin_solution['cost'], mm.nominal_cost)
+
+    def test_GoalProgram(self):
+        """ Tests creation and solution of RobustModels with variable Gamma,
+            and tightness of the two solution methods."""
+        m = sp_test_model()
+        n = 6
+        gammas = np.linspace(0.,1.,n)
+        Gamma = Variable('\\Gamma', '-', 'Uncertainty bound')
+        solBound = Variable('1+\\delta', '-', 'Acceptable optimal solution bound', fix = True)
+        nominal_cost = m.localsolve(verbosity=0)['cost']
+        box_cost = [RobustModel(m, 'box', gamma = gammas[i]).robustsolve(verbosity=0)['cost']
+                    for i in range(n)]/(np.ones(n)*nominal_cost)
+        ell_cost = [RobustModel(m, 'elliptical', gamma = gammas[i]).robustsolve(verbosity=0)['cost']
+                    for i in range(n)]/(np.ones(n)*nominal_cost)
+        self.assertTrue(all(box_cost >= nominal_cost))
+        self.assertTrue(all(ell_cost >= nominal_cost))
+        # Creating goal model
+        gm = Model(1 / Gamma, [m, m.cost <= nominal_cost * solBound, Gamma <= 1e30, solBound <= 1e30],
+                  m.substitutions)
+        goal_box_gamma = []
+        goal_ell_gamma = []
+        for i in range(1,n):
+            gm.substitutions.update({'1+\\delta': box_cost[i]})
+            robust_goal_bm = RobustModel(gm, 'box', gamma=Gamma)
+            goal_box_gamma.append(robust_goal_bm.robustsolve(verbosity=0)['cost']**-1)
+            gm.substitutions.update({'1+\\delta': ell_cost[i]})
+            robust_goal_em = RobustModel(gm, 'elliptical', gamma=Gamma)
+            goal_ell_gamma.append(robust_goal_em.robustsolve(verbosity=0)['cost']**-1)
+            self.assertAlmostEqual(goal_box_gamma[i-1], gammas[i], places=5)
+            self.assertAlmostEqual(goal_ell_gamma[i-1], gammas[i], places=5)
 
     def test_conservativeness(self):
         """ Testing conservativeness of solution methods"""
