@@ -112,7 +112,7 @@ class TestPrimitives(unittest.TestCase):
                 #                            method['name'] + '_' + uncertainty_set)
                 self.assertTrue(sol.almost_equal(pickle.load(open(os.path.dirname(__file__) +
                                            '/diffs/test_methods/' +
-                                           method['name'] + '_' + uncertainty_set)), reltol=1e-4))
+                                           method['name'] + '_' + uncertainty_set)), reltol=1e-2))
 
 TESTS = [TestPrimitives]
 
