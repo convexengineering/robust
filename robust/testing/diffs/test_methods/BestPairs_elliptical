@@ -120,7 +120,7 @@ Rp49
 g13
 g14
 sg15
-V\u005cfbox{128}
+V\u005cfbox{6}
 p51
 sbg17
 (g21
@@ -368,7 +368,7 @@ Rp150
 sg101
 NsbsS'setuptime'
 p151
-F1.0220000743865967
+F1.5160000324249268
 sS'numoflinearsections'
 p152
 I20
@@ -728,7 +728,7 @@ p287
 tp288
 bssS'soltime'
 p289
-F0.0709998607635498
+F0.09200000762939453
 sg244
 F0.6535499
 stp290
