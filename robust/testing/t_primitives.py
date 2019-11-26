@@ -115,7 +115,7 @@ class TestPrimitives(unittest.TestCase):
                 #                            method['name'] + '_' + uncertainty_set)),
                 #                                  reltol=1e-2, sens_abstol=1e-2))
                 print(sol.diff(pickle.load(open(os.path.dirname(__file__) +
-                                           'diffs/test_methods/' +
+                                           '/diffs/test_methods/' +
                                            method['name'] + '_' + uncertainty_set))))
 
 TESTS = [TestPrimitives]
