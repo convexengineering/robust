@@ -114,7 +114,7 @@ class TestPrimitives(unittest.TestCase):
                                             '/diffs/test_methods/' +
                                             method['name'] + '_' + uncertainty_set))
                 for vk in m.varkeys:
-                    self.assertAlmostEqual(sol(vk), prev_sol(vk), places=6)
+                    self.assertAlmostEqual(sol(vk), prev_sol(vk), places=5)
 
 TESTS = [TestPrimitives]
 
