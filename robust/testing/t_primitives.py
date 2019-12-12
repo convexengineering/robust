@@ -104,19 +104,17 @@ class TestPrimitives(unittest.TestCase):
         for method in methods:
             for uncertainty_set in uncertainty_sets:
                 rm = RobustModel(m, uncertainty_set, gamma=gamma, twoTerm=method['twoTerm'],
-                                           boyd=method['boyd'], simpleModel=method['simpleModel'],
-                                           nominalsolve=nominal_solution)
+                                 boyd=method['boyd'], simpleModel=method['simpleModel'],
+                                 nominalsolve=nominal_solution)
                 sol = rm.robustsolve(verbosity=0)
                 # sol.save(os.path.dirname(__file__) +
                 #                            'diffs/test_methods/' +
                 #                            method['name'] + '_' + uncertainty_set)
-                # self.assertTrue(sol.almost_equal(pickle.load(open(os.path.dirname(__file__) +
-                #                            '/diffs/test_methods/' +
-                #                            method['name'] + '_' + uncertainty_set)),
-                #                                  reltol=1e-2, sens_abstol=1e-2))
-                print(sol.diff(pickle.load(open(os.path.dirname(__file__) +
-                                           '/diffs/test_methods/' +
-                                           method['name'] + '_' + uncertainty_set))))
+                prev_sol = pickle.load(open(os.path.dirname(__file__) +
+                                            '/diffs/test_methods/' +
+                                            method['name'] + '_' + uncertainty_set))
+                for vk in m.varkeys:
+                    self.assertAlmostEqual(sol(vk), prev_sol(vk), places=6)
 
 TESTS = [TestPrimitives]
 
