@@ -97,7 +97,7 @@ class TestPrimitives(unittest.TestCase):
         methods = [{'name': 'BestPairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                    {'name': 'LinearizedPerturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                    {'name': 'SimpleConservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
-                   {'name': 'TwoTerm', 'twoTerm': False, 'boyd': True, 'simpleModel': False}
+                   # {'name': 'TwoTerm', 'twoTerm': False, 'boyd': True, 'simpleModel': False}
                    ]
         uncertainty_sets = ['box', 'elliptical']
         gamma = 0.5
