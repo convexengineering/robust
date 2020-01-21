@@ -89,7 +89,7 @@ class RobustGPTools(object):
             raise Exception('Dict size mismatch in monomial creation.')
         monmaps = [NomialMap({exps[i]: cs[i]}) for i in range(len(exps))]
         for monmap in monmaps:
-            monmap.units = [k.units**v for k, v in exps[i].items() if k.units]
+            monmap.units = [k.units**v for k, v in list(monmap.keys())[0].items() if k.units]
         mons = [Monomial(monmap) for monmap in monmaps]
         return mons
 
