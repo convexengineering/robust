@@ -82,6 +82,9 @@ class TwoTermApproximation(object):
             data_constraints += [
                 (monomials[number_of_monomials - 2]
                  + monomials[number_of_monomials - 1]) / z_2 <= 1]
+            if p.pof:
+                for constr in data_constraints:
+                    constr.pof = p.pof
             return [], data_constraints
 
         length_of_permutation = len(permutation)
@@ -99,7 +102,14 @@ class TwoTermApproximation(object):
             zs.append(z)
             data_constraints += [monomials[permutation[length_of_permutation - 1]] <= z]
 
-        no_data_constraints.append([sum(zs) <= 1])
+        no_data_constraint = sum(zs) <= 1
+
+        if p.pof:
+            for constr in data_constraints:
+                constr.pof = p.pof
+            no_data_constraint.pof = p.pof
+
+        no_data_constraints.append([no_data_constraint])
 
         return no_data_constraints, data_constraints
 

@@ -24,7 +24,7 @@ class EquivalentModel(Model):
         """
         data_constraints, no_data_constraints = [], []
 
-        for i, p in enumerate(model.as_posyslt1()):
+        for i, p in enumerate(RobustGPTools.as_posyslt1_pof(model)):
 
             equivalent_p = EquivalentPosynomials(p, i,
                                                  setting.get('simpleModel'), dependent_uncertainties)

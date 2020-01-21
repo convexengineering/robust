@@ -193,6 +193,8 @@ class RobustifyLargePosynomial(object):
         for monmap in monmaps:
             monmap.units = self.p.hmap.units
         mons = [Monomial(monmap) for monmap in monmaps]
+        for mony in mons:
+            mony.pof = self.p.pof
         return mons
 
     @staticmethod
@@ -316,10 +318,17 @@ class RobustifyLargePosynomial(object):
             self.linearize_perturbations(p_uncertain_vars, setting.get('numberOfRegressionPoints'))
 
         monomials = self.no_coefficient_monomials()
+        if self.setting.get('constraintwise'):
+            gamma = self.p.pof
+        else:
+            gamma = setting.get('gamma')
         constraints = RobustifyLargePosynomial. \
-            generate_robust_constraints(setting.get('gamma'), type_of_uncertainty_set, monomials,
+            generate_robust_constraints(gamma, type_of_uncertainty_set, monomials,
                                         perturbation_matrix, intercept,
                                         mean_vector, setting.get('enableSP'), m)
+        if self.p.pof:
+            for constraint in constraints:
+                constraint.pof = self.p.pof
         return constraints
 
 if __name__ == '__main__':

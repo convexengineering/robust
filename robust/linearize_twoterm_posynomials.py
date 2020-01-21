@@ -181,6 +181,10 @@ class LinearizeTwoTermPosynomials(object):
                                  second_monomial ** a[i] * np.exp(b[i]) <= w]
 
         data_constraints += [second_monomial <= w]
+
+        for constr in data_constraints:
+            constr.pof = self.p.pof
+
         return no_data_constraints_upper, no_data_constraints_lower, data_constraints
 
 if __name__ == '__main__':

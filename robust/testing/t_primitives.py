@@ -116,6 +116,16 @@ class TestPrimitives(unittest.TestCase):
                 for vk in m.varkeys:
                     self.assertAlmostEqual(sol(vk), prev_sol(vk), places=5)
 
+    def test_constraintwise_robustification(self):
+        m = gp_test_model()
+        constraints = [i for i in m.flat()]
+        pofs = [0.1, 0.05]
+        for i in range(2):
+            constraints[i].pof = pofs[i]
+        rm = RobustModel(m, 'elliptical', constraintwise = True)
+        nominal_solution = m.solve(verbosity=0)
+
+
 TESTS = [TestPrimitives]
 
 def test():

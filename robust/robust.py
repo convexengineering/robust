@@ -24,6 +24,7 @@ class RobustnessSetting(object):
     def __init__(self, **options):
         self._options = {
             'gamma': 1,
+            'constraintwise': False,
             'simpleModel': False,
             'numberOfRegressionPoints': 2,
             'numberOfRegressionPointsElliptical': 25,
@@ -103,6 +104,17 @@ class RobustModel(object):
 
         equality_constraints = False
 
+        all_constraints = model.flat(constraintsets=False)
+
+        # Make sure all_constraints have probability of failure attribute
+        if self.setting.get('constraintwise'):
+            for i in all_constraints:
+                if not i.pof:
+                    i.pof = np.nan
+        else:
+            for i in all_constraints:
+                i.pof = np.nan
+
         if self.setting.get('boyd'):
             self.setting.set('iterationLimit', 1)
             try:
@@ -116,7 +128,7 @@ class RobustModel(object):
                     self.ready_gp_constraints += [cs]
                     equality_constraints = True
                 else:
-                    p = cs.as_posyslt1()[0]
+                    p = RobustGPTools.as_posyslt1_pof(cs)[0]
                     if len(p.exps) == 1:
                         robust_monomial, _ = self.robustify_monomial(p)
                         self.ready_gp_constraints += [robust_monomial <= 1]
@@ -129,8 +141,6 @@ class RobustModel(object):
             self.number_of_gp_posynomials = 0
             return
 
-        all_constraints = model.flat(constraintsets=False)
-
         gp_posynomials = []
 
         # Classifying all constraints
@@ -142,9 +152,8 @@ class RobustModel(object):
             elif isinstance(cs, MonomialEquality):
                 self.ready_gp_constraints += [cs]
                 equality_constraints = True
-
             else:
-                gp_posynomials += cs.as_posyslt1()
+                gp_posynomials += RobustGPTools.as_posyslt1_pof(cs)
 
         self.number_of_gp_posynomials = len(gp_posynomials)
 
@@ -184,7 +193,7 @@ class RobustModel(object):
                 no_data, data = TwoTermApproximation. \
                     equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 ready_constraints += no_data
-                two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+                two_term_data_posynomials += [RobustGPTools.as_posyslt1_pof(constraint)[0] for constraint in data]
             two_term_data_posynomials += to_linearize_posynomials
             if reached_feasibility:
                 self._robust_model, _ = self. \
@@ -251,11 +260,15 @@ class RobustModel(object):
             for cs in self.sp_constraints:
                 css = SignomialInequality(cs.left.sub(solution["constants"]), cs.oper, cs.right.sub(solution["constants"]))
                 sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
+                sp_gp_approximation.pof = cs.pof
             ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial = self.\
                 classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
             for cs in self.sp_equality_constraints:
                 css = SingleSignomialEquality(cs.left.sub(solution["constants"]), cs.right.sub(solution["constants"]))
-                ready_sp_constraints.append(css.as_gpconstr(x0=solution["freevariables"]))
+                css = css.as_gpconstr(x0=solution["freevariables"])
+                if cs.pof:
+                    css.pof = cs.pof
+                ready_sp_constraints.append(css)
         return ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial
 
     def classify_gp_constraints(self, gp_posynomials, offset=0):
@@ -265,7 +278,7 @@ class RobustModel(object):
             equivalent_p = EquivalentPosynomials(p, i + offset, self.setting.get('simpleModel'),
                                                  self.dependent_uncertainty_set)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
-            data_gp_posynomials += [posy.as_posyslt1()[0] for posy in data]
+            data_gp_posynomials += [RobustGPTools.as_posyslt1_pof(posy)[0] for posy in data]
             ready_gp_constraints += no_data
 
         to_linearize_gp_posynomials = []
@@ -308,10 +321,21 @@ class RobustModel(object):
                 raise Exception('This type of set is not supported')
         if self.type_of_uncertainty_set == 'elliptical':
             l_norm = np.sqrt(l_norm)
-        g = self.setting.get('gamma')
+        # Detecting whether to robustify constraint-wise or globally
+        if self.setting.get('constraintwise'):
+            if self.type_of_uncertainty_set == 'elliptical':
+                g = RobustGPTools.gamma_from_pof(monomial.pof)
+            # elif self.type_of_uncertainty_set == 'box':
+            #     g = np.sqrt(-2*np.log(monomial.pof))
+            else:
+                raise Exception('Only elliptical sets are currently supported'
+                                'for constraintwise robustification.')
+        else:
+            g = self.setting.get('gamma')
         # Fifth order Taylor approx of the e**gamma, so that gamma can be a variable
         if l_norm != 0:
-            robust_monomial = monomial**(1/l_norm) * (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)
+            robust_monomial = monomial**(1/l_norm) * \
+                              (1.+g+1./2.*g**2+1./6.*g**3+1./24.*g**4+1./120.*g**5)
         else:
             l_norm = 1
             robust_monomial = monomial
@@ -387,7 +411,7 @@ class RobustModel(object):
                 linearize(i, r)
             no_data_upper_constraints += no_data_upper
             no_data_lower_constraints += no_data_lower
-            data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+            data_posynomials += [RobustGPTools.as_posyslt1_pof(constraint)[0] for constraint in data]
             del linearize_p, no_data_lower, no_data_upper
         data_constraints, slackvar = self.robustify_set_of_monomials(data_posynomials, feasible)
 

@@ -56,6 +56,11 @@ class TestRobustGPTools(unittest.TestCase):
             self.assertEqual([i.exps for i in new_monos],
                              [j.exps for j in constraint.left.chop()])
 
+    def test_pof_conservation(self):
+        m = gp_test_model()
+        posyConstrs = [i for i in m.flat(constraintsets=False)]
+        posys = [i.as_posyslt1() for i in posyConstrs]
+
 TESTS = [TestRobustGPTools]
 
 def test():

@@ -94,6 +94,24 @@ class RobustGPTools(object):
         return mons
 
     @staticmethod
+    def as_posyslt1_pof(posy):
+        """Same as gpkit.PosynomialInequality.as_posyslt1(),
+        except that it preserves/adds the probability of failure attribute."""
+        std_posy = posy.as_posyslt1()
+        for i in std_posy:
+            if posy.pof:
+                i.pof = posy.pof
+            else:
+                i.pof = np.nan
+        return std_posy
+
+    @staticmethod
+    def gamma_from_pof(pof):
+        """Returns gamma for a given probability of failure
+        under a box-elliptical uncertainty set."""
+        return np.sqrt(-2*np.log(pof))
+
+    @staticmethod
     def replace_indirect_uncertain_variable_by_equivalent(monomial, exps):
         equivalent = {}
 
