@@ -7,7 +7,7 @@ import unittest
 from gpkit.tests.helpers import run_tests
 
 from robust.robust_gp_tools import RobustGPTools
-from robust.testing.models import sp_test_model
+from robust.testing.models import sp_test_model, simple_wing
 
 class TestRobustGPTools(unittest.TestCase):
     def test_check_if_no_data(self):
@@ -45,7 +45,7 @@ class TestRobustGPTools(unittest.TestCase):
                     self.assertTrue(RobustGPTools.check_if_no_data(p_uncertain_vars, m[i].exps[0]))
 
     def test_monomials_from_data(self):
-        mtest = sp_test_model()
+        mtest = simple_wing()
         constraints = [i for i in mtest.flat(constraintsets=False)]
         for constraint in constraints:
             # Just testing LHS of constraints
