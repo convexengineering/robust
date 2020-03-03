@@ -113,10 +113,10 @@ def print_simulation_results(robust_model, robust_model_solution, robust_model_s
                       (mag(robust_model_solution['cost']) / float(mag(nominal_cost))))
     try:
         number_of_constraints = \
-            len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])
+            len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat()])
     except AttributeError:
         number_of_constraints = \
-            len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
+            len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat()])
     file_id.write('\t\t\t' + 'Number of constraints: %s\n' % number_of_constraints)
     file_id.write('\t\t\t' + 'Relative number of constraints: %s\n' %
                       (number_of_constraints / float(nominal_no_of_constraints)))
@@ -199,10 +199,10 @@ def variable_gamma_results(model, methods, gammas, number_of_iterations,
                                           number_of_time_average_solves, parallel)
                 try:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model().flat()])
                 except AttributeError:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_model.get_robust_model()[-1].flat()])
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
                 simulations[ind] = simulation_results
@@ -250,10 +250,10 @@ def variable_goal_results(model, methods, deltas, number_of_iterations,
                                                                   verbosity=verbosity, parallel=parallel)
                 try:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model().flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model().flat()])
                 except AttributeError:
                     nconstraints = \
-                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model()[-1].flat(constraintsets=False)])
+                        len([cnstrnt for cnstrnt in robust_goal_model.get_robust_model()[-1].flat()])
                 ind = (delta, method['name'], uncertainty_set)
                 solutions[ind] = robust_model_solution
                 solve_times[ind] = robust_model_solve_time
@@ -378,7 +378,7 @@ def generate_model_properties(model, number_of_time_average_solves, number_of_it
                                      for k, v in list(model.substitutions.items())
                                      if k in model.varkeys and RobustGPTools.is_directly_uncertain(k)}
                                     for _ in range(number_of_iterations)]
-    nominal_number_of_constraints = len([cs for cs in model.flat(constraintsets=False)])
+    nominal_number_of_constraints = len([cs for cs in model.flat()])
 
     return nominal_solution, nominal_solve_time, nominal_number_of_constraints, directly_uncertain_vars_subs
 

@@ -178,13 +178,13 @@ class SameModel(Model):
         :param model: the original model
         :return: the new model
         """
-        all_constraints = model.flat(constraintsets=False)
+        all_constraints = model.flat()
         constraints = []
         for cs in all_constraints:
             if isinstance(cs, MonomialEquality):
                 constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
-                constraints += [cs.as_posyslt1()[0] <= 1]
+                constraints += [cs.unsubbed[0] <= 1]
         self.cost = model.cost
         return constraints
 

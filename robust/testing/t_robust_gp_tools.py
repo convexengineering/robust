@@ -46,7 +46,7 @@ class TestRobustGPTools(unittest.TestCase):
 
     def test_monomials_from_data(self):
         mtest = simple_wing()
-        constraints = [i for i in mtest.flat(constraintsets=False)]
+        constraints = [i for i in mtest.flat()]
         for constraint in constraints:
             # Just testing LHS of constraints
             exps = [i.exps[0] for i in constraint.left.chop()]

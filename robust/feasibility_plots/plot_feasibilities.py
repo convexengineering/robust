@@ -14,7 +14,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
     if rm:
         rmtype = rm.type_of_uncertainty_set
 
-    # posynomials = m.as_posyslt1()
+    # posynomials = m.unsubbed
     # old = []
     # while set(old) != set(interesting_vars):
     #     old = interesting_vars

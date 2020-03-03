@@ -3,6 +3,7 @@ from builtins import zip
 from builtins import range
 import numpy as np
 from gpkit import Variable, Model
+from gpkit.nomials import Posynomial
 import scipy.optimize as op
 import os
 
@@ -142,8 +143,8 @@ class TestLinearization(unittest.TestCase):
             sol = m.solve(verbosity=0)
             w_1 = sol['cost']
 
-            upper_pos = no_data_upper[0].as_posyslt1()
-            lower_pos = no_data_lower[0].as_posyslt1()
+            upper_pos = no_data_upper[0].unsubbed
+            lower_pos = no_data_lower[0].unsubbed
 
             upper_over_lower = upper_pos[0]/lower_pos[0]
             eps = np.log(upper_over_lower.cs[0])
