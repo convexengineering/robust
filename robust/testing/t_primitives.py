@@ -69,8 +69,8 @@ class TestPrimitives(unittest.TestCase):
     #     """ Testing whether monomials are robustified correctly"""
     #     m = gp_test_model()
     #     monys = []
-    #     for c in m.flat(constraintsets=False):
-    #         for monomial in c.as_posyslt1()[0].chop():
+    #     for c in m.flat():
+    #         for monomial in c.unsubbed[0].chop():
     #             monys.append(monomial)
     #     uncertain_vars = [i for i in m.varkeys if RobustGPTools.is_directly_uncertain(i)]
     #     rm = RobustModel(m, 'box')
@@ -79,7 +79,7 @@ class TestPrimitives(unittest.TestCase):
     # def test_two_term_tolerance(self):
     #     m = gp_test_model()
     #     rm = RobustModel(m, 'box')
-    #     posy = [c for c in m.flat(constraintsets=False)][1].left
+    #     posy = [c for c in m.flat()][1].left
     #     tta = TwoTermApproximation(posy, rm.setting)
     #     data_constr = []
     #     no_data_constr = []
@@ -108,11 +108,11 @@ class TestPrimitives(unittest.TestCase):
                                  nominalsolve=nominal_solution)
                 sol = rm.robustsolve(verbosity=0)
                 # sol.save(os.path.dirname(__file__) +
-                #                            'diffs/test_methods/' +
-                #                            method['name'] + '_' + uncertainty_set)
+                #          '/diffs/test_methods/' +
+                #           method['name'] + '_' + uncertainty_set)
                 prev_sol = pickle.load(open(os.path.dirname(__file__) +
                                             '/diffs/test_methods/' +
-                                            method['name'] + '_' + uncertainty_set))
+                                            method['name'] + '_' + uncertainty_set, "rb"))
                 for vk in m.varkeys:
                     self.assertAlmostEqual(sol(vk), prev_sol(vk), places=5)
 

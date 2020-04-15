@@ -15,17 +15,17 @@ class TestTwoTermApproximation(unittest.TestCase):
     def test_equivalent_twoterm_model(self):
         gpmodel = gp_test_model()
         equivalent_constraints = []
-        for c in gpmodel.flat(constraintsets=False):
-            equivalent_constraints += TwoTermApproximation.equivalent_posynomial(c.as_posyslt1()[0], 0, [], True)[1]
+        for c in gpmodel.flat():
+            equivalent_constraints += TwoTermApproximation.equivalent_posynomial(c.unsubbed[0], 0, [], True)[1]
         twoterm_gpmodel = Model(gpmodel.cost, [equivalent_constraints], gpmodel.substitutions)
         self.assertAlmostEqual(gpmodel.solve(verbosity=0)['cost'],twoterm_gpmodel.solve(verbosity=0)['cost'])
 
     # def test_two_term_approx(self):
     #     m = gp_test_model()
     #     settings = {}
-    #     tta = [TwoTermApproximation(i.as_posyslt1()[0], {}) for i in m.flat(constraintsets=False)]
-    #     tta_smart = [TwoTermApproximation(i.as_posyslt1()[0],
-    #                                       {'smartTwoTermChoose': True}) for i in m.flat(constraintsets=False)]
+    #     tta = [TwoTermApproximation(i.unsubbed[0], {}) for i in m.flat()]
+    #     tta_smart = [TwoTermApproximation(i.unsubbed[0],
+    #                                       {'smartTwoTermChoose': True}) for i in m.flat()]
 
     def test_check_if_permutation_exists(self):
         for _ in range(10):
@@ -58,7 +58,7 @@ class TestTwoTermApproximation(unittest.TestCase):
                 else:
                     list_of_permutations.append(temp)
                     _, data_constraints = TwoTermApproximation.equivalent_posynomial(p, 1, temp, False)
-                    data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
+                    data_posynomial = [constraint.unsubbed[0]*Variable("z^%s_%s" % (i, 1))
                                        for i, constraint in enumerate(data_constraints)]
                     list_of_posynomials.append(list(data_posynomial))
                     counter += 1
@@ -71,7 +71,7 @@ class TestTwoTermApproximation(unittest.TestCase):
             #
             #     flag_one = TwoTermApproximation.check_if_permutation_exists(list_of_permutations, temp)
             #     _, data_constraints = TwoTermApproximation.equivalent_posynomial(p, 1, temp, False)
-            #     data_posynomial = [constraint.as_posyslt1()[0]*Variable("z^%s_%s" % (i, 1))
+            #     data_posynomial = [constraint.unsubbed[0]*Variable("z^%s_%s" % (i, 1))
             #                        for i, constraint in enumerate(data_constraints)]
             #     flag_two = list(data_posynomial) in list_of_posynomials
             #

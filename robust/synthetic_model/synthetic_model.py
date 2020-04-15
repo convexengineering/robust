@@ -24,7 +24,7 @@ def print_robust_results(the_robust_model, the_robust_model_solution, the_nomina
         '\n' + the_robust_model.type_of_uncertainty_set + ' uncertainty using ' + the_method_name + ' formulation: \n' +
         ' \t cost : %s \n \t relative cost : %s \n  \t number of constraints : %s \n \t setup time : %s \n \t solve time : %s'
         % (the_robust_model_solution['cost'], the_robust_model_solution['cost'] / the_nominal_solution['cost'],
-           len([cs for cs in the_robust_model.get_robust_model().flat(constraintsets=False)]),
+           len([cs for cs in the_robust_model.get_robust_model().flat()]),
            the_robust_model_solution['setuptime'], the_robust_model_solution['soltime']))
 
 

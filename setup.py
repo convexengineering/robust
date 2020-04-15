@@ -8,7 +8,7 @@ Requires installations of `GPkit <https://github.com/convexengineering/gpkit>`_.
 """
 
 license = """MIT License
-Copyright (c) 2018 Convex Engineering
+Copyright (c) 2020 Convex Engineering
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -29,11 +29,12 @@ setup(name='robust',
       version='0.0.0',
       description=description,
       url='https://github.com/convexengineering/robust',
-      author='Ali Saab',
-      author_email='saab@mit.edu',
+      author='Ali Saab and Berk Ozturk',
+      author_email='bozturk@mit.edu',
       license=license,
       packages=["robust", "robust.data", "robust.feasibility_plots",
                 "robust.solar_model", "robust.synthetic_model", "robust.testing",
                 "robust.simulations"],
       package_data={"robust.data":['*.txt'], "robust.solar_model":['*.txt']},
       install_requires=['gpkit', 'gplibrary', 'numpy', 'matplotlib', 'scipy'])
+s

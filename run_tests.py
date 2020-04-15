@@ -30,7 +30,7 @@ def import_tests():
 
     return tests
 
-def test():
+def test(xmloutput=True):
     try:
         import gpkitmodels
     except:
@@ -45,7 +45,7 @@ def test():
                             (testcase,), {})
                 setattr(test, "solver", solver)
                 TESTS.append(test)
-    run(tests=TESTS, xmloutput=True)
+    run(tests=TESTS, xmloutput=xmloutput)
 
 if __name__ == '__main__':
-    test()
+    test(xmloutput=False)

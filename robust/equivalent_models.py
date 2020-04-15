@@ -24,7 +24,7 @@ class EquivalentModel(Model):
         """
         data_constraints, no_data_constraints = [], []
 
-        for i, p in enumerate(model.as_posyslt1()):
+        for i, p in enumerate(model.unsubbed):
 
             equivalent_p = EquivalentPosynomials(p, i,
                                                  setting.get('simpleModel'), dependent_uncertainties)
@@ -49,7 +49,7 @@ class TwoTermBoydModel(Model):
         :param model: the original model
         :return: two term model and the number of no data constraints
         """
-        all_constraints = model.flat(constraintsets=False)
+        all_constraints = model.flat()
 
         data_constraints = []
 
@@ -58,7 +58,7 @@ class TwoTermBoydModel(Model):
                 data_constraints += [cs]
             elif isinstance(cs, PosynomialInequality):
                 _, data = TwoTermApproximation. \
-                    equivalent_posynomial(cs.as_posyslt1()[0], i, [], True)
+                    equivalent_posynomial(cs.unsubbed[0], i, [], True)
                 data_constraints += data
                 del data
             else:

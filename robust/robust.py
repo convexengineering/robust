@@ -109,14 +109,14 @@ class RobustModel(object):
                 safe_model = TwoTermBoydModel(model)
             except InvalidGPConstraint:
                 raise Exception("Boyd's formulation is not supported for SP models.")
-            safe_model_constraints = safe_model.flat(constraintsets=False)
+            safe_model_constraints = safe_model.flat()
             del safe_model
             for cs in safe_model_constraints:
                 if isinstance(cs, MonomialEquality):
                     self.ready_gp_constraints += [cs]
                     equality_constraints = True
                 else:
-                    p = cs.as_posyslt1()[0]
+                    p, = cs.unsubbed
                     if len(p.exps) == 1:
                         robust_monomial, _ = self.robustify_monomial(p)
                         self.ready_gp_constraints += [robust_monomial <= 1]
@@ -129,7 +129,7 @@ class RobustModel(object):
             self.number_of_gp_posynomials = 0
             return
 
-        all_constraints = model.flat(constraintsets=False)
+        all_constraints = model.flat()
 
         gp_posynomials = []
 
@@ -144,7 +144,7 @@ class RobustModel(object):
                 equality_constraints = True
 
             else:
-                gp_posynomials += cs.as_posyslt1()
+                gp_posynomials += cs.unsubbed
 
         self.number_of_gp_posynomials = len(gp_posynomials)
 
@@ -184,7 +184,7 @@ class RobustModel(object):
                 no_data, data = TwoTermApproximation. \
                     equivalent_posynomial(two_term_approximation.p, i, permutation, False)
                 ready_constraints += no_data
-                two_term_data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+                two_term_data_posynomials += [constraint.unsubbed[0] for constraint in data]
             two_term_data_posynomials += to_linearize_posynomials
             if reached_feasibility:
                 self._robust_model, _ = self. \
@@ -250,7 +250,7 @@ class RobustModel(object):
         with SignomialsEnabled():
             for cs in self.sp_constraints:
                 css = SignomialInequality(cs.left.sub(solution["constants"]), cs.oper, cs.right.sub(solution["constants"]))
-                sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).as_posyslt1()[0])
+                sp_gp_approximation.append(css.as_gpconstr(x0=solution["freevariables"]).unsubbed[0])
             ready_sp_constraints, to_linearize_sp_posynomials, large_sp_posynomial = self.\
                 classify_gp_constraints(sp_gp_approximation, number_of_gp_posynomials)
             for cs in self.sp_equality_constraints:
@@ -265,7 +265,7 @@ class RobustModel(object):
             equivalent_p = EquivalentPosynomials(p, i + offset, self.setting.get('simpleModel'),
                                                  self.dependent_uncertainty_set)
             no_data, data = equivalent_p.no_data_constraints, equivalent_p.data_constraints
-            data_gp_posynomials += [posy.as_posyslt1()[0] for posy in data]
+            data_gp_posynomials += [posy.unsubbed[0] for posy in data]
             ready_gp_constraints += no_data
 
         to_linearize_gp_posynomials = []
@@ -387,7 +387,7 @@ class RobustModel(object):
                 linearize(i, r)
             no_data_upper_constraints += no_data_upper
             no_data_lower_constraints += no_data_lower
-            data_posynomials += [constraint.as_posyslt1()[0] for constraint in data]
+            data_posynomials += [constraint.unsubbed[0] for constraint in data]
             del linearize_p, no_data_lower, no_data_upper
         data_constraints, slackvar = self.robustify_set_of_monomials(data_posynomials, feasible)
 
@@ -399,8 +399,8 @@ class RobustModel(object):
         model_upper.substitutions.update(self.substitutions)
         model_lower.substitutions.update(self.substitutions)
         model_upper.unique_varkeys, model_lower.unique_varkeys = [self.nominal_model.varkeys] * 2
-        model_upper.reset_varkeys()
-        model_lower.reset_varkeys()
+        model_upper.varkeys.update(model_upper.unique_varkeys)
+        model_lower.varkeys.update(model_lower.unique_varkeys)
         del upper_cons, lower_cons, no_data_lower_constraints, no_data_upper_constraints, data_posynomials
         return model_upper, model_lower
 
