@@ -104,7 +104,7 @@ class TestSimulation(unittest.TestCase):
         f.write('\n')
         f.close()
 
-        self.assertEqual(open(origfilename, 'r').readlines(), open(filename, 'r').readlines())
+        self.assertAlmostEqual(open(origfilename, 'r').readlines(), open(filename, 'r').readlines())
 
 TESTS = [TestSimulation]
 
