@@ -15,7 +15,8 @@ Choosing between RGP approximation methods and uncertainty sets
 ---------------------------------------------------------------
 
 There are many possible ``**options`` to ``RobustModel``, but the primary function
-of the options is to be able to choose between the different RGP approximation methods,
+of the options is to be able to choose between the different RGP approximation methods
+defined in [Saab, 2018],
 which have differing levels of conservativeness.
 We prefer to define the three methods in a dict for ease access, and call ``RobustModel``, for example
 for Best Pairs, as follows:
@@ -35,32 +36,33 @@ define the :math:`\infty`- and 2-norms respectively.
 Simulating robust designs
 -------------------------
 
-Robust optimization provides probabilistic guarantees of constraint satisfaction
+Robust optimization provides guarantees of constraint satisfaction
 under the defined uncertainty sets, but it is possible that the real
 distributions of uncertainty are better defined by probability distributions. Within ``robust``,
-we have a framework to generate random Monte Carlo (MC) simulations of the uncertain parameters
-to be able to determine the probability of constraint violation (i.e. probability of failure)
+we have a framework to generate Monte Carlo (MC) simulations of the uncertain parameters
+to estimate the probability of constraint violation (i.e. probability of failure [pof])
 of models, as well as the expectation and standard deviation of the objective cost.
 To generate samples of uncertain parameters and simulate a robust model's performance
 over these samples, we use the ``simulate`` module of ``robust``.
-Good implementations of ``robust.simulate`` are in `robustSPpaper`_.
+Good implementations of ``robust.simulate`` are in
+`robustSPpaper/SimPleAC_pof_simulate <https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_pof_simulate.py>`_.
 
-.. _robustSPpaper: https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_pof_simulate.py
-
-There is one additional step before GP models can be simulated. Every free variable
-that is *fixed* during MC simulation must have a ```fix = True``` attribute, as following:
+There is one additional step before GPkit models can be simulated. Every free variable
+that is *fixed* during MC simulation must have a ``fix = True`` attribute, as following:
 
 .. code-block:: python
 
         A         = Variable("A", "-", "aspect ratio", fix = True)
 
 This allows for the optimizer to know that these variables (eg. aspect ratio in aircraft design),
-once the optimization is complete, cannot change. Other variables, eg. state variables
+once the optimization is complete, cannot change under simulation. Other variables, eg. state variables
 such as speed and altitude of an aircraft, can change during MC simulation to fulfill constraints.
 
-There are a daunting number of parameters for the functions in this module.
+There are a daunting number of parameters for the functions in this module,
+most of which have little or no effect to optimization and simulation outcomes,
+but are necessary for the mathematics of RGPs.
 This I would recommend overcoming by creating a parameter function such as the following,
-which I have filled with defaults:
+which I have filled with some defaults:
 
 .. code-block:: python
 
@@ -104,10 +106,10 @@ which I have filled with defaults:
         number_of_time_average_solves, uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel,
                 nominal_number_of_constraints, nominal_solve_time]
 
-For Monte Carlo simulations, it is important to note that **the solution time is proportional
+Simulating a GPkit model is equivalent to optimizing the model over its remaining free variables (without
+the 'fix' attribute). For Monte Carlo simulations, it is important to note that **the solution time is proportional
 to the product of number of methods, uncertainty sets, gammas and samples**.
-Simulating a model is equivalent to optimizing the model over its remaining free variables (without
-the 'fix' attribute). As such, one MC simulation usually takes similar time to one
+As such, one MC simulation usually takes similar to slightly less time to one
 solution to the un-robustified model. Furthermore, MC simulations take *longer* for robustified
 models vs. unrobust ones, since infeasibility can be detected faster than a feasible solution.
 If in a time crunch, it is recommended that one method, set and gamma is chosen for simulation purposes.
@@ -124,9 +126,9 @@ Once the parameters are generated, the ``robust.simulate`` module can be used to
                                              uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel=parallel)
 
 It is highly recommended that you save/pickle the results, since MC simulations can have a large time cost.
-`robustSPpaper/SimPleAC_save`_ and  `robustSPpaper/SimPleAC_pof_simulate`_ have simple demonstrations of saving/pickling.
+`robustSPpaper/SimPleAC_save <https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_save.py>`_
+and other files in the ``simulate`` module
+have simple demonstrations of saving/pickling.
 
-..  _robustSPpaper/SimPleAC_pof_save: https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_save.py
-.. _robustSPpaper/SimPleAC_pof_simulate: https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_pof_simulate.py
 
 
