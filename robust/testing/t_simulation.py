@@ -8,6 +8,7 @@ from robust.margin import MarginModel
 from robust.robust import RobustModel
 from robust.simulations import simulate
 from robust.testing.models import simple_ac
+import pickle
 
 class TestSimulation(unittest.TestCase):
     solver = None
@@ -74,9 +75,14 @@ class TestSimulation(unittest.TestCase):
         esol = em.robustsolve(verbosity=0)
 
         soltab = [sol, msol, bsol, esol]
+        diff_idx = ['sol', 'msol', 'bsol', 'esol']
 
-        origfilename = os.path.dirname(__file__) + '/' + 'diffs/test_table.txt'
-        filename = os.path.dirname(__file__) + '/' + 'diffs/test_table_diff.txt'
+        for i in range(len(soltab)):
+            soltab[i].save(filename=os.path.dirname(__file__) + '/diffs/' + diff_idx[i] + '.pkl')
+            # soltab[i].save('diffs/' + diff_idx[i] + '.pkl')
+
+        filename = os.path.dirname(__file__) + '/diffs/test_table_diff.txt'
+        origfilename = os.path.dirname(__file__) + '/diffs/test_table.txt'
         f = open(filename, 'w+')
 
         for i in ['L/D', 'A', 'Re', 'S', 'V', 't_s', 'W_w', 'W_{w_{strc}}', 'W_{w_{surf}}',
@@ -98,7 +104,7 @@ class TestSimulation(unittest.TestCase):
         f.write('\n')
         f.close()
 
-        self.assertEqual(open(origfilename, 'r').readlines(), open(filename, 'r').readlines())
+        self.assertAlmostEqual(open(origfilename, 'r').readlines(), open(filename, 'r').readlines())
 
 TESTS = [TestSimulation]
 

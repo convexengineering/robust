@@ -106,6 +106,7 @@ which I have filled with some defaults:
         number_of_time_average_solves, uncertainty_sets, nominal_solution, directly_uncertain_vars_subs, parallel,
                 nominal_number_of_constraints, nominal_solve_time]
 
+
 Simulating a GPkit model is equivalent to optimizing the model over its remaining free variables (without
 the 'fix' attribute). For Monte Carlo simulations, it is important to note that **the solution time is proportional
 to the product of number of methods, uncertainty sets, gammas and samples**.
@@ -129,6 +130,5 @@ It is highly recommended that you save/pickle the results, since MC simulations 
 `robustSPpaper/SimPleAC_save <https://github.com/1ozturkbe/robustSPpaper/blob/master/code/SimPleAC_save.py>`_
 and other files in the ``simulate`` module
 have simple demonstrations of saving/pickling.
-
 
 
