@@ -77,15 +77,15 @@ def objective_proboffailure_vs_gamma(gammas, objective_values, objective_name, o
         ax1.fill_between(x, lowers, uppers,
                          alpha=0.5, edgecolor='#CC4F1B', facecolor='#FF9848')
     lines2 = ax2.plot(gammas, prob_of_failure, 'b-', label='Prob. of Fail.')
-    ax1.set_xlabel(r'Uncertainty Set Scaling Factor $\Gamma$', fontsize=18)
-    ax1.set_ylabel(objective_name + ' (' + objective_units.capitalize() + ')', fontsize=18)
-    ax2.set_ylabel("Probability of Failure", fontsize=18)
+    ax1.set_xlabel(r'Uncertainty Set Scaling Factor $\Gamma$', fontsize=16)
+    ax1.set_ylabel(objective_name + ' (' + objective_units.capitalize() + ')', fontsize=16)
+    ax2.set_ylabel("Probability of Failure", fontsize=16)
     ax1.set_ylim([min_obj, max_obj])
     # ax2.set_ylim([0, 1])
-    plt.title(title, fontsize=18)
+    plt.title(title, fontsize=16)
     lines = lines1 + lines2
     labs = [l.get_label() for l in lines]
-    ax1.legend(lines, labs, loc="upper center", fontsize=18, numpoints=1)
+    ax1.legend(lines, labs, loc="upper center", fontsize=16, numpoints=1)
     plt.show(block=False)
 
 
@@ -100,12 +100,12 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     lines2 = ax2.bar(x + [0.5] * len(methods),
                      relative_number_of_constraints,
                      [0.25] * len(methods), color='b', label='No. of Cons.')
-    ax1.set_ylabel("Scaled Average Cost", fontsize=18)
+    ax1.set_ylabel("Scaled Average Cost", fontsize=16)
     ax1.set_ylim([min(relative_objective_values) - 0.1*min(relative_objective_values),
                  max(relative_objective_values) + 0.1*max(relative_objective_values)])
-    ax2.set_ylabel("Scaled Number of Constraints", fontsize=18)
-    plt.xticks(x + .45, methods)
-    ax1.tick_params(axis='x', which='major', labelsize=17)
+    ax2.set_ylabel("Scaled Number of Constraints", fontsize=16)
+    plt.xticks(x + .35, methods)
+    ax1.tick_params(axis='x', which='major', labelsize=14)
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
@@ -123,10 +123,10 @@ def generate_comparison_plots(relative_objective_values, objective_name, relativ
     lines2 = ax2.bar(x + [0.5] * len(methods),
                      relative_solve_times,
                      [0.25] * len(methods), color='b', label='Solve Time')
-    ax1.set_ylabel("Scaled Setup Time", fontsize=18)
-    ax2.set_ylabel("Scaled Solve Time", fontsize=18)
-    plt.xticks(x + .45, methods)
-    ax1.tick_params(axis='x', which='major', labelsize=17)
+    ax1.set_ylabel("Scaled Setup Time", fontsize=16)
+    ax2.set_ylabel("Scaled Solve Time", fontsize=16)
+    plt.xticks(x + .35, methods)
+    ax1.tick_params(axis='x', which='major', labelsize=14)
     plt.title(uncertainty_set.capitalize() + ' Uncertainty Set', fontsize=18)
     lines = [lines1, lines2]
     labs = [l.get_label() for l in lines]
@@ -144,10 +144,10 @@ def generate_performance_vs_pwl_plots(numbers_of_linear_sections, method_perform
     for method in method_performance_dictionary:
         plt.plot(numbers_of_linear_sections, method_performance_dictionary[method], marker=next(marker),
                  linestyle='', label=method)
-    plt.xlabel("Number of Piecewise-linear Sections", fontsize=18)
-    plt.ylabel(objective_name + '(' + objective_units + ')', fontsize=18)
+    plt.xlabel("Number of Piecewise-linear Sections", fontsize=16)
+    plt.ylabel(objective_name + '(' + objective_units + ')', fontsize=16)
     plt.title('The ' + worst_case_or_average + ' Performance: ' + uncertainty_set.capitalize() + ' Uncertainty Set',
-              fontsize=18)
+              fontsize=16)
     plt.legend(loc=0, numpoints=1)
     plt.show(block=False)
 
