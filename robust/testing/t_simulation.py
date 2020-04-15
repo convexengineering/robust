@@ -78,11 +78,11 @@ class TestSimulation(unittest.TestCase):
         diff_idx = ['sol', 'msol', 'bsol', 'esol']
 
         for i in range(len(soltab)):
-            # soltab[i].save(filename=os.path.dirname(__file__) + '/diffs/' + diff_idx[i] + '.pkl')
-            soltab[i].save('diffs/' + diff_idx[i] + '.pkl')
+            soltab[i].save(filename=os.path.dirname(__file__) + '/diffs/' + diff_idx[i] + '.pkl')
+            # soltab[i].save('diffs/' + diff_idx[i] + '.pkl')
 
-        filename = 'diffs/test_table_diff.txt'
-        origfilename = 'diffs/test_table.txt'
+        filename = os.path.dirname(__file__) + '/diffs/test_table_diff.txt'
+        origfilename = os.path.dirname(__file__) + '/diffs/test_table.txt'
         f = open(filename, 'w+')
 
         for i in ['L/D', 'A', 'Re', 'S', 'V', 't_s', 'W_w', 'W_{w_{strc}}', 'W_{w_{surf}}',
