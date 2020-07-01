@@ -188,13 +188,6 @@ class SameModel(Model):
         self.cost = model.cost
         return constraints
 
-
-class EqualModel(Model):
-    def setup(self, model):
-        subs = model.substitutions
-        self.cost = model.cost
-        return model, subs
-
 def confirmSuccess(model, solution, uncertainsub):
     new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
     fail_success, cost = RobustGPTools.fail_or_success(new_model)
