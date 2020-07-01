@@ -1,6 +1,6 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
+
+
+
 from builtins import range
 from builtins import object
 from gpkit import Model, Variable, SignomialsEnabled
@@ -41,7 +41,7 @@ class RobustnessSetting(object):
             'iterationLimit': 10,
             'lognormal': True
         }
-        for key, value in options.items():
+        for key, value in list(options.items()):
             self._options[key] = value
 
         if self._options['twoTerm']:
@@ -157,7 +157,7 @@ class RobustModel(object):
             warnings.warn('Equality constraints will not be robustified.')
 
     def setup(self, verbosity=0, **options):
-        for option, key in options.items():
+        for option, key in list(options.items()):
             self.setting.set(option, key)
 
         start_time = time()

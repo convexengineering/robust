@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import division
+
+
 from builtins import range
 from builtins import object
 import numpy as np
@@ -89,7 +89,7 @@ class EquivalentPosynomials(object):
                 # Should streamline/speed up in the future.
                 new_no_data_posynomial = 0
                 hmap = NomialMap({HashVector(uncertain_vars_exps[i]): 1.0})
-                unitarr = [k.units**v for k, v in uncertain_vars_exps[i].items() if k.units]
+                unitarr = [k.units**v for k, v in list(uncertain_vars_exps[i].items()) if k.units]
                 try:
                     hmap.units = np.prod(unitarr)
                 except:

@@ -1,5 +1,5 @@
-from __future__ import print_function
-from __future__ import division
+
+
 from builtins import range
 from builtins import object
 from gpkit import Model, Variable, Monomial
@@ -89,7 +89,7 @@ class RobustGPTools(object):
             raise Exception('Dict size mismatch in monomial creation.')
         monmaps = [NomialMap({exps[i]: cs[i]}) for i in range(len(exps))]
         for monmap in monmaps:
-            monmap.units = [k.units**v for k, v in list(monmap.keys())[0].items() if k.units]
+            monmap.units = [k.units**v for k, v in list(list(monmap.keys())[0].items()) if k.units]
         mons = [Monomial(monmap) for monmap in monmaps]
         return mons
 
@@ -187,13 +187,6 @@ class SameModel(Model):
                 constraints += [cs.unsubbed[0] <= 1]
         self.cost = model.cost
         return constraints
-
-
-class EqualModel(Model):
-    def setup(self, model):
-        subs = model.substitutions
-        self.cost = model.cost
-        return model, subs
 
 def confirmSuccess(model, solution, uncertainsub):
     new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)

@@ -1,5 +1,5 @@
-from __future__ import print_function
-from __future__ import absolute_import
+
+
 from gpkit import Variable, Model
 import numpy as np
 

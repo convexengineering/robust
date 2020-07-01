@@ -1,5 +1,5 @@
 """Python setup script for robust"""
-from __future__ import print_function
+
 from distutils.core import setup
 
 description = """
@@ -36,5 +36,6 @@ setup(name='robust',
                 "robust.solar_model", "robust.synthetic_model", "robust.testing",
                 "robust.simulations"],
       package_data={"robust.data":['*.txt'], "robust.solar_model":['*.txt']},
+      python_requires=">=3.5.2",
       install_requires=['gpkit', 'gplibrary', 'numpy', 'matplotlib', 'scipy'])
 s
