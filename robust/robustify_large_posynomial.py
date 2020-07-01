@@ -1,5 +1,5 @@
-from __future__ import absolute_import
-from __future__ import division
+
+
 from builtins import map
 from builtins import zip
 from builtins import range
@@ -189,7 +189,7 @@ class RobustifyLargePosynomial(object):
         with no coefficients
         :return: The list of monomials
         """
-        monmaps = [NomialMap({exp: 1.}) for exp, c in self.p.hmap.items()]
+        monmaps = [NomialMap({exp: 1.}) for exp, c in list(self.p.hmap.items())]
         for monmap in monmaps:
             monmap.units = self.p.hmap.units
         mons = [Monomial(monmap) for monmap in monmaps]

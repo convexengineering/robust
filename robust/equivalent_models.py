@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 from gpkit import Model
 from gpkit.nomials import MonomialEquality, PosynomialInequality
 from gpkit.exceptions import InvalidGPConstraint

@@ -156,8 +156,8 @@ def generate_variable_gamma_plots(variable_gamma_file_path_name):
 
     gammas = list(dictionary_gamma.keys())
     gammas.sort()
-    methods = list(dictionary_gamma.values())[0].keys()
-    uncertainty_sets = list(dictionary_gamma.values())[0].values()[0].keys()
+    methods = list(list(dictionary_gamma.values())[0].keys())
+    uncertainty_sets = list(list(dictionary_gamma.values())[0].values())[0].keys()
     min_obj = min([dictionary_gamma[gamma][method][uncertainty_set]['Average performance']
                        for gamma in gammas
                        for method in methods
@@ -195,8 +195,8 @@ def generate_variable_pwl_plots(variable_pwl_file_path_name):
     dictionary_pwl, properties_pwl = read_simulation_data(variable_pwl_file_path_name)
     numbers_of_linear_sections = list(dictionary_pwl.keys())
     numbers_of_linear_sections.sort()
-    methods = list(dictionary_pwl.values())[0].keys()
-    uncertainty_sets = list(dictionary_pwl.values())[0].values()[0].keys()
+    methods = list(list(dictionary_pwl.values())[0].keys())
+    uncertainty_sets = list(list(dictionary_pwl.values())[0].values())[0].keys()
     for uncertainty_set in uncertainty_sets:
         method_average_objective_dictionary = \
             {method: [dictionary_pwl[number_of_linear_sections][method][uncertainty_set]['Average performance']
