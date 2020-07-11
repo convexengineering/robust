@@ -3,8 +3,8 @@
 from distutils.core import setup
 
 description = """
-generates and solves robust formulations for geometric and signomial programming. 
-Requires installations of `GPkit <https://github.com/convexengineering/gpkit>`_. 
+generates and solves robust formulations for geometric and signomial programming.
+Requires installations of `GPkit <https://github.com/convexengineering/gpkit>`_.
 """
 
 license = """MIT License
@@ -38,4 +38,3 @@ setup(name='robust',
       package_data={"robust.data":['*.txt'], "robust.solar_model":['*.txt']},
       python_requires=">=3.5.2",
       install_requires=['gpkit', 'gplibrary', 'numpy', 'matplotlib', 'scipy'])
-s
