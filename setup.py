@@ -38,4 +38,3 @@ setup(name='robust',
       package_data={"robust.data":['*.txt'], "robust.solar_model":['*.txt']},
       python_requires=">=3.5.2",
       install_requires=['gpkit', 'gplibrary', 'numpy', 'matplotlib', 'scipy'])
-s

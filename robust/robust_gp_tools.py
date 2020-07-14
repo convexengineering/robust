@@ -121,6 +121,10 @@ class RobustGPTools(object):
 
     @staticmethod
     def probability_of_failure(model, solution, directly_uncertain_vars_subs, number_of_iterations, verbosity=0, parallel=False):
+        def confirmSuccess(model, solution, uncertainsub):
+            new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
+            fail_success, cost = RobustGPTools.fail_or_success(new_model)
+            return cost
         if parallel:
             pool = mp.Pool(mp.cpu_count()-1)
             processes = []
@@ -132,7 +136,6 @@ class RobustGPTools(object):
             pool.join()
         else:
             results = [confirmSuccess(model, solution, directly_uncertain_vars_subs[i]) for i in range(number_of_iterations)]
-
         costs = [0 if i is None else mag(i) for i in results]
         if verbosity > 0:
             print(costs)
@@ -160,9 +163,9 @@ class RobustGPTools(object):
     def fail_or_success(model):
         try:
             try:
-                sol = model.solve(verbosity=0)
+                sol = model.solve(verbosity=0, reltol=1e-3)
             except InvalidGPConstraint:
-                sol = model.localsolve(verbosity=0)
+                sol = model.localsolve(verbosity=0, reltol=1e-3, use_pccp=True)
             return True, sol['cost']
         except:  # ValueError:
             return False, 0
@@ -187,11 +190,6 @@ class SameModel(Model):
                 constraints += [cs.unsubbed[0] <= 1]
         self.cost = model.cost
         return constraints
-
-def confirmSuccess(model, solution, uncertainsub):
-    new_model = RobustGPTools.DesignedModel(model, solution, uncertainsub)
-    fail_success, cost = RobustGPTools.fail_or_success(new_model)
-    return cost
 
 if __name__ == '__main__':
     pass
