@@ -3,8 +3,8 @@
 from distutils.core import setup
 
 description = """
-generates and solves robust formulations for geometric and signomial programming. 
-Requires installations of `GPkit <https://github.com/convexengineering/gpkit>`_. 
+generates and solves robust formulations for geometric and signomial programming.
+Requires installations of `GPkit <https://github.com/convexengineering/gpkit>`_.
 """
 
 license = """MIT License
