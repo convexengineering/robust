@@ -99,13 +99,12 @@ def simple_ac():
         'h_{cruise_m}': 5000 * units('m'),
         'Range_m': 3000 * units('km'),
         'W_{p_m}': 6250 * units('N'),
-        '\\rho_{p_m}' : 1500*units('kg/m^3'),
+        '\\rho_{p_m}': 1500*units('kg/m^3'),
         'C_m': 120 * units('1/hr'),
         'V_{min_m}': 25 * units('m/s'),
         'T/O factor_m': 2,
     })
-    c = Variable('c', '-', 'model cost')
-    m = Model(c, [m, c >= m['W_{f_m}'] * units('1/N') + m['C_m'] * m['t_m']])
+    m = Model(m['W_{f_m}'] * units('1/N') + m['C_m'] * m['t_m'], m, m.substitutions)
     return m
 
 

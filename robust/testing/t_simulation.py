@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import unittest
+from gpkit import units
 from gpkit.tests.helpers import run_tests
 from gpkit.small_scripts import mag
 
@@ -8,7 +9,6 @@ from robust.margin import MarginModel
 from robust.robust import RobustModel
 from robust.simulations import simulate
 from robust.testing.models import simple_ac
-import pickle
 
 class TestSimulation(unittest.TestCase):
     solver = None
@@ -18,13 +18,12 @@ class TestSimulation(unittest.TestCase):
             return  # cvxopt does not converge on these tests.
 
         model = simple_ac()
-        model.cost = model['c']
         number_of_time_average_solves = 3
         number_of_iterations = 10
         uncertainty_sets = ['box']
         methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False}]
         nGammas = 3
-        gammas = np.linspace(0, 1.0, nGammas)
+        gammas = np.linspace(0., 1., nGammas)
         min_num_of_linear_sections = 3
         max_num_of_linear_sections = 99
         linearization_tolerance = 1e-4
@@ -60,7 +59,6 @@ class TestSimulation(unittest.TestCase):
             return  # cvxopt does not converge on these tests.
 
         m = simple_ac()
-        m.cost = m['c']
         sol = m.localsolve(verbosity=0)
         gamma = 0.5
 
@@ -79,7 +77,6 @@ class TestSimulation(unittest.TestCase):
 
         for i in range(len(soltab)):
             soltab[i].save(filename=os.path.dirname(__file__) + '/diffs/' + diff_idx[i] + '.pkl')
-            # soltab[i].save('diffs/' + diff_idx[i] + '.pkl')
 
         filename = os.path.dirname(__file__) + '/diffs/test_table_diff.txt'
         origfilename = os.path.dirname(__file__) + '/diffs/test_table.txt'
@@ -103,8 +100,9 @@ class TestSimulation(unittest.TestCase):
         f.write(' '.join(["& " + str(np.format_float_scientific(i['cost'], precision=2)) for i in soltab]))
         f.write('\n')
         f.close()
-
-        self.assertAlmostEqual(open(origfilename, 'r').readlines(), open(filename, 'r').readlines())
+        a = open(origfilename, 'r').readlines()
+        b = open(filename, 'r').readlines()
+        self.assertAlmostEqual(a, b)
 
 TESTS = [TestSimulation]
 
