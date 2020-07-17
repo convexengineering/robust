@@ -104,6 +104,7 @@ class TestSimulation(unittest.TestCase):
         b = open(filename, 'r').readlines()
         self.assertTrue(a == b)
 
+
 TESTS = [TestSimulation]
 
 def test():
