@@ -165,8 +165,11 @@ class RobustGPTools(object):
             try:
                 sol = model.solve(verbosity=0, reltol=1e-3)
             except InvalidGPConstraint:
-                sp = model.sp(use_pccp = False)
+                sp = model.sp(use_pccp = True, pccp_penalty=500)
+                EPS = 1e-6
                 sol = sp.localsolve(verbosity=0, reltol=1e-3)
+                if abs(sol(sp.slack) - 1) >= EPS:
+                    return False, 0
             return True, sol['cost']
         except:  # ValueError:
             return False, 0
