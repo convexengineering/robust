@@ -33,7 +33,7 @@ if __name__ == '__main__':
                     'Linearized Perturbations': {'twoTerm': False, 'boyd': False, 'simpleModel': False},
                     'Simple Conservative': {'twoTerm': False, 'boyd': False, 'simpleModel': True},
                     'Two Term': {'twoTerm': False, 'boyd': True, 'simpleModel': False}}
-    uncertainty_sets = ['box', 'elliptical']
+    uncertainty_sets = ['box', 'ellipsoidal']
 
     # a_synthetic_model = Models.synthetic_model(15)
     model = models.test_synthetic_model()

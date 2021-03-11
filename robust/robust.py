@@ -26,7 +26,7 @@ class RobustnessSetting(object):
             'gamma': 1,
             'simpleModel': False,
             'numberOfRegressionPoints': 2,
-            'numberOfRegressionPointsElliptical': 25,
+            'numberOfRegressionPointsEllipsoidal': 25,
             'linearizeTwoTerm': True,
             'enableSP': True,
             'boyd': False,
@@ -92,8 +92,8 @@ class RobustModel(object):
             self.dependent_uncertainty_set = False
         else:
             self.dependent_uncertainty_set = True
-            if self.type_of_uncertainty_set == 'elliptical':
-                self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsElliptical'))
+            if self.type_of_uncertainty_set == 'ellipsoidal':
+                self.setting.set('numberOfRegressionPoints', self.setting.get('numberOfRegressionPointsEllipsoidal'))
 
         self.ready_gp_constraints = []
         self.to_linearize_gp_posynomials = [] # two-term posynomials
@@ -300,13 +300,13 @@ class RobustModel(object):
 
             if self.type_of_uncertainty_set == 'box':
                 l_norm += np.abs(pert)
-            elif self.type_of_uncertainty_set == 'elliptical':
+            elif self.type_of_uncertainty_set == 'ellipsoidal':
                 l_norm += pert ** 2
             elif self.type_of_uncertainty_set == 'one norm':
                 l_norm = max(l_norm, np.abs(pert))
             else:
                 raise Exception('This type of set is not supported')
-        if self.type_of_uncertainty_set == 'elliptical':
+        if self.type_of_uncertainty_set == 'ellipsoidal':
             l_norm = np.sqrt(l_norm)
         g = self.setting.get('gamma')
         # Fifth order Taylor approx of the e**gamma, so that gamma can be a variable

@@ -22,7 +22,7 @@ are carried by nominal models but only come into effect when **robust** is appli
 
 Once you have added uncertainties to parameters, and created a GPkit model,
 robustifying said model and solving it is easy. The most straight-forward
-inputs for uncertainty_set are 'box' or 'elliptical'. *gamma* defines the size of
+inputs for uncertainty_set are 'box' or 'ellipsoidal'. *gamma* defines the size of
 the uncertainty set protected against, where *gamma=1* protects against :math:`3\sigma`
 uncertainty.
 

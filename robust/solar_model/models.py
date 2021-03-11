@@ -33,7 +33,7 @@ if __name__ == '__main__':
                {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                {'name': 'Simple Cons.', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
                {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
-    uncertainty_sets = ['box', 'elliptical']
+    uncertainty_sets = ['box', 'ellipsoidal']
 
     model = mike_solar_model(20)
 
@@ -51,7 +51,7 @@ if __name__ == '__main__':
     methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
-    uncertainty_sets = ['box', 'elliptical']
+    uncertainty_sets = ['box', 'ellipsoidal']
 
     variable_pwl_file_name = os.path.dirname(__file__) + '/simulation_data_variable_pwl.txt'
     simulate.print_variable_pwlsections_results(model, model_name, gamma, number_of_iterations,

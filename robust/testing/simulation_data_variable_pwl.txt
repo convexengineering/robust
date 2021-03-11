@@ -27,7 +27,7 @@ number of piecewise-linear sections = 12:
 			Relative solve time: 1.04874321077
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 566.005461529
 			Relative average performance: 1.39602868794
@@ -56,7 +56,7 @@ number of piecewise-linear sections = 12:
 			Relative solve time: 0.85043726831
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 565.716040623
 			Relative average performance: 1.39531484344
@@ -85,7 +85,7 @@ number of piecewise-linear sections = 12:
 			Relative solve time: 1.06382841882
 			Number of linear sections: 12
 			Upper lower relative error: 0.0423145667697
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.004
 			Average performance: 568.443944971
 			Relative average performance: 1.40204310489
@@ -115,7 +115,7 @@ number of piecewise-linear sections = 14:
 			Relative solve time: 0.949632174882
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 565.322681933
 			Relative average performance: 1.39434464076
@@ -144,7 +144,7 @@ number of piecewise-linear sections = 14:
 			Relative solve time: 0.95596093538
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 565.111221092
 			Relative average performance: 1.39382308148
@@ -173,7 +173,7 @@ number of piecewise-linear sections = 14:
 			Relative solve time: 1.15891996281
 			Number of linear sections: 14
 			Upper lower relative error: 0.0334141883288
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.004
 			Average performance: 566.504828885
 			Relative average performance: 1.39726035654
@@ -203,7 +203,7 @@ number of piecewise-linear sections = 15:
 			Relative solve time: 0.940169562197
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.746915573
 			Relative average performance: 1.39292453723
@@ -232,7 +232,7 @@ number of piecewise-linear sections = 15:
 			Relative solve time: 1.12328078668
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.74691567
 			Relative average performance: 1.39292453747
@@ -261,7 +261,7 @@ number of piecewise-linear sections = 15:
 			Relative solve time: 1.00068139503
 			Number of linear sections: 15
 			Upper lower relative error: 0.0267224331386
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 566.098832911
 			Relative average performance: 1.39625898453
@@ -291,7 +291,7 @@ number of piecewise-linear sections = 16:
 			Relative solve time: 0.842146020607
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.895996646
 			Relative average performance: 1.39329223943
@@ -320,7 +320,7 @@ number of piecewise-linear sections = 16:
 			Relative solve time: 0.847494406629
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.738631849
 			Relative average performance: 1.39290410577
@@ -349,7 +349,7 @@ number of piecewise-linear sections = 16:
 			Relative solve time: 1.06309313797
 			Number of linear sections: 16
 			Upper lower relative error: 0.0244707150936
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 565.033351699
 			Relative average performance: 1.3936310199
@@ -379,7 +379,7 @@ number of piecewise-linear sections = 17:
 			Relative solve time: 0.950910007837
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.770181784
 			Relative average performance: 1.39298192236
@@ -408,7 +408,7 @@ number of piecewise-linear sections = 17:
 			Relative solve time: 0.952780584935
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.770181932
 			Relative average performance: 1.39298192272
@@ -437,7 +437,7 @@ number of piecewise-linear sections = 17:
 			Relative solve time: 1.09497747116
 			Number of linear sections: 17
 			Upper lower relative error: 0.0197791888029
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 566.04306531
 			Relative average performance: 1.39612143609
@@ -467,7 +467,7 @@ number of piecewise-linear sections = 18:
 			Relative solve time: 1.26913778107
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.609120033
 			Relative average performance: 1.39258467032
@@ -496,7 +496,7 @@ number of piecewise-linear sections = 18:
 			Relative solve time: 0.851434373467
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.491470653
 			Relative average performance: 1.39229449306
@@ -525,7 +525,7 @@ number of piecewise-linear sections = 18:
 			Relative solve time: 1.19417172589
 			Number of linear sections: 18
 			Upper lower relative error: 0.0183958611519
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.467830347
 			Relative average performance: 1.39223618524
@@ -555,7 +555,7 @@ number of piecewise-linear sections = 20:
 			Relative solve time: 0.973082506378
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.405569959
 			Relative average performance: 1.39208262261
@@ -584,7 +584,7 @@ number of piecewise-linear sections = 20:
 			Relative solve time: 0.952837947271
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.336830483
 			Relative average performance: 1.39191307958
@@ -613,7 +613,7 @@ number of piecewise-linear sections = 20:
 			Relative solve time: 1.03376881631
 			Number of linear sections: 20
 			Upper lower relative error: 0.0149860254854
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.770838573
 			Relative average performance: 1.3929835423
@@ -643,7 +643,7 @@ number of piecewise-linear sections = 22:
 			Relative solve time: 0.960530149666
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.300387502
 			Relative average performance: 1.3918231945
@@ -672,7 +672,7 @@ number of piecewise-linear sections = 22:
 			Relative solve time: 0.90982510354
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.30037317
 			Relative average performance: 1.39182315915
@@ -701,7 +701,7 @@ number of piecewise-linear sections = 22:
 			Relative solve time: 1.08685287843
 			Number of linear sections: 22
 			Upper lower relative error: 0.0122912063805
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 565.41377104
 			Relative average performance: 1.39456930821
@@ -731,7 +731,7 @@ number of piecewise-linear sections = 24:
 			Relative solve time: 0.943805769391
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.302735326
 			Relative average performance: 1.39182898531
@@ -760,7 +760,7 @@ number of piecewise-linear sections = 24:
 			Relative solve time: 0.835906128275
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.302735733
 			Relative average performance: 1.39182898632
@@ -789,7 +789,7 @@ number of piecewise-linear sections = 24:
 			Relative solve time: 1.11268548513
 			Number of linear sections: 24
 			Upper lower relative error: 0.010259465734
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 566.209465333
 			Relative average performance: 1.39653185476
@@ -819,7 +819,7 @@ number of piecewise-linear sections = 26:
 			Relative solve time: 0.959055894165
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.327708673
 			Relative average performance: 1.39189058102
@@ -848,7 +848,7 @@ number of piecewise-linear sections = 26:
 			Relative solve time: 1.12281145847
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.327709227
 			Relative average performance: 1.39189058239
@@ -877,7 +877,7 @@ number of piecewise-linear sections = 26:
 			Relative solve time: 1.1129229739
 			Number of linear sections: 26
 			Upper lower relative error: 0.00858880793517
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.879661368
 			Relative average performance: 1.39325194915
@@ -907,7 +907,7 @@ number of piecewise-linear sections = 28:
 			Relative solve time: 1.11792848959
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.365781108
 			Relative average performance: 1.39198448508
@@ -936,7 +936,7 @@ number of piecewise-linear sections = 28:
 			Relative solve time: 0.953654926001
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.365801924
 			Relative average performance: 1.39198453642
@@ -965,7 +965,7 @@ number of piecewise-linear sections = 28:
 			Relative solve time: 1.07132093945
 			Number of linear sections: 28
 			Upper lower relative error: 0.00737929485081
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.875178915
 			Relative average performance: 1.39324089337
@@ -995,7 +995,7 @@ number of piecewise-linear sections = 30:
 			Relative solve time: 1.18097078367
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.41120082
 			Relative average performance: 1.3920965109
@@ -1024,7 +1024,7 @@ number of piecewise-linear sections = 30:
 			Relative solve time: 0.864075381063
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.411226998
 			Relative average performance: 1.39209657546
@@ -1053,7 +1053,7 @@ number of piecewise-linear sections = 30:
 			Relative solve time: 1.13124741571
 			Number of linear sections: 30
 			Upper lower relative error: 0.00640695051328
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.857270554
 			Relative average performance: 1.39319672315
@@ -1083,7 +1083,7 @@ number of piecewise-linear sections = 32:
 			Relative solve time: 0.960471918203
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.46041502
 			Relative average performance: 1.39221789565
@@ -1112,7 +1112,7 @@ number of piecewise-linear sections = 32:
 			Relative solve time: 0.8580269138
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.460441088
 			Relative average performance: 1.39221795995
@@ -1141,7 +1141,7 @@ number of piecewise-linear sections = 32:
 			Relative solve time: 1.2723431189
 			Number of linear sections: 32
 			Upper lower relative error: 0.00556194746076
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.830501656
 			Relative average performance: 1.39313069879
@@ -1171,7 +1171,7 @@ number of piecewise-linear sections = 36:
 			Relative solve time: 1.01795267303
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.562156122
 			Relative average performance: 1.3924688358
@@ -1200,7 +1200,7 @@ number of piecewise-linear sections = 36:
 			Relative solve time: 0.878649325569
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.562156139
 			Relative average performance: 1.39246883585
@@ -1229,7 +1229,7 @@ number of piecewise-linear sections = 36:
 			Relative solve time: 1.19529029145
 			Number of linear sections: 36
 			Upper lower relative error: 0.00436621477971
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.215914524
 			Relative average performance: 1.39161484545
@@ -1259,7 +1259,7 @@ number of piecewise-linear sections = 44:
 			Relative solve time: 1.22881010307
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.514607747
 			Relative average performance: 1.39235155974
@@ -1288,7 +1288,7 @@ number of piecewise-linear sections = 44:
 			Relative solve time: 0.958634150624
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.306971748
 			Relative average performance: 1.39183943427
@@ -1317,7 +1317,7 @@ number of piecewise-linear sections = 44:
 			Relative solve time: 1.33044008428
 			Number of linear sections: 44
 			Upper lower relative error: 0.00287763629272
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.857535293
 			Relative average performance: 1.39319737612
@@ -1347,7 +1347,7 @@ number of piecewise-linear sections = 52:
 			Relative solve time: 0.959114342909
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.230688863
 			Relative average performance: 1.39165128574
@@ -1376,7 +1376,7 @@ number of piecewise-linear sections = 52:
 			Relative solve time: 1.03536757416
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.224916853
 			Relative average performance: 1.39163704932
@@ -1405,7 +1405,7 @@ number of piecewise-linear sections = 52:
 			Relative solve time: 1.25559223027
 			Number of linear sections: 52
 			Upper lower relative error: 0.00204670922015
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.321482623
 			Relative average performance: 1.39187522473
@@ -1435,7 +1435,7 @@ number of piecewise-linear sections = 60:
 			Relative solve time: 1.15274916602
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.336127355
 			Relative average performance: 1.39191134535
@@ -1464,7 +1464,7 @@ number of piecewise-linear sections = 60:
 			Relative solve time: 1.09143838883
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.336128029
 			Relative average performance: 1.39191134701
@@ -1493,7 +1493,7 @@ number of piecewise-linear sections = 60:
 			Relative solve time: 1.24800801682
 			Number of linear sections: 60
 			Upper lower relative error: 0.00155873235463
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.605858091
 			Relative average performance: 1.39257662488
@@ -1523,7 +1523,7 @@ number of piecewise-linear sections = 70:
 			Relative solve time: 0.855030600851
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.482916063
 			Relative average performance: 1.39227339353
@@ -1552,7 +1552,7 @@ number of piecewise-linear sections = 70:
 			Relative solve time: 0.952890312132
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.326424519
 			Relative average performance: 1.39188741371
@@ -1581,7 +1581,7 @@ number of piecewise-linear sections = 70:
 			Relative solve time: 1.64621474851
 			Number of linear sections: 70
 			Upper lower relative error: 0.00112677454889
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.183342008
 			Relative average performance: 1.39153450671
@@ -1611,7 +1611,7 @@ number of piecewise-linear sections = 80:
 			Relative solve time: 0.844183469956
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.307138753
 			Relative average performance: 1.39183984618
@@ -1640,7 +1640,7 @@ number of piecewise-linear sections = 80:
 			Relative solve time: 0.957014533747
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.22589454
 			Relative average performance: 1.39163946074
@@ -1669,7 +1669,7 @@ number of piecewise-linear sections = 80:
 			Relative solve time: 1.38753603343
 			Number of linear sections: 80
 			Upper lower relative error: 0.000875334332261
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.601924584
 			Relative average performance: 1.39256692304

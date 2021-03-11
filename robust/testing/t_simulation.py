@@ -68,8 +68,8 @@ class TestSimulation(unittest.TestCase):
         # Model with box uncertainty
         bm = RobustModel(m, 'box', gamma=gamma, twoTerm = True, boyd = False, simpleModel = False)
         bsol = bm.robustsolve(verbosity=0)
-        # Model with elliptical uncertainty
-        em = RobustModel(m, 'elliptical', gamma=gamma, twoTerm = True, boyd = False, simpleModel = False)
+        # Model with ellipsoidal uncertainty
+        em = RobustModel(m, 'ellipsoidal', gamma=gamma, twoTerm = True, boyd = False, simpleModel = False)
         esol = em.robustsolve(verbosity=0)
 
         soltab = [sol, msol, bsol, esol]

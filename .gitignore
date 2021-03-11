@@ -76,3 +76,7 @@ test_reports_nounits/
 
 # OSX
 .DS_Store
+
+# More...
+*.pkl
+test_table_diff.txt

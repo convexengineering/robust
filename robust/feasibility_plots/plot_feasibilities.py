@@ -112,7 +112,7 @@ def plot_feasibilities(x, y, m, rm=None, design_feasibility=True, skipfailures=F
             x_center = np.log(xo)
             y_center = np.log(yo)
             ax.plot(np.exp(x_center), np.exp(y_center), "kx")
-            if rmtype == "elliptical":
+            if rmtype == "ellipsoidal":
                 th = np.linspace(0, 2 * np.pi, 50)
                 ax.plot(np.exp(x_center) * np.exp(np.cos(th)) ** (np.log(xo) + eta_x - x_center),
                         np.exp(y_center) * np.exp(np.sin(th)) ** (np.log(yo) + eta_y - y_center), "k",

@@ -37,7 +37,7 @@ class TestPrimitives(unittest.TestCase):
         nominal_cost = m.localsolve(verbosity=0)['cost']
         box_cost = [RobustModel(m, 'box', gamma = gammas[i]).robustsolve(verbosity=0)['cost']
                     for i in range(n)]/(np.ones(n)*nominal_cost)
-        ell_cost = [RobustModel(m, 'elliptical', gamma = gammas[i]).robustsolve(verbosity=0)['cost']
+        ell_cost = [RobustModel(m, 'ellipsoidal', gamma = gammas[i]).robustsolve(verbosity=0)['cost']
                     for i in range(n)]/(np.ones(n)*nominal_cost)
         self.assertTrue(all(box_cost >= nominal_cost))
         self.assertTrue(all(ell_cost >= nominal_cost))
@@ -51,7 +51,7 @@ class TestPrimitives(unittest.TestCase):
             robust_goal_bm = RobustModel(gm, 'box', gamma=Gamma)
             goal_box_gamma.append(robust_goal_bm.robustsolve(verbosity=0)['cost']**-1)
             gm.substitutions.update({'1+\\delta': ell_cost[i]})
-            robust_goal_em = RobustModel(gm, 'elliptical', gamma=Gamma)
+            robust_goal_em = RobustModel(gm, 'ellipsoidal', gamma=Gamma)
             goal_ell_gamma.append(robust_goal_em.robustsolve(verbosity=0)['cost']**-1)
             self.assertAlmostEqual(goal_box_gamma[i-1], gammas[i], places=5)
             self.assertAlmostEqual(goal_ell_gamma[i-1], gammas[i], places=5)
@@ -60,7 +60,7 @@ class TestPrimitives(unittest.TestCase):
         """ Testing conservativeness of solution methods"""
         m = gp_test_model()
         sm = m.solve(verbosity=0)
-        sem = RobustModel(m, 'elliptical').robustsolve(verbosity=0)
+        sem = RobustModel(m, 'ellipsoidal').robustsolve(verbosity=0)
         smm = MarginModel(m).solve(verbosity=0)
         sbm = RobustModel(m, 'box').robustsolve(verbosity=0)
         self.assertTrue(sm['cost'] <= sem['cost'] <= smm['cost'] <= sbm['cost'])
@@ -99,7 +99,7 @@ class TestPrimitives(unittest.TestCase):
                    {'name': 'SimpleConservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
                    # {'name': 'TwoTerm', 'twoTerm': False, 'boyd': True, 'simpleModel': False}
                    ]
-        uncertainty_sets = ['box', 'elliptical']
+        uncertainty_sets = ['box', 'ellipsoidal']
         gamma = 0.5
         for method in methods:
             for uncertainty_set in uncertainty_sets:

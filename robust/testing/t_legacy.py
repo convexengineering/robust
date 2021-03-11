@@ -30,7 +30,7 @@ class TestLegacy(unittest.TestCase):
                    {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                    {'name': 'Simple Cons.', 'twoTerm': False, 'boyd': False, 'simpleModel': True},
                    {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
-        uncertainty_sets = ['box', 'elliptical']
+        uncertainty_sets = ['box', 'ellipsoidal']
 
         variable_gamma_file_name = os.path.dirname(__file__) + '/' + \
                                    model_name + '_simulation_data_variable_gamma.txt'
@@ -47,7 +47,7 @@ class TestLegacy(unittest.TestCase):
         methods = [{'name': 'Best Pairs', 'twoTerm': True, 'boyd': False, 'simpleModel': False},
                    {'name': 'Linear. Perts.', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                    {'name': 'Two Term', 'twoTerm': False, 'boyd': True, 'simpleModel': False}]
-        uncertainty_sets = ['box', 'elliptical']
+        uncertainty_sets = ['box', 'ellipsoidal']
 
         variable_pwl_file_name = os.path.dirname(__file__) + '/' + \
                                  model_name + '_simulation_data_variable_pwl.txt'

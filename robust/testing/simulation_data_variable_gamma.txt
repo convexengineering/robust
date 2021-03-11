@@ -28,7 +28,7 @@ Gamma = 0:
 			Relative solve time: 0.990348569625
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.511
 			Average performance: 330.863666544
 			Relative average performance: 0.81606133101
@@ -57,7 +57,7 @@ Gamma = 0:
 			Relative solve time: 1.11296208458
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.511
 			Average performance: 330.864780761
 			Relative average performance: 0.816064079178
@@ -86,7 +86,7 @@ Gamma = 0:
 			Relative solve time: 0.895870411529
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.512
 			Average performance: 330.65115242
 			Relative average performance: 0.815537173852
@@ -115,7 +115,7 @@ Gamma = 0:
 			Relative solve time: 1.26402427644
 			Number of linear sections: 64
 			Upper lower relative error: 0.000982782724112
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.513
 			Average performance: 329.81004971
 			Relative average performance: 0.813462629359
@@ -145,7 +145,7 @@ Gamma = 0.05:
 			Relative solve time: 0.970766067484
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.511
 			Average performance: 331.012073997
 			Relative average performance: 0.816427371756
@@ -174,7 +174,7 @@ Gamma = 0.05:
 			Relative solve time: 1.71951142934
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.511
 			Average performance: 331.011087584
 			Relative average performance: 0.81642493881
@@ -203,7 +203,7 @@ Gamma = 0.05:
 			Relative solve time: 1.54917288508
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.508
 			Average performance: 331.499078536
 			Relative average performance: 0.817628547989
@@ -232,7 +232,7 @@ Gamma = 0.05:
 			Relative solve time: 1.30148774869
 			Number of linear sections: 64
 			Upper lower relative error: 0.000983300581932
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.508
 			Average performance: 331.507653515
 			Relative average performance: 0.817649697813
@@ -262,7 +262,7 @@ Gamma = 0.1:
 			Relative solve time: 1.95509941393
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.503
 			Average performance: 333.509524794
 			Relative average performance: 0.822587229207
@@ -291,7 +291,7 @@ Gamma = 0.1:
 			Relative solve time: 1.63166361857
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.503
 			Average performance: 333.502581167
 			Relative average performance: 0.822570103044
@@ -320,7 +320,7 @@ Gamma = 0.1:
 			Relative solve time: 1.92573054955
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.504
 			Average performance: 333.331954767
 			Relative average performance: 0.822149260196
@@ -349,7 +349,7 @@ Gamma = 0.1:
 			Relative solve time: 2.2448722091
 			Number of linear sections: 64
 			Upper lower relative error: 0.000983310062367
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.504
 			Average performance: 333.311255805
 			Relative average performance: 0.822098207078
@@ -379,7 +379,7 @@ Gamma = 0.15:
 			Relative solve time: 1.80820707282
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.497
 			Average performance: 336.090583662
 			Relative average performance: 0.828953302452
@@ -408,7 +408,7 @@ Gamma = 0.15:
 			Relative solve time: 2.05663227027
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.497
 			Average performance: 336.065582303
 			Relative average performance: 0.828891637649
@@ -437,7 +437,7 @@ Gamma = 0.15:
 			Relative solve time: 1.62247586708
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.497
 			Average performance: 336.177908523
 			Relative average performance: 0.829168685551
@@ -466,7 +466,7 @@ Gamma = 0.15:
 			Relative solve time: 2.53828620894
 			Number of linear sections: 64
 			Upper lower relative error: 0.000983273264116
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.497
 			Average performance: 336.106310441
 			Relative average performance: 0.828992091892
@@ -496,7 +496,7 @@ Gamma = 0.2:
 			Relative solve time: 1.73174872776
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.487
 			Average performance: 338.653615836
 			Relative average performance: 0.835274913612
@@ -525,7 +525,7 @@ Gamma = 0.2:
 			Relative solve time: 1.63049833747
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.486
 			Average performance: 338.857615161
 			Relative average performance: 0.835778069376
@@ -554,7 +554,7 @@ Gamma = 0.2:
 			Relative solve time: 2.05793226594
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.485
 			Average performance: 338.889492396
 			Relative average performance: 0.835856693238
@@ -583,7 +583,7 @@ Gamma = 0.2:
 			Relative solve time: 2.29355675384
 			Number of linear sections: 64
 			Upper lower relative error: 0.000991852410828
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.486
 			Average performance: 338.474595778
 			Relative average performance: 0.834833368162
@@ -613,7 +613,7 @@ Gamma = 0.25:
 			Relative solve time: 2.81870199028
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.466
 			Average performance: 344.714891014
 			Relative average performance: 0.850224794151
@@ -642,7 +642,7 @@ Gamma = 0.25:
 			Relative solve time: 1.7194458103
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.465
 			Average performance: 344.810394355
 			Relative average performance: 0.850460349129
@@ -671,7 +671,7 @@ Gamma = 0.25:
 			Relative solve time: 1.66393406113
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.463
 			Average performance: 345.41635959
 			Relative average performance: 0.85195493692
@@ -700,7 +700,7 @@ Gamma = 0.25:
 			Relative solve time: 2.40655121338
 			Number of linear sections: 64
 			Upper lower relative error: 0.000990926033953
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.465
 			Average performance: 344.780537533
 			Relative average performance: 0.850386708533
@@ -730,7 +730,7 @@ Gamma = 0.3:
 			Relative solve time: 1.70092255585
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.446
 			Average performance: 351.440380073
 			Relative average performance: 0.866812930317
@@ -759,7 +759,7 @@ Gamma = 0.3:
 			Relative solve time: 1.72554555602
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.443
 			Average performance: 352.107532771
 			Relative average performance: 0.868458434416
@@ -788,7 +788,7 @@ Gamma = 0.3:
 			Relative solve time: 1.71613248353
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.44
 			Average performance: 352.886191229
 			Relative average performance: 0.870378962783
@@ -817,7 +817,7 @@ Gamma = 0.3:
 			Relative solve time: 2.20680404222
 			Number of linear sections: 64
 			Upper lower relative error: 0.000999438108154
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.447
 			Average performance: 351.253067847
 			Relative average performance: 0.866350932584
@@ -847,7 +847,7 @@ Gamma = 0.35:
 			Relative solve time: 1.77381335469
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.42
 			Average performance: 358.890023737
 			Relative average performance: 0.88518716339
@@ -876,7 +876,7 @@ Gamma = 0.35:
 			Relative solve time: 1.5556782955
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.42
 			Average performance: 359.134448406
 			Relative average performance: 0.885790026564
@@ -905,7 +905,7 @@ Gamma = 0.35:
 			Relative solve time: 1.61200050496
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.413
 			Average performance: 360.450194918
 			Relative average performance: 0.889035260051
@@ -934,7 +934,7 @@ Gamma = 0.35:
 			Relative solve time: 2.61770153898
 			Number of linear sections: 65
 			Upper lower relative error: 0.00096921840155
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.42
 			Average performance: 358.579760828
 			Relative average performance: 0.884421912962
@@ -964,7 +964,7 @@ Gamma = 0.4:
 			Relative solve time: 1.93247496971
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.395
 			Average performance: 365.358950958
 			Relative average performance: 0.901142500564
@@ -993,7 +993,7 @@ Gamma = 0.4:
 			Relative solve time: 1.68872110888
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.395
 			Average performance: 365.401408134
 			Relative average performance: 0.901247219405
@@ -1022,7 +1022,7 @@ Gamma = 0.4:
 			Relative solve time: 1.81065540163
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.386
 			Average performance: 367.140861881
 			Relative average performance: 0.90553750898
@@ -1051,7 +1051,7 @@ Gamma = 0.4:
 			Relative solve time: 1.65972748979
 			Number of linear sections: 65
 			Upper lower relative error: 0.00097844118739
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.395
 			Average performance: 365.347871026
 			Relative average performance: 0.901115172377
@@ -1081,7 +1081,7 @@ Gamma = 0.5:
 			Relative solve time: 0.995338658325
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.333
 			Average performance: 382.557584163
 			Relative average performance: 0.943562206695
@@ -1110,7 +1110,7 @@ Gamma = 0.5:
 			Relative solve time: 0.951098825528
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.333
 			Average performance: 382.604233366
 			Relative average performance: 0.943677264996
@@ -1139,7 +1139,7 @@ Gamma = 0.5:
 			Relative solve time: 0.854465234187
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.321
 			Average performance: 386.193971733
 			Relative average performance: 0.95253120384
@@ -1168,7 +1168,7 @@ Gamma = 0.5:
 			Relative solve time: 1.43419594844
 			Number of linear sections: 65
 			Upper lower relative error: 0.000988518353781
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.335
 			Average performance: 381.887147097
 			Relative average performance: 0.941908601844
@@ -1198,7 +1198,7 @@ Gamma = 0.6:
 			Relative solve time: 1.2218866429
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.226
 			Average performance: 411.409049298
 			Relative average performance: 1.01472313315
@@ -1227,7 +1227,7 @@ Gamma = 0.6:
 			Relative solve time: 1.25229889341
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.226
 			Average performance: 411.449045094
 			Relative average performance: 1.01482178109
@@ -1256,7 +1256,7 @@ Gamma = 0.6:
 			Relative solve time: 0.984485660828
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.206
 			Average performance: 416.966884972
 			Relative average performance: 1.0284313013
@@ -1285,7 +1285,7 @@ Gamma = 0.6:
 			Relative solve time: 1.69338353697
 			Number of linear sections: 66
 			Upper lower relative error: 0.000986431486493
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.226
 			Average performance: 411.100925914
 			Relative average performance: 1.01396315976
@@ -1315,7 +1315,7 @@ Gamma = 0.7:
 			Relative solve time: 0.958445332933
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.131
 			Average performance: 442.026063374
 			Relative average performance: 1.09023871187
@@ -1344,7 +1344,7 @@ Gamma = 0.7:
 			Relative solve time: 1.02048987001
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.132
 			Average performance: 442.539010493
 			Relative average performance: 1.09150387439
@@ -1373,7 +1373,7 @@ Gamma = 0.7:
 			Relative solve time: 1.11825137001
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.107
 			Average performance: 451.819786691
 			Relative average performance: 1.11439451891
@@ -1402,7 +1402,7 @@ Gamma = 0.7:
 			Relative solve time: 1.28603120641
 			Number of linear sections: 67
 			Upper lower relative error: 0.000982178249114
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.132
 			Average performance: 442.498160728
 			Relative average performance: 1.09140312016
@@ -1432,7 +1432,7 @@ Gamma = 0.8:
 			Relative solve time: 1.10418803722
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.066
 			Average performance: 473.842830925
 			Relative average performance: 1.16871343213
@@ -1461,7 +1461,7 @@ Gamma = 0.8:
 			Relative solve time: 0.981040878704
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.066
 			Average performance: 473.986568533
 			Relative average performance: 1.1690679549
@@ -1490,7 +1490,7 @@ Gamma = 0.8:
 			Relative solve time: 0.962251237038
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.046
 			Average performance: 488.431677594
 			Relative average performance: 1.20469620943
@@ -1519,7 +1519,7 @@ Gamma = 0.8:
 			Relative solve time: 1.2978030877
 			Number of linear sections: 69
 			Upper lower relative error: 0.00097060636029
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.066
 			Average performance: 473.853205726
 			Relative average performance: 1.16873902114
@@ -1549,7 +1549,7 @@ Gamma = 0.9:
 			Relative solve time: 1.28383144773
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.026
 			Average performance: 512.408242989
 			Relative average performance: 1.26383340051
@@ -1578,7 +1578,7 @@ Gamma = 0.9:
 			Relative solve time: 1.01820211228
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.025
 			Average performance: 512.68906054
 			Relative average performance: 1.2645260252
@@ -1607,7 +1607,7 @@ Gamma = 0.9:
 			Relative solve time: 0.860633423599
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.014
 			Average performance: 535.1732436
 			Relative average performance: 1.31998231796
@@ -1636,7 +1636,7 @@ Gamma = 0.9:
 			Relative solve time: 2.17797686082
 			Number of linear sections: 71
 			Upper lower relative error: 0.000976122862392
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.024
 			Average performance: 513.059970155
 			Relative average performance: 1.26544085818
@@ -1666,7 +1666,7 @@ Gamma = 1:
 			Relative solve time: 1.89187851439
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.250544525
 			Relative average performance: 1.39170025889
@@ -1695,7 +1695,7 @@ Gamma = 1:
 			Relative solve time: 1.59845039125
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.430555809
 			Relative average performance: 1.39214424916
@@ -1724,7 +1724,7 @@ Gamma = 1:
 			Relative solve time: 1.69513069813
 			Number of linear sections: 0
 			Upper lower relative error: 0
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.0
 			Average performance: 604.078939952
 			Relative average performance: 1.48993532267
@@ -1753,7 +1753,7 @@ Gamma = 1:
 			Relative solve time: 2.30107513097
 			Number of linear sections: 75
 			Upper lower relative error: 0.000982515852276
-		elliptical:
+		ellipsoidal:
 			Probability of failure: 0.005
 			Average performance: 564.514057838
 			Relative average performance: 1.39235020341

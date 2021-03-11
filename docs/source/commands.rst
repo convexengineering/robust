@@ -30,7 +30,7 @@ for Best Pairs, as follows:
     robust_model = RobustModel(m, uncertainty_set, gamma=Gamma, twoTerm=method['twoTerm'],
                                    boyd=method['boyd'], simpleModel=method['simpleModel'])
 
-For ``uncertainty_set``, ``'box'`` and ``'elliptical'`` are currently supported, and
+For ``uncertainty_set``, ``'box'`` and ``'ellipsoidal'`` are currently supported, and
 define the :math:`\infty`- and 2-norms respectively.
 
 Simulating robust designs
@@ -77,7 +77,7 @@ which I have filled with some defaults:
                    {'name': 'Linearized Perturbations', 'twoTerm': False, 'boyd': False, 'simpleModel': False},
                    {'name': 'Simple Conservative', 'twoTerm': False, 'boyd': False, 'simpleModel': True}
                    ]
-        uncertainty_sets = ['box', 'elliptical']
+        uncertainty_sets = ['box', 'ellipsoidal']
         nGammas = 11
         gammas = np.linspace(0, 1.0, nGammas)
 

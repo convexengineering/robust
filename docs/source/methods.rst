@@ -53,7 +53,7 @@ This formulation allows for uncertain exponents, by maximizing each pair of mono
 while finding the best combination of monomials that gives the least conservative solution.
 [Saab, 2018] provides a descent algorithm to find locally optimal combinations of the monomials,
 and shows how the uncertain GP can be approximated as a GP for polyhedral uncertainty,
-and a conic optimization problem for elliptical uncertainty with uncertain exponents.
+and a conic optimization problem for ellipsoidal uncertainty with uncertain exponents.
 
 To reiterate, please refer to [Saab, 2018] for further details
 on robust GP approximations.

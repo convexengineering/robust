@@ -78,30 +78,30 @@ def plot_feasibility_simple_Wing(type_of_uncertainty_set, x, y, str1, val1, str2
     del y.key.descr[str2]
 
 
-# plot_feasibility_simple_Wing('elliptical', W_0, W_W_coeff2, 'r', 1.6, 'r', 1.66, True)
-# plot_feasibility_simple_Wing('elliptical', W_0, W_W_coeff2, 'r', 1.6, 'r', 1.66, False)
+# plot_feasibility_simple_Wing('ellipsoidal', W_0, W_W_coeff2, 'r', 1.6, 'r', 1.66, True)
+# plot_feasibility_simple_Wing('ellipsoidal', W_0, W_W_coeff2, 'r', 1.6, 'r', 1.66, False)
 # plot_feasibility_simple_Wing('box', W_0, W_W_coeff2, 'pr', 60, 'pr', 66, True)
 # plot_feasibility_simple_Wing('box', W_0, W_W_coeff2, 'pr', 60, 'pr', 66, False)
 
-# plot_feasibility_simple_Wing('elliptical', W_W_coeff1, W_W_coeff2, 'r', 1.6, 'r', 1.66, True)
-# plot_feasibility_simple_Wing('elliptical', W_W_coeff1, W_W_coeff2, 'r', 1.6, 'r', 1.66, False)
+# plot_feasibility_simple_Wing('ellipsoidal', W_W_coeff1, W_W_coeff2, 'r', 1.6, 'r', 1.66, True)
+# plot_feasibility_simple_Wing('ellipsoidal', W_W_coeff1, W_W_coeff2, 'r', 1.6, 'r', 1.66, False)
 # plot_feasibility_simple_Wing('box', W_W_coeff1, W_W_coeff2, 'pr', 60, 'pr', 66, True)
 # plot_feasibility_simple_Wing('box', W_W_coeff1, W_W_coeff2, 'pr', 60, 'pr', 66, False)
 
-# plot_feasibility_simple_Wing('elliptical', C_Lmax, V_min, 'r', 1.25, 'r', 1.2, True)
-# plot_feasibility_simple_Wing('elliptical', C_Lmax, V_min, 'r', 1.25, 'r', 1.2, False)
+# plot_feasibility_simple_Wing('ellipsoidal', C_Lmax, V_min, 'r', 1.25, 'r', 1.2, True)
+# plot_feasibility_simple_Wing('ellipsoidal', C_Lmax, V_min, 'r', 1.25, 'r', 1.2, False)
 # plot_feasibility_simple_Wing('box', C_Lmax, V_min, 'pr', 25, 'pr', 20, True)
 # plot_feasibility_simple_Wing('box', C_Lmax, V_min, 'pr', 25, 'pr', 20, False)
 
-# plot_feasibility_simple_Wing('elliptical', dummy, e, 'r', 1.12, 'r', 1.31, True)
-# plot_feasibility_simple_Wing('elliptical', dummy, e, 'r', 1.12, 'r', 1.31, False)
+# plot_feasibility_simple_Wing('ellipsoidal', dummy, e, 'r', 1.12, 'r', 1.31, True)
+# plot_feasibility_simple_Wing('ellipsoidal', dummy, e, 'r', 1.12, 'r', 1.31, False)
 # plot_feasibility_simple_Wing('box', dummy, e, 'pr', 12, 'pr', 31, True)
 # plot_feasibility_simple_Wing('box', dummy, e, 'pr', 12, 'pr', 31, False)
 
-# plot_feasibility_simple_Wing('elliptical', rho, dummy, 'r', 1.1, 'r', 1.12, True)
-# plot_feasibility_simple_Wing('elliptical', rho, dummy, 'r', 1.1, 'r', 1.12, False)
+# plot_feasibility_simple_Wing('ellipsoidal', rho, dummy, 'r', 1.1, 'r', 1.12, True)
+# plot_feasibility_simple_Wing('ellipsoidal', rho, dummy, 'r', 1.1, 'r', 1.12, False)
 # plot_feasibility_simple_Wing('box', rho, dummy, 'pr', 10, 'pr', 12, True)
 # plot_feasibility_simple_Wing('box', rho, dummy, 'pr', 10, 'pr', 12, False)
 
-plot_feasibility_simple_Wing('elliptical', rho, W_0, 'r', 1.1, 'r', 1.6, True)
+plot_feasibility_simple_Wing('ellipsoidal', rho, W_0, 'r', 1.1, 'r', 1.6, True)
 plot_feasibility_simple_Wing('box', rho, W_0, 'r', 1.1, 'r', 1.6, False)

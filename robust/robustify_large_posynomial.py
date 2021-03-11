@@ -201,7 +201,7 @@ class RobustifyLargePosynomial(object):
                                     intercept, mean_vector, enable_sp, m):
         """
         :param gamma: controls the size of the uncertainty set
-        :param type_of_uncertainty_set: box, elliptical, or one norm
+        :param type_of_uncertainty_set: box, ellipsoidal, or one norm
         :param monomials: the list of monomials
         :param perturbation_matrix: the matrix of perturbations
         :param intercept: the list of intercepts
@@ -217,7 +217,7 @@ class RobustifyLargePosynomial(object):
             constraints += [sum([a * b for a, b in
                                  zip([a * b for a, b in
                                       zip(mean_vector, intercept)], monomials)]) + gamma * s_main <= 1]
-        elif type_of_uncertainty_set == 'elliptical':
+        elif type_of_uncertainty_set == 'ellipsoidal':
 
             constraints += [sum([a * b for a, b in
                                  zip([c * d for c, d in
@@ -228,7 +228,7 @@ class RobustifyLargePosynomial(object):
             positive_pert, negative_pert = [], []
             positive_monomials, negative_monomials = [], []
 
-            if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'elliptical':
+            if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'ellipsoidal':
 
                 s = Variable("s^%s_%s" % (i, m))
                 ss.append(s)
@@ -259,7 +259,7 @@ class RobustifyLargePosynomial(object):
                                                  zip(negative_pert, negative_monomials)]) -
                                             sum([a * b for a, b in
                                                  zip(positive_pert, positive_monomials)]) <= s]
-                    elif type_of_uncertainty_set == 'elliptical':
+                    elif type_of_uncertainty_set == 'ellipsoidal':
                         if negative_pert and not positive_pert:
                             constraints += [(sum([a * b for a, b in
                                                  zip(negative_pert, negative_monomials)]))**2 <= s]
@@ -281,12 +281,12 @@ class RobustifyLargePosynomial(object):
                     if negative_pert:
                         constraints += [sum([a * b for a, b in
                                              zip(negative_pert, negative_monomials)]) <= s]
-                elif type_of_uncertainty_set == 'elliptical':
+                elif type_of_uncertainty_set == 'ellipsoidal':
                     constraints += [sum([a * b for a, b in
                                          zip(positive_pert, positive_monomials)]) ** 2
                                     + sum([a * b for a, b in
                                            zip(negative_pert, negative_monomials)]) ** 2 <= s]
-        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'elliptical':
+        if type_of_uncertainty_set == 'box' or type_of_uncertainty_set == 'ellipsoidal':
             constraints.append(sum(ss) <= s_main)
         return constraints
 
@@ -294,7 +294,7 @@ class RobustifyLargePosynomial(object):
                                    setting):
         """
         generate a safe approximation for large posynomials with uncertain coefficients
-        :param type_of_uncertainty_set: 'box', elliptical, or 'one norm'
+        :param type_of_uncertainty_set: 'box', ellipsoidal, or 'one norm'
         :param m: Index
         :param setting: robustness setting
         :return: set of robust constraints
